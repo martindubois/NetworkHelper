@@ -1,0 +1,52 @@
+
+! Author    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_3_Router_0.txt
+
+enable
+  configure terminal
+    no ip access-list extended 101
+    no ip access-list extended 102
+    ip access-list extended 101
+      permit ip 192.168.20.0 0.0.0.255 host 192.168.10.2
+      permit tcp 192.168.40.0 0.0.0.255 host 192.168.10.2 eq 80
+    exit
+    ip access-list extended 102
+      permit icmp 192.168.40.0 0.0.0.255 any
+      permit ip host 192.168.10.2 any
+      permit tcp any any established
+    exit
+    interface f0/0
+      no shutdown
+    interface f0/0.1
+      no shutdown
+      encapsulation dot1q 10
+      ip access-group 101 out
+      ip address 192.168.10.1 255.255.255.0
+    interface f0/0.2
+      no shutdown
+      encapsulation dot1q 20
+      ip access-group 102 out
+      ip address 192.168.20.1 255.255.255.0
+    interface f0/1
+      no shutdown
+      ip address 192.168.90.1 255.255.255.0
+    interface e0/3/0
+      no shutdown
+      ip address 192.168.80.1 255.255.255.0
+    exit
+    ip dhcp pool Alice
+      no default-router
+      network 192.168.20.0 255.255.255.0
+      default-router 192.168.20.1
+    exit
+    ip route 192.168.30.0 255.255.255.0 192.168.90.2
+    ip route 192.168.40.0 255.255.255.0 192.168.90.2
+    ip route 192.168.50.0 255.255.255.0 192.168.90.2
+    ip route 192.168.60.0 255.255.255.0 192.168.90.2
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

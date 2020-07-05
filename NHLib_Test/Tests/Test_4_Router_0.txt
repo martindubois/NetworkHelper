@@ -1,0 +1,42 @@
+
+! Author    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_4_Router_0.txt
+
+enable
+  configure terminal
+    no access-list 1
+    access-list 1 permit 192.168.40.0 0.0.0.255
+    ip nat pool Alice 8.2.3.4 8.2.3.4 netmask 255.0.0.0
+    ip nat inside source list 1 pool Alice overload
+    interface f0/0
+      no ip address
+      no shutdown
+      ip address 8.2.3.4 255.0.0.0
+      ip nat outside
+    interface f0/1
+      no shutdown
+      ip address 192.168.40.1 255.255.255.0
+      ip nat inside
+    interface tunnel 0
+      no ip address
+      no shutdown
+      ip address 192.168.50.1 255.255.255.0
+      tunnel destination 8.1.2.3
+      tunnel source f0/0
+      tunnel mode gre ip
+    exit
+    ip dhcp pool Alice
+      no default-router
+      no dns-server
+      network 192.168.40.0 255.255.255.0
+      default-router 192.168.40.1
+      dns-server 192.168.10.10
+    exit
+    ip route 192.168.10.0 255.255.255.0 192.168.50.2
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

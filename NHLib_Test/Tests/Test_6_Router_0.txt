@@ -1,0 +1,45 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_6_Router_0.txt
+
+encapsulation dot1q
+encapsulation dot1q 10
+interface
+interface tunnel
+ip address
+ip address 192.168.0.1 255.255.255.0
+ip address dhcp invalid
+ip nat outside invalid
+ip route
+network
+
+interface test1
+	encapsulation dot1q invalid
+	encapsulation dot1q 4096
+	encapsulation dot1q 10
+	ip address dhcp
+	ip address 1.2.3.4 255.255.255.0
+	ip nat outside
+	ip nat inside
+
+interface test2
+	ip address 1.2.3.4 255.255.255.0
+	ip address dhcp
+	ip nat inside
+	ip nat outside
+
+interface test2.1
+
+interface test3.1
+
+interface test3
+	encapsulation dot1q 10
+	ip address 1.2.3.4 255.255.255.0
+	ip address dhcp
+
+interface test4
+	ip address dhcp
+
+interface test4.1

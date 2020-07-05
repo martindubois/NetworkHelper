@@ -1,0 +1,22 @@
+
+! Author    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_2_Router_1.txt
+
+enable
+  configure terminal
+    interface f0/0
+      no shutdown
+      ip address 192.168.20.1 255.255.255.0
+    interface f0/1
+      no shutdown
+      ip address 192.168.40.2 255.255.255.0
+    exit
+    ip route 192.168.10.0 255.255.255.0 192.168.40.1
+    ip route 192.168.30.0 255.255.255.0 192.168.40.1
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

@@ -1,0 +1,45 @@
+
+! Authot     KMS - Martin Dubois, P.Eng.
+! Copyright  (C) 2020 KMS. All rights reserved.
+! Product    NetworkHelper
+! File       NHLib_Test/Tests/Test_5_Router_0.txt
+
+enable
+  config terminal
+    hostname Routeur0
+    interface e0/3/0
+      no shutdown
+      ip address 8.1.2.3 255.0.0.0
+    interface f0/0
+      no shutdown
+      ip address 192.168.10.1 255.255.255.0
+    interface f0/1
+      no shutdown
+      ip address 192.168.20.1 255.255.255.0
+    interface f1/0
+      no shutdown
+      ip address 192.168.100.1 255.255.255.0
+    interface tunnel 0
+      no shutdown
+      ip address 192.168.200.1 255.255.255.0
+      tunnel destination 8.2.3.4
+      tunnel source e0/3/0
+      tunnel mode gre ip
+    exit
+    ip dhcp pool Utilisateurs
+      no default-router
+      no dns-server
+      default-router 192.168.10.1
+      dns-server 8.8.8.8
+      network 192.168.10.0 255.255.255.0
+    exit
+    ip route 192.168.30.0 255.255.255.0 192.168.100.2
+    ip route 192.168.40.0 255.255.255.0 192.168.100.2
+    ip route 192.168.50.0 255.255.255.0 192.168.100.2
+    ip route 192.168.60.0 255.255.255.0 192.168.100.2
+    ip route 192.168.70.0 255.255.255.0 192.168.100.2
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

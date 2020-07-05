@@ -1,0 +1,313 @@
+
+// Author    KMS - Martin Dubois, P.Eng.
+// Copyright (C) 2020 KMS. All rights reserved.
+// Product   NetworkHelper
+// File      NHLib/InterfaceList.cpp
+
+// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+
+// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+
+// ===== C ==================================================================
+#include <assert.h>
+
+// ===== Import/Includes ====================================================
+#include <HI/Line.h>
+#include <HI/Link.h>
+
+// ===== Includes ===========================================================
+#include <NH/Interface.h>
+#include <NH/SubNet.h>
+
+#include <NH/InterfaceList.h>
+
+// ===== NHLib ==============================================================
+#include "Color.h"
+#include "Utilities.h"
+
+namespace NH
+{
+
+    // Public
+    /////////////////////////////////////////////////////////////////////////
+
+    InterfaceList::InterfaceList()
+    {
+    }
+
+    InterfaceList::~InterfaceList()
+    {
+        for (InterfaceMap::iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+        {
+            assert(NULL != lIt->second);
+
+            delete lIt->second;
+        }
+    }
+
+    bool InterfaceList::CanReach(uint32_t aAddr) const
+    {
+        for (InterfaceMap::const_iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+        {
+            assert(NULL != lIt->second);
+
+            const SubNet * lSubNet = lIt->second->GetSubNet();
+            if ((NULL != lSubNet) && lSubNet->VerifyAddress(aAddr))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // NOT TESTED NH.InterfaceList.Find
+    //            Fail to find Interface by SubNet
+
+    // aSubNet [---;---]
+    const Interface * InterfaceList::Find(const SubNet * aSubNet) const
+    {
+        assert(NULL != aSubNet);
+
+        for (InterfaceMap::const_iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+        {
+            const Interface * lInterface = lIt->second;
+            assert(NULL != lInterface);
+
+            if (lInterface->GetSubNet() == aSubNet)
+            {
+                return lInterface;
+            }
+        }
+
+        return NULL;
+    }
+
+    const Interface * InterfaceList::Find(uint32_t aAddr) const
+    {
+        for (InterfaceMap::const_iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+        {
+            const Interface * lInterface = lIt->second;
+            assert(NULL != lInterface);
+
+            if (lInterface->GetAddress() == aAddr)
+            {
+                return lInterface;
+            }
+        }
+
+        return NULL;
+    }
+
+    // NOT TESTED NH.InterfaceList.FindOrCreate
+    //            Find an Interface by name
+
+    Interface * InterfaceList::FindOrCreate(const char * aName)
+    {
+        assert(NULL != aName);
+
+        Interface * lResult;
+
+        InterfaceMap::iterator lIt = mInterfaces.find(aName);
+        if (mInterfaces.end() == lIt)
+        {
+            lResult = new Interface(aName);
+            assert(NULL != lResult);
+
+            Add(lResult);
+        }
+        else
+        {
+            lResult = lIt->second;
+        }
+
+        return lResult;
+    }
+
+    // NOT TESTED NH.InterfaceList.GetIndex
+    //            Do not find
+
+    unsigned int InterfaceList::GetIndex(const char * aName) const
+    {
+        assert(NULL != aName);
+
+        unsigned int lResult = 0;
+
+        for (InterfaceMap::const_iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+        {
+            if (0 == strcmp(lIt->second->GetName(), aName))
+            {
+                return lResult;
+            }
+
+            lResult++;
+        }
+
+        return 0x7fffffff;
+    }
+
+    Interface * InterfaceList::GetInterface(const char * aName)
+    {
+        assert(NULL != aName);
+
+        InterfaceMap::iterator lIt = mInterfaces.find(aName);
+        if (mInterfaces.end() == lIt)
+        {
+            return false;
+        }
+
+        assert(NULL != lIt->second);
+
+        return lIt->second;
+    }
+
+    // NOT TESTED NH.InterfaceList.Verify.Error
+
+    void InterfaceList::Verify() const
+    {
+        unsigned int lErrorCount = 0;
+
+        for (InterfaceMap::const_iterator lIt0 = mInterfaces.begin(); lIt0 != mInterfaces.end(); lIt0++)
+        {
+            try
+            {
+                const Interface * lI0 = lIt0->second;
+                assert(NULL != lI0);
+
+                lI0->Verify();
+
+                InterfaceMap::const_iterator lIt1 = lIt0;
+
+                lIt1++;
+
+                for (; lIt1 != mInterfaces.end(); lIt1++)
+                {
+                    const Interface * lI1 = lIt1->second;
+                    assert(NULL != lI1);
+
+                    if (lI0->GetSubNet() == lI1->GetSubNet())
+                    {
+                        char lMessage[128];
+
+                        int lRet = sprintf_s(lMessage, "Interface %s and %s are connected to the same subnet", lI0->GetName(), lI1->GetName());
+                        assert(               0 < lRet);
+                        assert(sizeof(lMessage) > lRet);
+
+                        Utl_ThrowError("ERROR", __LINE__, lMessage);
+                    }
+                }
+            }
+            catch (std::exception eE)
+            {
+                lErrorCount++;
+
+                COLOR(RED);
+                    fprintf(stderr, "EXCEPTION  %3d  %s\n", __LINE__, eE.what());
+                COLOR(WHITE);
+            }
+        }
+
+        if (0 < lErrorCount)
+        {
+            Utl_ThrowError("ERROR", __LINE__, "At least one interface is not correctly configured");
+        }
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    void InterfaceList::Prepare(HI::Diagram * aDiagram, HI::CSS_Color aColor, const HI::Shape * aParent, const ShapeMap & aSubNetMap)
+    {
+        assert(NULL !=  aParent);
+
+        if (0 < mInterfaces.size())
+        {
+            unsigned int lIndex  = 0;
+            HI::Shape ** lShapes = new HI::Shape *[mInterfaces.size()];
+            assert(NULL != lShapes);
+
+            for (InterfaceMap::iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+            {
+                assert(NULL != lIt->second);
+
+                lShapes[lIndex] = lIt->second->PrepareShape(aDiagram, aColor, aSubNetMap);
+                assert(NULL != lShapes[lIndex]);
+
+                lIndex++;
+            }
+
+            assert(mInterfaces.size() == lIndex);
+
+            lIndex = 0;
+
+            for (InterfaceMap::iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+            {
+                char              lBaseName[64];
+                Interface       * lInterface = lIt->second;
+                const HI::Shape * lParent    = aParent;
+
+                if (lInterface->GetBaseName(lBaseName, sizeof(lBaseName)))
+                {
+                    unsigned int lParentIndex = GetIndex(lBaseName);
+
+                    if (mInterfaces.size() > lParentIndex)
+                    {
+                        lParent = lShapes[lParentIndex];
+                    }
+                }
+
+                lInterface->PrepareLink(aDiagram, lShapes[lIndex], lParent);
+
+                lIndex++;
+            }
+
+            delete[] lShapes;
+        }
+    }
+
+    // Private
+    /////////////////////////////////////////////////////////////////////////
+
+    void InterfaceList::Add(Interface * aInterface)
+    {
+        assert(NULL != aInterface);
+
+        char         lBaseName[64];
+        const char * lNewName = aInterface->GetName();
+
+        assert(NULL != lNewName);
+
+        try
+        {
+            if (aInterface->GetBaseName(lBaseName, sizeof(lBaseName)))
+            {
+                Interface * lBase = GetInterface(lBaseName);
+                if (NULL != lBase)
+                {
+                    lBase->SetHasSubInterface();
+                }
+            }
+            else
+            {
+                for (InterfaceMap::iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+                {
+                    assert(NULL != lIt->second);
+
+                    if (lIt->second->GetBaseName(lBaseName, sizeof(lBaseName)) && (0 == strcmp(lBaseName, lNewName)))
+                    {
+                        aInterface->SetHasSubInterface();
+                        break;
+                    }
+                }
+            }
+
+            mInterfaces.insert(InterfaceMap::value_type(lNewName, aInterface));
+        }
+        catch (...)
+        {
+            delete aInterface;
+            throw;
+        }
+    }
+
+}

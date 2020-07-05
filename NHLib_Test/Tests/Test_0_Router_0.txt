@@ -1,0 +1,37 @@
+
+! Authot     KMS - Martin Dubois, P.Eng.
+! Copyright  (C) 2020 KMS. All rights reserved.
+! Product    NetworkHelper
+! File       NHLib_Test/Tests/Test_0_Router_0.txt
+
+enable
+  configure terminal
+    interface f0/0
+      no shutdown
+    interface f0/0.1
+      encapsulation dot1q 10
+      ip address 192.168.10.1 255.255.255.0
+      no shutdown
+    interface f0/0.2
+      encapsulation dot1q 20
+      ip address 192.168.20.1 255.255.255.0
+      no shutdown
+    exit
+    no ip dhcp pool DHCP10
+    no ip dhcp pool DHCP20
+    ip dhcp pool DHCP10
+      no default-router
+      default-router 192.168.10.1
+      network 192.168.10.0 255.255.255.0
+    ip dhcp pool DHCP20
+      no default-router
+      default-router 192.168.20.1
+      network 192.168.20.0 255.255.255.0
+    exit
+    ip dhcp excluded-address 192.168.10.1
+    ip dhcp excluded-address 192.168.20.1
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

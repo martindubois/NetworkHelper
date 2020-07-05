@@ -1,0 +1,57 @@
+
+! Author    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_3_Router_2.txt
+
+enable
+  configure terminal
+    no ip access-list extended 104
+    no ip access-list extended 105
+    ip access-list extended 104
+      permit ip 192.168.60.0 0.0.0.255 host 192.168.50.2
+      permit tcp 192.168.20.0 0.0.0.255 host 192.168.50.2 eq 80
+    exit
+    ip access-list extended 105
+      permit ip host 192.168.50.2 any
+      permit tcp any any established
+    exit
+    interface f0/0
+      no shutdown
+    interface f0/0.1
+      no shutdown
+      encapsulation dot1q 50
+      ip access-group 104 out
+      ip address 192.168.50.1 255.255.255.0
+    interface f0/0.2
+      no shutdown
+      encapsulation dot1q 60
+      ip access-group 105 out
+      ip address 192.168.60.1 255.255.255.0
+    interface f0/1
+      no shutdown
+      ip address 172.188.9.1 255.0.0.0
+    interface e0/3/0
+      no shutdown
+      ip address 192.168.80.2 255.255.255.0
+    interface tunnel 0
+      no shutdown
+      ip address 192.168.70.2 255.255.255.0
+      tunnel destination 172.148.9.1
+      tunnel source f0/1
+      tunnel mode gre ip
+    exit
+    ip dhcp pool Charles
+      no default-router
+      network 192.168.60.0 255.255.255.0
+      default-router 192.168.60.1
+    exit
+    ip route 192.168.10.0 255.255.255.0 192.168.80.1
+    ip route 192.168.20.0 255.255.255.0 192.168.80.1
+    ip route 192.168.30.0 255.255.255.0 192.168.70.1
+    ip route 192.168.40.0 255.255.255.0 192.168.70.1
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

@@ -1,0 +1,21 @@
+
+# Author    KMS - Martin Dubois, P.Eng.
+# Copyright (C) 2020 KMS. All rights reserved.
+# Product   NetworkHelper
+# File      .gitignore
+
+/.vs/
+/doxygen_en/
+/Import/
+/Installer/
+/KmsDoc/
+
+/*.html
+
+/debug.log
+
+*.bak
+*.user
+
+Debug/
+Release/

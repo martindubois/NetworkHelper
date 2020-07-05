@@ -1,0 +1,69 @@
+
+# Author     KMS - Martin Dubois, P.Eng.
+# Copyrights (C) 2020 KMS. All rights reserved.
+# Product    NetworkHelper
+# File       NetworkHelper/Tests/Base.txt
+
+BrowserArgument Browser.Prefered=None
+
+# ===== Testing error conditions ============================================
+
+AddDevice
+AddRouter Cisco
+AddRouter Network
+Cisco ManyRouters
+Cisco ManyRouters DoesNotExist
+Cisco OneRouter
+Generate
+Reset
+Router AddInterface
+Router AddInterface NoRouter
+Router RetrieveInfo ConfigFile
+Router RetrieveInfo ConfigFile DoesNotExist.txt
+Router Verify
+SubNet
+SubNet 0.0.0.0 255.255.255.255
+
+# ===== Testing some feature not tested with the home network ===============
+
+AddRouter Cisco Test
+
+ChangeDir NHLib_Test\Tests
+
+Cisco ManyRouters Test_3_Router_?.txt
+
+ChangeDir ..\..
+
+Cisco OneRouter NHLib_Test\Tests\Test_3_Router_0.txt
+
+Reset
+
+# ===== Creating a diagram for my home network ==============================
+
+AddRouter Network Bell
+Router AddInterface WAN DHCP
+SubNet 192.168.2.0 255.255.255.0
+Router AddInterface 1 192.168.2.1 DHCP-Server
+Router Verify
+
+AddDevice Decoder DHCP
+AddDevice FireStick DHCP
+AddDevice S DHCP Wifi
+AddDevice TV DHCP
+
+AddRouter Network ASUS
+Router AddInterface WAN DHCP
+SubNet 192.168.0.0 255.255.255.0
+Router AddInterface 1 192.168.0.1 DHCP-Server
+
+AddDevice GitLab 192.168.0.15 Virtual
+AddDevice MFC-9130CW DHCP Wifi
+AddDevice Mo DHCP
+AddDevice PDC 192.168.0.21 Virtual
+AddDevice VMWare 192.168.0.9
+
+Verify
+
+Generate MyNetwork MyNetwork
+
+Exit

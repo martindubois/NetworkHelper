@@ -1,0 +1,77 @@
+
+! Author    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_4_Router_3.txt
+
+enable
+  configure terminal
+    no access-list 1
+    no ip access-list extended 101
+    access-list 1 permit 192.168.20.0 0.0.0.255
+    ip access-list extended 101
+      permit ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+      permit udp any host 192.168.10.10 eq 53
+      permit tcp any host 192.168.10.10 eq 80
+    exit
+    ip nat pool Charles 8.1.2.3 8.1.2.3 netmask 255.0.0.0
+    ip nat inside source list 1 pool Charles overload
+    interface f0/0
+      no shutdown
+    interface f0/0.1
+      no shutdown
+      encapsulation dot1q 10
+      ip access-group 101 out
+      ip address 192.168.10.1 255.255.255.0
+    interface f0/0.2
+      no shutdown
+      encapsulation dot1q 20
+      ip address 192.168.20.1 255.255.255.0
+      ip nat inside
+    interface f0/1
+      no ip address
+      no shutdown
+      ip address 8.1.2.3 255.0.0.0
+      ip nat outside
+    interface e0/0/0
+      no ip address
+      no shutdown
+      ip address 192.168.30.1 255.255.255.0
+    interface tunnel 0
+      no ip address
+      no shutdown
+      ip address 192.168.50.2 255.255.255.0
+      tunnel destination 8.2.3.4
+      tunnel source f0/1
+      tunnel mode gre ip
+    interface tunnel 1
+      no ip address
+      no shutdown
+      ip address 192.168.70.2 255.255.255.0
+      tunnel destination 8.3.4.5
+      tunnel source f0/1
+      tunnel mode gre ip
+    interface tunnel 2
+      no ip address
+      no shutdown
+      ip address 192.168.90.2 255.255.255.0
+      tunnel destination 8.4.5.6
+      tunnel source f0/1
+      tunnel mode gre ip
+    exit
+    ip dhcp pool Charles
+      no default-router
+      no dns-server
+      network 192.168.20.0 255.255.255.0
+      default-router 192.168.20.1
+      dns-server 192.168.10.10
+      dns-server 8.8.8.8
+    exit
+    ip route 192.168.40.0 255.255.255.0 192.168.50.1
+    ip route 192.168.60.0 255.255.255.0 192.168.70.1
+    ip route 192.168.80.0 255.255.255.0 192.168.90.1
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

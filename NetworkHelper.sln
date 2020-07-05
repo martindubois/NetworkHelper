@@ -1,0 +1,114 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6201CB6E-ABC4-432E-ABAA-6DD0C2603970}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Build.cmd = Build.cmd
+		DoxyFile_en.txt = DoxyFile_en.txt
+		Export.cmd = Export.cmd
+		Export.cmd.txt = Export.cmd.txt
+		Import.cmd = Import.cmd
+		License.txt = License.txt
+		NetworkHelper.iss = NetworkHelper.iss
+		README.md = README.md
+		RunDoxygen.cmd = RunDoxygen.cmd
+		Test.cmd = Test.cmd
+		ViewTestResult.cmd = ViewTestResult.cmd
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocDev", "_DocDev", "{19A263FB-0616-4638-A3D3-C9923A72387A}"
+	ProjectSection(SolutionItems) = preProject
+		_DocDev\Build.txt = _DocDev\Build.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_DocUser", "_DocUser", "{A36E88C0-D45B-4515-8B64-867E3123B173}"
+	ProjectSection(SolutionItems) = preProject
+		_DocUser\NetworkHelper.ReadMe.txt = _DocUser\NetworkHelper.ReadMe.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{54C3C9EA-A8F6-488E-B0C6-8CE71E91C553}"
+	ProjectSection(SolutionItems) = preProject
+		Common\Version.h = Common\Version.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Includes", "Includes", "{E85B83E2-8AF9-412F-B63D-7FDB9DCF783D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cisco", "Cisco", "{6FAD86A6-2083-4DD0-AE6C-8C0B68564258}"
+	ProjectSection(SolutionItems) = preProject
+		Includes\Cisco\Router.h = Includes\Cisco\Router.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NH", "NH", "{A1547218-640B-4D6E-82EA-899E721F0CC8}"
+	ProjectSection(SolutionItems) = preProject
+		Includes\NH\Access.h = Includes\NH\Access.h
+		Includes\NH\AccessList.h = Includes\NH\AccessList.h
+		Includes\NH\AccessListMap.h = Includes\NH\AccessListMap.h
+		Includes\NH\Device.h = Includes\NH\Device.h
+		Includes\NH\Interface.h = Includes\NH\Interface.h
+		Includes\NH\InterfaceList.h = Includes\NH\InterfaceList.h
+		Includes\NH\Network.h = Includes\NH\Network.h
+		Includes\NH\Route.h = Includes\NH\Route.h
+		Includes\NH\Router.h = Includes\NH\Router.h
+		Includes\NH\SubNet.h = Includes\NH\SubNet.h
+		Includes\NH\SubNetList.h = Includes\NH\SubNetList.h
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkHelper", "NetworkHelper\NetworkHelper.vcxproj", "{833BCEE7-7093-4B31-9A16-0AC2D381B017}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B853A922-8882-4727-B42D-68C6F24698F1} = {B853A922-8882-4727-B42D-68C6F24698F1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NHLib", "NHLib\NHLib.vcxproj", "{B853A922-8882-4727-B42D-68C6F24698F1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NHLib_Test", "NHLib_Test\NHLib_Test.vcxproj", "{40B6A4AA-1802-41D7-989C-ED87789DF941}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B853A922-8882-4727-B42D-68C6F24698F1} = {B853A922-8882-4727-B42D-68C6F24698F1}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Debug|x64.ActiveCfg = Debug|x64
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Debug|x64.Build.0 = Debug|x64
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Debug|x86.ActiveCfg = Debug|Win32
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Debug|x86.Build.0 = Debug|Win32
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Release|x64.ActiveCfg = Release|x64
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Release|x64.Build.0 = Release|x64
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Release|x86.ActiveCfg = Release|Win32
+		{833BCEE7-7093-4B31-9A16-0AC2D381B017}.Release|x86.Build.0 = Release|Win32
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Debug|x64.ActiveCfg = Debug|x64
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Debug|x64.Build.0 = Debug|x64
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Debug|x86.ActiveCfg = Debug|Win32
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Debug|x86.Build.0 = Debug|Win32
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Release|x64.ActiveCfg = Release|x64
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Release|x64.Build.0 = Release|x64
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Release|x86.ActiveCfg = Release|Win32
+		{B853A922-8882-4727-B42D-68C6F24698F1}.Release|x86.Build.0 = Release|Win32
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Debug|x64.ActiveCfg = Debug|x64
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Debug|x64.Build.0 = Debug|x64
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Debug|x86.ActiveCfg = Debug|Win32
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Debug|x86.Build.0 = Debug|Win32
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Release|x64.ActiveCfg = Release|x64
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Release|x64.Build.0 = Release|x64
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Release|x86.ActiveCfg = Release|Win32
+		{40B6A4AA-1802-41D7-989C-ED87789DF941}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6FAD86A6-2083-4DD0-AE6C-8C0B68564258} = {E85B83E2-8AF9-412F-B63D-7FDB9DCF783D}
+		{A1547218-640B-4D6E-82EA-899E721F0CC8} = {E85B83E2-8AF9-412F-B63D-7FDB9DCF783D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EEF9D5E8-59A5-400A-A031-8EF39C463FC5}
+	EndGlobalSection
+EndGlobal

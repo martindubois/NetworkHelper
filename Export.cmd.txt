@@ -1,0 +1,9 @@
+
+# Author    KMS - Martin Dubois, P.Eng.
+# Copyright (C) 2020 KMS. All rights reserved.
+# Product   NetworkHelper
+# File      Export.cmd.txt
+
+Installer .
+# KmsVersion "NetworkHelper_" ".exe" 3
+	NetworkHelper_1.0.1.exe

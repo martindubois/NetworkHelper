@@ -1,0 +1,47 @@
+
+! Author    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_4_Router_2.txt
+
+enable
+  configure terminal
+    no access-list 1
+    access-list 1 permit 192.168.80.0 0.0.0.255
+    ip nat pool Bob 8.4.5.6 8.4.5.6 netmask 255.0.0.0
+    ip nat inside source list 1 pool Bob overload
+    interface f0/0
+      no ip address
+      no shutdown
+      ip address 192.168.80.1 255.255.255.0
+      ip nat inside
+    interface f0/1
+      no ip address
+      no shutdown
+      ip address 8.4.5.6 255.0.0.0
+      ip nat outside
+    interface e0/0/0
+      no ip address
+      no shutdown
+      ip address 192.168.30.2 255.255.255.0
+    interface tunnel 0
+      no ip address
+      no shutdown
+      ip address 192.168.90.1 255.255.255.0
+      tunnel destination 8.1.2.3
+      tunnel source f0/1
+      tunnel mode gre ip
+    exit
+    ip dhcp pool Bob
+      no default-router
+      no dns-server
+      network 192.168.80.0 255.255.255.0
+      default-router 192.168.80.1
+      dns-server 192.168.10.10
+    exit
+    ip route 192.168.10.0 255.255.255.0 192.168.90.2
+    ip routing
+  exit
+  copy running-config startup-config
+
+exit

@@ -1,0 +1,30 @@
+
+Author    KMS - Martin Dubois, P.Eng.
+Copyright (C) 2020 KMS. All rights reserved.
+Product   NetworkHelper
+File      _DocDev/Procedures/Build.txt
+
+Name                _________________________________________________________
+
+Date and time       20 ______ - ______ - ______               ______ : ______
+
+[ ] File "Common/Version.h" - Edit the version number
+
+Version             ______ . ______ . ______ . ______ - _____________________
+
+[ ] File "_DocUser/NetworkHelper.ReadMe.txt"
+[ ] File "NetworkHelper/_DocUser/NetworkHelper.NetworkHelper.ReadMe.txt"
+
+[ ]	Tool "Windows PowerShell" - In The product folder
+		.\RunDoxygen.cmd
+		.\Build.cmd
+
+[ ] Tool "GIT"
+	- Index the modified file and commit them using
+	  "{Major}.{Minor}.{Build}[_{Type}]_Windows}" as message.
+	- Add the tag "{Major}.{Minor}.{Build}[_{Type}]_Windows}"
+	- Push the repository to the servers
+
+Time and duration   ______ : ______              ______ hours, ______ minutes
+
+Signature           _________________________________________________________
