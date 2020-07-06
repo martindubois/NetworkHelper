@@ -22,6 +22,7 @@ class ShapeMap;
 namespace NH
 {
 
+    class AccessList;
     class SubNet;
 
     /// \brief NH::Interface
@@ -29,6 +30,15 @@ namespace NH
     {
 
     public:
+
+        typedef enum
+        {
+            DIRECTION_IN ,
+            DIRECTION_OUT,
+
+            DIRECTION_QTY
+        }
+        Direction;
 
         /// \param aName The interface's name
         Interface(const char * aName);
@@ -51,6 +61,10 @@ namespace NH
 
         /// \return This methode returns the pointer to an internal stored into the SubNetList instance associated to the Network.
         const SubNet * GetSubNet() const;
+
+        /// \aDirection  See Direction
+        /// \aAccessList
+        void SetAccessList(Direction aDirection, const AccessList * aAccessList);
 
         /// \param aAddr The address
         void SetAddress(uint32_t aAddr);
@@ -121,6 +135,8 @@ namespace NH
         std::string    mName  ;
         const SubNet * mSubNet;
         uint16_t       mVLAN  ;
+
+        const NH::AccessList * mAccessLists[DIRECTION_QTY];
 
     };
 

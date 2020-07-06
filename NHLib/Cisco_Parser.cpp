@@ -35,6 +35,14 @@ static const Parser::Node ENUM_ACCESS_PROTOCOL[] =
     { Parser::CODE_ERROR, NULL, NULL }
 };
 
+static const Parser::Node ENUM_ACCESS_END_FILTER[] =
+{
+    { NH::AccessEnd::FILTER_ANY , "any" , NULL },
+    { NH::AccessEnd::FILTER_HOST, "host", NULL },
+
+    { Parser::CODE_NO_MATCH, NULL, NULL }
+};
+
 static const Parser::Node ENUM_ACCESS_END_OPERATOR[] =
 {
     { NH::AccessEnd::OPERATOR_EQ   , "eq"   , NULL },
@@ -44,6 +52,14 @@ static const Parser::Node ENUM_ACCESS_END_OPERATOR[] =
     { NH::AccessEnd::OPERATOR_RANGE, "range", NULL },
 
     { NH::AccessEnd::OPERATOR_ANY, NULL, NULL },
+};
+
+static const Parser::Node ENUM_INTERFACE_DIRECTION[] =
+{
+    { NH::Interface::DIRECTION_IN , "in" , NULL },
+    { NH::Interface::DIRECTION_OUT, "out", NULL },
+
+    { Parser::CODE_ERROR, NULL, NULL }
 };
 
 // Commands
@@ -66,6 +82,14 @@ static const Parser::Node ENUM_ACCESS_END_OPERATOR[] =
 #define CMD_PERMIT                  (15)
 #define CMD_TUNNEL_DESTINATION      (16)
 #define CMD_TUNNEL_SOURCE           (17)
+
+static const Parser::Node CMDS_ACCESS[] =
+{
+    { CMD_DENY  , "deny"  , NULL },
+    { CMD_PERMIT, "permit", NULL },
+
+    { Parser::CODE_ERROR, NULL, NULL }
+};
 
 static const Parser::Node CMDS_ENCAPSULATION[] =
 {
@@ -193,6 +217,7 @@ namespace Cisco
         case CMD_ENCAPSULATION_DOT1Q    : return Cmd_Encapsulation_Dot1Q   (aElements, aCount);
         case CMD_INTERFACE              : return Cmd_Interface             (aElements, aCount);
         case CMD_INTERFACE_TUNNEL       : return Cmd_Interface_Tunnel      (aElements, aCount);
+        case CMD_IP_ACCESS_GROUP        : return Cmd_Ip_AccessGroup        (aElements, aCount);
         case CMD_IP_ACCESS_LIST_EXTENDED: return Cmd_Ip_AccessList_Extended(aElements, aCount);
         case CMD_IP_ADDRESS             : return Cmd_Ip_Address            (aElements, aCount);
         case CMD_IP_ADDRESS_DHCP        : return Cmd_Ip_Address_Dhcp       (aElements, aCount);
@@ -203,7 +228,6 @@ namespace Cisco
         case CMD_PERMIT                 : return Cmd_Permit                (aElements, aCount);
 
         case CMD_ACCESS_LIST       :
-        case CMD_IP_ACCESS_GROUP   :
         case CMD_IP_NAT_POOL       :
         case CMD_TUNNEL_DESTINATION:
         case CMD_TUNNEL_SOURCE     :
@@ -219,7 +243,7 @@ namespace Cisco
     /////////////////////////////////////////////////////////////////////////
 
     // NOT TESTED Cisco.Router.Error
-    //            Error in access list entry
+    //            Invalid final element for deny or permit command
 
     bool Parser::Access(const char ** aElements, unsigned int aCount, NH::Access::Type aType, const char * aCommand)
     {
@@ -285,31 +309,38 @@ namespace Cisco
         ValidateCount(aCommand, aCount, lIndex + 1);
         assert(NULL != aElements[lIndex]);
 
-        if (0 == _stricmp("any", aElements[lIndex]))
+        switch (Walk(aElements + lIndex, 1, ENUM_ACCESS_END_FILTER))
         {
+        case NH::AccessEnd::FILTER_ANY:
             aEnd->SetAny();
-        }
-        else if (0 == _stricmp("host", aElements[lIndex]))
-        {
+            break;
+
+        case NH::AccessEnd::FILTER_HOST:
             lIndex++;
 
             ValidateCount(aCommand, aCount, lIndex + 1);
             assert(NULL != aElements[lIndex]);
 
             aEnd->SetHost(aElements[lIndex]);
-        }
-        else
-        {
+            break;
+
+        case Parser::CODE_NO_MATCH:
             ValidateCount(aCommand, aCount, lIndex + 2);
             assert(NULL != aElements[lIndex    ]);
             assert(NULL != aElements[lIndex + 1]);
 
-            uint32_t lAddr = IPv4_TextToAddress       (aElements[lIndex    ]);
-            uint32_t lMask = IPv4_TextToAddress_Invert(aElements[lIndex + 1]);
+            uint32_t lAddr;
+            uint32_t lMask;
+
+            lAddr = IPv4_TextToAddress       (aElements[lIndex    ]);
+            lMask = IPv4_TextToAddress_Invert(aElements[lIndex + 1]);
 
             aEnd->SetSubNet(GetRouter()->GetSubNetList()->FindOrCreate(lAddr, lMask));
 
             lIndex += 1;
+            break;
+
+        default: assert(false);
         }
 
         lIndex++;
@@ -388,6 +419,30 @@ namespace Cisco
         return true;
     }
 
+    bool Parser::Cmd_Ip_AccessGroup(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "ip access-group";
+
+        assert(NULL != aElements);
+        assert(   2 <= aCount   );
+
+        ValidateCount(COMMAND, aCount, 4, 4);
+        assert(NULL != aElements[2]);
+        assert(NULL != aElements[3]);
+
+        Section_Interface(COMMAND);
+        assert(NULL != mInterface);
+
+        NH::Interface::Direction lDirection = static_cast<NH::Interface::Direction>(Walk(aElements + 3, 1, ENUM_INTERFACE_DIRECTION));
+
+        NH::AccessList * lAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[2]);
+        assert(NULL != lAccessList);
+
+        mInterface->SetAccessList(lDirection, lAccessList);
+
+        return true;
+    }
+
     // NOT TESTED Cisco.Router
     //            deny or permit at the end of an access-list command
 
@@ -399,16 +454,17 @@ namespace Cisco
         ValidateCount("ip access-list extended", aCount, 4);
         assert(NULL != aElements[3]);
 
-        mAccessList = GetRouter()->mAccessLists.Add(aElements[3]);
+        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3]);
         assert(NULL != mAccessList);
 
         if (5 <= aCount)
         {
-            if      (0 == _stricmp("permit", aElements[4])) { Cmd_Permit(aElements + 4, aCount - 4); }
-            else if (0 == _stricmp("deny"  , aElements[4])) { Cmd_Deny  (aElements + 4, aCount - 4); }
-            else
+            switch (Walk(aElements + 4, 1, CMDS_ACCESS))
             {
-                return false;
+            case CMD_DENY  : return Cmd_Deny  (aElements + 4, aCount - 4);
+            case CMD_PERMIT: return Cmd_Permit(aElements + 4, aCount - 4);
+
+            default: assert(false);
             }
         }
 

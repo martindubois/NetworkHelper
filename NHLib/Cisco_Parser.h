@@ -4,6 +4,8 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.h
 
+// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
+
 #pragma once
 
 // ===== Includes ===========================================================
@@ -40,6 +42,7 @@ namespace Cisco
         bool Cmd_Interface             (const char ** aElements, unsigned int aCount);
         bool Cmd_Interface_Tunnel      (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip                    (const char ** aElements, unsigned int aCount);
+        bool Cmd_Ip_AccessGroup        (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_AccessList_Extended(const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Address            (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Address_Dhcp       (const char ** aElements, unsigned int aCount);

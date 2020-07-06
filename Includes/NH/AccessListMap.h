@@ -28,7 +28,8 @@ namespace NH
         ~AccessListMap();
 
         /// \param aName
-        AccessList * Add(const char * aName);
+        /// \return This method return a pointer to a AccessList instance.
+        AccessList * FindOrCreate(const char * aName);
 
         void Verify() const;
 

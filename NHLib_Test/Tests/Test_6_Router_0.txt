@@ -63,3 +63,11 @@ exit
 !           An access-list entry use the established keywork but does not describe TCP stream.
 
 ip access-list extended 103 permit UDP host 192.168.0.10 eq 80 192.168.10.0 0.0.0.255 established
+
+! TEST INFO Interface.Error
+!           More than one access-list for the same direction
+
+interface f0/0
+	ip access-group 101 in
+	ip access-group 102 in
+exit

@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -84,6 +84,19 @@ namespace NH
 
     const char   * Interface::GetName  () const { return mName.c_str(); }
     const SubNet * Interface::GetSubNet() const { return mSubNet; }
+
+    void Interface::SetAccessList(Direction aDirection, const AccessList * aAccessList)
+    {
+        assert(DIRECTION_QTY >  aDirection );
+        assert(NULL          != aAccessList);
+
+        if (NULL != mAccessLists[aDirection])
+        {
+            Utl_ThrowError("ERROR", __LINE__, "An access-list is already set for this direction");
+        }
+
+        mAccessLists[aDirection] = aAccessList;
+    }
 
     // NOT TESTED NH.Interface.SetAddress
     //            Set address after the subnet
@@ -307,18 +320,12 @@ namespace NH
 
     void Interface::Init()
     {
-        mAddr = 0;
-
-        mFlags.mDHCP            = false;
-        mFlags.mHasSubInterface = false;
-        mFlags.mNAT_Inside      = false;
-        mFlags.mNAT_Outside     = false;
-        mFlags.mSub             = false;
-        mFlags.mVirtual         = false;
-        mFlags.mWifi            = false;
-
+        mAddr   =    0;
         mSubNet = NULL;
         mVLAN   =    0;
+
+        memset(&mFlags      , 0, sizeof(mFlags      ));
+        memset(&mAccessLists, 0, sizeof(mAccessLists));
     }
 
     void Interface::Prepare_Link_SubNet(HI::Shape * aShape, HI::Diagram * aDiagram, const ShapeMap & aSubNetMap)

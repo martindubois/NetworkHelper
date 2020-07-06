@@ -4,6 +4,10 @@
 // Product    NetworkHelper
 // File       NHLib/AccessListMap.cpp
 
+// CODE REVIEW 2020-07-05 KMS - Martin Dubois, P.Eng.
+
+// TEST COVERAGE 2020-07-05 KMS - Martin Dubois, P.Eng.
+
 // ===== C ==================================================================
 #include <assert.h>
 
@@ -32,14 +36,25 @@ namespace NH
         }
     }
 
-    AccessList * AccessListMap::Add(const char * aName)
+    AccessList * AccessListMap::FindOrCreate(const char * aName)
     {
         assert(NULL != aName);
 
-        AccessList * lResult = new AccessList(aName);
-        assert(NULL != lResult);
+        AccessList * lResult;
 
-        mAccessLists.insert(InternalMap::value_type(aName, lResult));
+        InternalMap::iterator lIt = mAccessLists.find(aName);
+        if (mAccessLists.end() == lIt)
+        {
+            lResult = new AccessList(aName);
+
+            mAccessLists.insert(InternalMap::value_type(aName, lResult));
+        }
+        else
+        {
+            lResult = lIt->second;
+        }
+
+        assert(NULL != lResult);
 
         return lResult;
     }
