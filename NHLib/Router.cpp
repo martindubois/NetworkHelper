@@ -136,7 +136,8 @@ namespace NH
 
     void Router::Verify() const
     {
-        mInterfaces.Verify();
+        mAccessLists.Verify();
+        mInterfaces .Verify();
 
         for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
         {

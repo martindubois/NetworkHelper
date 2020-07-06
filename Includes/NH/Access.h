@@ -15,6 +15,9 @@
 // ===== C ==================================================================
 #include <stdint.h>
 
+// ===== Includes ===========================================================
+#include <NH/AccessEnd.h>
+
 namespace NH
 {
 
@@ -25,69 +28,6 @@ namespace NH
     {
 
     public:
-
-        /// \brief NH::Access::End
-        class End
-        {
-
-        public:
-
-            /// \brief NH::Access::End::Operator
-            typedef enum
-            {
-                OPERATOR_ANY  ,
-                OPERATOR_EQ   ,
-                OPERATOR_GT   ,
-                OPERATOR_LT   ,
-                OPERATOR_NEQ  ,
-                OPERATOR_RANGE,
-
-                OPERATOR_QTY,
-
-                OPERATOR_INVALID
-            }
-            Operator;
-
-            End();
-
-            void SetAny();
-
-            /// \param aHost
-            void SetHost(uint32_t aHost);
-
-            /// \param aHost
-            void SetHost(const char * aHost);
-
-            /// \param aOp    See Operator
-            /// \param aPortA
-            /// \param aPortB
-            void SetPort(Operator aOp, uint16_t aPortA = 0, uint16_t aPortB = 0);
-
-            /// \param aOp    See Operator
-            /// \param aPortA
-            /// \param aPortB
-            void SetPort(Operator aOp, const char * aPortA = NULL, const char * aPortB = NULL);
-
-            /// \param aSubNet
-            void SetSubNet(const SubNet * aSubNet);
-
-        private:
-
-            struct
-            {
-                unsigned mAny : 1;
-
-                unsigned mReserved0 : 31;
-            }
-            mFlags;
-
-            uint32_t       mHost   ;
-            uint16_t       mPort_A ;
-            uint16_t       mPort_B ;
-            Operator       mPort_Op;
-            const SubNet * mSubNet ;
-
-        };
 
         typedef enum
         {
@@ -113,17 +53,23 @@ namespace NH
 
         Access(Type aType);
 
+        /// \param aOut
+        /// \param aOutSize_byte
+        void GetDescription(char * aOut, unsigned int aOutSize_byte) const;
+
         void SetEstablished();
 
         /// \param aProtocol See Protocol
         void SetProtocol(Protocol aProtocol);
 
-        void Verify();
+        void Verify() const;
 
-        End mDestination;
-        End mSource     ;
+        AccessEnd mDestination;
+        AccessEnd mSource     ;
 
     private:
+
+        void Error(int aCode, const char * aMessage) const;
 
         struct
         {

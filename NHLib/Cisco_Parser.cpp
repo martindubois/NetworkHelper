@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-04 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-05 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-04 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-05 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -37,13 +37,13 @@ static const Parser::Node ENUM_ACCESS_PROTOCOL[] =
 
 static const Parser::Node ENUM_ACCESS_END_OPERATOR[] =
 {
-    { NH::Access::End::OPERATOR_EQ   , "eq"   , NULL },
-    { NH::Access::End::OPERATOR_GT   , "gt"   , NULL },
-    { NH::Access::End::OPERATOR_LT   , "lt"   , NULL },
-    { NH::Access::End::OPERATOR_NEQ  , "neq"  , NULL },
-    { NH::Access::End::OPERATOR_RANGE, "range", NULL },
+    { NH::AccessEnd::OPERATOR_EQ   , "eq"   , NULL },
+    { NH::AccessEnd::OPERATOR_GT   , "gt"   , NULL },
+    { NH::AccessEnd::OPERATOR_LT   , "lt"   , NULL },
+    { NH::AccessEnd::OPERATOR_NEQ  , "neq"  , NULL },
+    { NH::AccessEnd::OPERATOR_RANGE, "range", NULL },
 
-    { NH::Access::End::OPERATOR_ANY, NULL, NULL },
+    { NH::AccessEnd::OPERATOR_ANY, NULL, NULL },
 };
 
 // Commands
@@ -140,7 +140,7 @@ static const Parser::Node COMMANDS[] =
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
-static unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::End * aEnd, const char * aCommand);
+static unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::AccessEnd * aEnd, const char * aCommand);
 
 namespace Cisco
 {
@@ -238,12 +238,14 @@ namespace Cisco
 
         try
         {
-            lAccess->SetProtocol(static_cast<NH::Access::Protocol>(Walk(aElements + 1, 1, ENUM_ACCESS_PROTOCOL)));
+            NH::Access::Protocol lProtocol = static_cast<NH::Access::Protocol>(Walk(aElements + 1, 1, ENUM_ACCESS_PROTOCOL));
+
+            lAccess->SetProtocol(lProtocol);
 
             unsigned int lIndex = 2;
 
-            lIndex = Access_End(aElements, aCount, lIndex, &lAccess->mSource     , aCommand);
-            lIndex = Access_End(aElements, aCount, lIndex, &lAccess->mDestination, aCommand);
+            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &lAccess->mSource     , aCommand);
+            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &lAccess->mDestination, aCommand);
 
             if (aCount > lIndex)
             {
@@ -268,11 +270,12 @@ namespace Cisco
         return true;
     }
 
-    unsigned int Parser::Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::End * aEnd, const char * aCommand)
+    unsigned int Parser::Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd * aEnd, const char * aCommand)
     {
         assert(NULL   != aElements);
-        assert(     0 < aCount    );
+        assert(     0 <  aCount   );
         assert(aCount >= aIndex   );
+        assert(NH::Access::PROTOCOL_QTY > aProtocol);
         assert(NULL   != aEnd     );
 
         unsigned int lIndex = aIndex;
@@ -309,7 +312,15 @@ namespace Cisco
 
         lIndex++;
 
-        return Access_End_Ports(aElements, aCount, lIndex, aEnd, aCommand);
+        switch (aProtocol)
+        {
+        case NH::Access::PROTOCOL_TCP:
+        case NH::Access::PROTOCOL_UDP:
+            lIndex = Access_End_Ports(aElements, aCount, lIndex, aEnd, aCommand);
+            break;
+        }
+
+        return lIndex;
     }
 
     // ===== Commands =======================================================
@@ -566,9 +577,10 @@ namespace Cisco
 /////////////////////////////////////////////////////////////////////////////
 
 // NOT TESTED Cisco.Router
-//            Access list entry with port range
+//            Access list entry with port range;
+//            Access list entry without destination port;
 
-unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::End * aEnd, const char * aCommand)
+unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::AccessEnd * aEnd, const char * aCommand)
 {
     assert(NULL   != aElements);
     assert(     0 <  aCount   );
@@ -582,15 +594,17 @@ unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsi
     {
         assert(NULL != aElements[lIndex]);
 
-        NH::Access::End::Operator lOperator = static_cast<NH::Access::End::Operator>(Parser::Walk(aElements + lIndex, 1, ENUM_ACCESS_END_OPERATOR));
+        NH::AccessEnd::Operator lOperator = static_cast<NH::AccessEnd::Operator>(Parser::Walk(aElements + lIndex, 1, ENUM_ACCESS_END_OPERATOR));
         switch (lOperator)
         {
-        case NH::Access::End::OPERATOR_ANY: break;
+        case NH::AccessEnd::OPERATOR_ANY:
+            aEnd->SetPort(lOperator);
+            break;
 
-        case NH::Access::End::OPERATOR_EQ :
-        case NH::Access::End::OPERATOR_GT :
-        case NH::Access::End::OPERATOR_LT :
-        case NH::Access::End::OPERATOR_NEQ:
+        case NH::AccessEnd::OPERATOR_EQ :
+        case NH::AccessEnd::OPERATOR_GT :
+        case NH::AccessEnd::OPERATOR_LT :
+        case NH::AccessEnd::OPERATOR_NEQ:
             lIndex++;
 
             Parser::ValidateCount(aCommand, aCount, lIndex + 1);
@@ -601,7 +615,7 @@ unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsi
             lIndex++;
             break;
 
-        case NH::Access::End::OPERATOR_RANGE:
+        case NH::AccessEnd::OPERATOR_RANGE:
             lIndex++;
 
             Parser::ValidateCount(aCommand, aCount, lIndex + 2);
@@ -615,6 +629,10 @@ unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsi
 
         default: assert(false);
         }
+    }
+    else
+    {
+        aEnd->SetPort(NH::AccessEnd::OPERATOR_ANY);
     }
 
     return lIndex;

@@ -27,7 +27,10 @@ namespace NH
 
         ~AccessListMap();
 
+        /// \param aName
         AccessList * Add(const char * aName);
+
+        void Verify() const;
 
     private:
 

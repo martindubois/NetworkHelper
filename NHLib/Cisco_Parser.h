@@ -31,8 +31,8 @@ namespace Cisco
 
     private:
 
-        bool         Access    (const char ** aElements, unsigned int aCount,                      NH::Access::Type  aType, const char * aCommand);
-        unsigned int Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::End * aEnd , const char * aCommand);
+        bool         Access    (const char ** aElements, unsigned int aCount,                      NH::Access::Type     aType    ,                         const char * aCommand);
+        unsigned int Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd  * aEnd , const char * aCommand);
 
         // ===== Commands ===================================================
         bool Cmd_Deny                  (const char ** aElements, unsigned int aCount);

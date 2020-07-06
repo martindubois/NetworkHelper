@@ -34,6 +34,8 @@ namespace NH
 
         void Undo();
 
+        void Verify() const;
+
     private:
 
         AccessList(const AccessList &);

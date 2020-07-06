@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Access.cpp" />
+    <ClCompile Include="AccessEnd.cpp" />
     <ClCompile Include="AccessList.cpp" />
     <ClCompile Include="AccessListMap.cpp" />
     <ClCompile Include="Cisco_Parser.cpp" />

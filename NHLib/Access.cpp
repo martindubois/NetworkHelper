@@ -4,19 +4,20 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-03 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-05 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-03 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-05 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
+#include <stdio.h>
 
 // ===== Includes ===========================================================
 #include <NH/Access.h>
+#include <NH/SubNet.h>
 
 // ===== NHLib ==============================================================
 #include "IP.h"
-#include "IPv4.h"
 #include "Utilities.h"
 
 namespace NH
@@ -27,128 +28,7 @@ namespace NH
 
     // NOT TESTED NH.Access.Error
 
-    Access::End::End() : mHost(0), mPort_A(0), mPort_B(0), mPort_Op(OPERATOR_INVALID), mSubNet(NULL)
-    {
-        mFlags.mAny = false;
-    }
-
-    void Access::End::SetAny()
-    {
-        if (!mFlags.mAny)
-        {
-            if (0 != mHost)
-            {
-                Utl_ThrowError("ERROR", __LINE__, "Cannot set to any when a host is already set");
-            }
-
-            if (NULL != mSubNet)
-            {
-                Utl_ThrowError("ERROR", __LINE__, "Cannot set to any when a subnet is already set");
-            }
-
-            mFlags.mAny = true;
-        }
-    }
-
-    void Access::End::SetHost(uint32_t aHost)
-    {
-        IPv4_Validate(aHost);
-
-        if (mHost != aHost)
-        {
-            if (mFlags.mAny)
-            {
-                Utl_ThrowError("ERROR", __LINE__, "Cannot set a host when any is alrady specified");
-            }
-
-            if (NULL != mSubNet)
-            {
-                Utl_ThrowError("ERROR", __LINE__, "Cannot set a host when a subnet is already set");
-            }
-
-            mHost = aHost;
-        }
-    }
-
-    void Access::End::SetHost(const char * aHost)
-    {
-        assert(NULL != aHost);
-
-        SetHost(IPv4_TextToAddress(aHost));
-    }
-
-    // NOT TESTED NH.Access.End.SetPort
-    //            OPERATOR_ANY, OPERATOR_RANGE
-
-    void Access::End::SetPort(Operator aOp, uint16_t aPortA, uint16_t aPortB)
-    {
-        if (mPort_Op != aOp)
-        {
-            switch (aOp)
-            {
-            case OPERATOR_ANY:
-                if (0 != aPortA)
-                {
-                    Utl_ThrowError("ERROR", __LINE__, "Unexpected port number");
-                }
-                // no break;
-            case OPERATOR_EQ :
-            case OPERATOR_GT :
-            case OPERATOR_LT :
-            case OPERATOR_NEQ:
-                if (0 != aPortB)
-                {
-                    Utl_ThrowError("ERROR", __LINE__, "Unexpected port number");
-                }
-                break;
-
-            case OPERATOR_RANGE:
-                if (aPortA > aPortB)
-                {
-                    Utl_ThrowError("ERROR", __LINE__, "Invalid port range");
-                }
-                break;
-
-            default: assert(false);
-            }
-
-            mPort_A  = aPortA;
-            mPort_B  = aPortB;
-            mPort_Op = aOp   ;
-        }
-    }
-
-    // aPortA [--O;R--]
-    // aPortB [--O;R--]
-    void Access::End::SetPort(Operator aOp, const char * aPortA, const char * aPortB)
-    {
-        assert(NULL != aPortA);
-
-        uint16_t lPortA = (NULL == aPortA) ? 0 : IP_TextToPort(aPortA);
-        uint16_t lPortB = (NULL == aPortB) ? 0 : IP_TextToPort(aPortB);
-
-        SetPort(aOp, lPortA, lPortB);
-    }
-
-    void Access::End::SetSubNet(const SubNet * aSubNet)
-    {
-        assert(NULL != aSubNet);
-
-        if (mSubNet != aSubNet)
-        {
-            if (mFlags.mAny)
-            {
-                Utl_ThrowError("ERROR", __LINE__, "Cannot set a subnet when any is already specified");
-            }
-
-            if (0 != mHost)
-            {
-                Utl_ThrowError("ERROR", __LINE__, "Cannot set a subnet when a host is already set");
-            }
-
-            mSubNet = aSubNet;
-        }
-    }
+    // NOT TESTED NH.Access.GetDescription
 
     Access::Access(Type aType) : mProtocol(PROTOCOL_INVALID)
     {
@@ -157,6 +37,20 @@ namespace NH
         mFlags.mEstablished = false;
 
         mType = aType;
+    }
+
+    void Access::GetDescription(char * aOut, unsigned int aOutSize_byte) const
+    {
+        assert(NULL != aOut         );
+        assert(   0 <  aOutSize_byte);
+
+        char lDst[64];
+        char lSrc[64];
+
+        mDestination.GetDescription(lDst, sizeof(lDst));
+        mSource     .GetDescription(lSrc, sizeof(lSrc));
+
+        sprintf_s(aOut, aOutSize_byte, "%s ==> %s", lSrc, lDst);
     }
 
     void Access::SetEstablished()
@@ -179,6 +73,69 @@ namespace NH
         assert(PROTOCOL_QTY > aProtocol);
 
         mProtocol = aProtocol;
+    }
+
+    void Access::Verify() const
+    {
+        mDestination.Verify();
+        mSource     .Verify();
+
+        switch (mDestination.GetFilter())
+        {
+        case AccessEnd::FILTER_ANY: break;
+
+        case AccessEnd::FILTER_HOST:
+            uint32_t lDstH;
+
+            lDstH = mDestination.GetHost();
+
+            switch (mSource.GetFilter())
+            {
+            case AccessEnd::FILTER_ANY: break;
+
+            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { Error(__LINE__, "describes trafic not going through the network"); } break;
+            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { Error(__LINE__, "describes trafic not going through the router" ); } break;
+
+            default: assert(false);
+            }
+            break;
+
+        case AccessEnd::FILTER_SUBNET:
+            const SubNet * lDstSN;
+            
+            lDstSN = mDestination.GetSubNet();
+            assert(NULL != lDstSN);
+
+            switch (mSource.GetFilter())
+            {
+            case AccessEnd::FILTER_ANY: break;
+
+            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { Error(__LINE__, "describes trafic not going through the router"); } break;
+            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { Error(__LINE__, "describes trafic not going through the router"); } break;
+
+            default: assert(false);
+            }
+            break;
+
+        default: assert(false);
+        }
+    }
+
+    // Private
+    /////////////////////////////////////////////////////////////////////////
+
+    void Access::Error(int aCode, const char * aMessage) const
+    {
+        assert(NULL != aMessage);
+
+        char lDesc   [128];
+        char lMessage[128];
+
+        GetDescription(lDesc, sizeof(lDesc));
+
+        sprintf_s(lMessage, "The access rules %s %s", lDesc, aMessage);
+
+        Utl_ThrowError("ERROR", __LINE__, lMessage);
     }
 
 }

@@ -59,4 +59,15 @@ namespace NH
 
         mAccess.pop_back();
     }
+
+    void AccessList::Verify() const
+    {
+        for (InternalList::const_iterator lIt = mAccess.begin(); lIt != mAccess.end(); lIt++)
+        {
+            assert(NULL != (*lIt));
+
+            (*lIt)->Verify();
+        }
+    }
+
 }

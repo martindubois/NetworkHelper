@@ -44,4 +44,14 @@ namespace NH
         return lResult;
     }
 
+    void AccessListMap::Verify() const
+    {
+        for (InternalMap::const_iterator lIt = mAccessLists.begin(); lIt != mAccessLists.end(); lIt++)
+        {
+            assert(NULL != lIt->second);
+
+            lIt->second->Verify();
+        }
+    }
+
 }
