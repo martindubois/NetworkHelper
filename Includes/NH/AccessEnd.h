@@ -114,6 +114,16 @@ namespace NH
 
         void Verify() const;
 
+        /// \param aAddr
+        /// \retval false
+        /// \retval true
+        bool VerifyAddress(uint32_t aAddr) const;
+
+        /// \param aSubNet
+        /// \retval false
+        /// \retval true
+        bool VerifySubNet(const SubNet * aSubNet) const;
+
     private:
 
         struct

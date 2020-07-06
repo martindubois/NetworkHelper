@@ -1,0 +1,16 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_6_Router_0.txt
+
+! This file test error detected when verifying the router configuration by calling NH::Router::Verify.
+
+! TEST INFO AccessList.Error
+!           A same access-list describes opposed traffics
+
+ip access-list extended 103
+	permit tcp 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+	permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.10 eq 80
+	permit udp host 192.168.20.1 192.168.10.0 0.0.0.255 neq 21
+exit

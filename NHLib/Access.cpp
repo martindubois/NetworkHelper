@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-05 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-05 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -20,15 +20,16 @@
 #include "IP.h"
 #include "Utilities.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static const char * PROTOCOL_NAMES[NH::Access::PROTOCOL_QTY] = { "ICMP", "IP", "TCP", "UDP" };
+
 namespace NH
 {
 
     // Public
     ////////////////////////////////////////////////////////////////////////
-
-    // NOT TESTED NH.Access.Error
-
-    // NOT TESTED NH.Access.GetDescription
 
     Access::Access(Type aType) : mProtocol(PROTOCOL_INVALID)
     {
@@ -44,13 +45,15 @@ namespace NH
         assert(NULL != aOut         );
         assert(   0 <  aOutSize_byte);
 
+        assert(PROTOCOL_QTY > mProtocol);
+
         char lDst[64];
         char lSrc[64];
 
         mDestination.GetDescription(lDst, sizeof(lDst));
         mSource     .GetDescription(lSrc, sizeof(lSrc));
 
-        sprintf_s(aOut, aOutSize_byte, "%s ==> %s", lSrc, lDst);
+        sprintf_s(aOut, aOutSize_byte, "%s %s ==> %s", PROTOCOL_NAMES[mProtocol], lSrc, lDst);
     }
 
     void Access::SetEstablished()
@@ -74,6 +77,9 @@ namespace NH
 
         mProtocol = aProtocol;
     }
+
+    // NOT TESTED NH.Access
+    //            FILTER_ANY on source
 
     void Access::Verify() const
     {

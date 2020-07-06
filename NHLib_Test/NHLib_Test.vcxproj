@@ -197,6 +197,7 @@
     <Text Include="Tests\Test_5_Router_4.txt" />
     <Text Include="Tests\Test_5_Router_5.txt" />
     <Text Include="Tests\Test_6_Router_0.txt" />
+    <Text Include="Tests\Test_7_Router_0.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

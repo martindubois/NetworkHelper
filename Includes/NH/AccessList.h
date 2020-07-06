@@ -30,6 +30,7 @@ namespace NH
 
         ~AccessList();
 
+        /// \param aType
         Access * Add(Access::Type aType);
 
         void Undo();
@@ -41,6 +42,9 @@ namespace NH
         AccessList(const AccessList &);
 
         const AccessList & operator = (const AccessList &);
+
+        void Error(int aCode, const char * aMessage) const;
+        void Error(int aCode, const char * aMessage, const Access * aA0, const Access * aA1) const;
 
         typedef std::list<Access *> InternalList;
 

@@ -69,7 +69,18 @@ KMS_TEST_BEGIN(Router_Base)
         printf("%s\n", eE.what());
     }
 
-KMS_TEST_END
+    try
+    {
+        Tests(7, 1);
+        KMS_TEST_ASSERT(false);
+    }
+    catch (std::exception eE)
+    {
+        KMS_TEST_ERROR_INFO;
+        printf("%s\n", eE.what());
+    }
+
+    KMS_TEST_END
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////

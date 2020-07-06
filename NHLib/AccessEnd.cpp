@@ -4,7 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-05 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
+
+// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -36,6 +38,9 @@ namespace NH
         mFlags.mAny = false;
     }
 
+    // NOT TESTED NH.Access.End.SetPort
+    //            OPERATOR_RANGE
+
     void AccessEnd::GetDescription(char * aOut, unsigned int aOutSize_byte) const
     {
         assert(NULL != aOut         );
@@ -56,7 +61,9 @@ namespace NH
 
         switch (mPort_Op)
         {
-        case OPERATOR_ANY: break;
+        case OPERATOR_ANY    :
+        case OPERATOR_INVALID:
+            break;
 
         case OPERATOR_EQ :
         case OPERATOR_GT :
@@ -72,6 +79,9 @@ namespace NH
         default: assert(false);
         }
     }
+
+    // NOT TESTED NH.AccessEnd.Error
+    //            Not initialized
 
     AccessEnd::Filter AccessEnd::GetFilter() const
     {
@@ -105,6 +115,8 @@ namespace NH
         IPv4_AddressToText(aOut, aOutSize_byte, mHost);
     }
 
+    // NOT TESTED NH.AccessEnd.GetPortOperator
+
     AccessEnd::Operator AccessEnd::GetPortOperator() const
     {
         return mPort_Op;
@@ -121,6 +133,9 @@ namespace NH
     {
         return mFlags.mAny || (0 != mHost) || (NULL != mSubNet);
     }
+
+    // NOT TESTED NH.AccessEnd.Error
+    //            Already initialized
 
     void AccessEnd::SetAny()
     {
@@ -154,6 +169,9 @@ namespace NH
 
         SetHost(IPv4_TextToAddress(aHost));
     }
+
+    // NOT TESTED NH.AccessEnd.Error
+    //            Port alread initialized
 
     void AccessEnd::SetPort(Operator aOp)
     {
@@ -194,9 +212,6 @@ namespace NH
         default: assert(false);
         }
     }
-
-    // NOT TESTED NH.Access.End.SetPort
-    //            OPERATOR_RANGE
 
     void AccessEnd::SetPort(Operator aOp, uint16_t aPortA, uint16_t aPortB)
     {
@@ -254,6 +269,39 @@ namespace NH
         {
             Utl_ThrowError("ERROR", __LINE__, "Access end is not correctly initialized");
         }
+    }
+
+    bool AccessEnd::VerifyAddress(uint32_t aAddr) const
+    {
+        if (0 != mHost)
+        {
+            return mHost == aAddr;
+        }
+        else if (NULL != mSubNet)
+        {
+            return mSubNet->VerifyAddress(aAddr);
+        }
+
+        return false;
+    }
+
+    // NOT TESTED NH.AccessEnd.VerifySubNet
+    //            FILTER_ANY
+
+    bool AccessEnd::VerifySubNet(const SubNet * aSubNet) const
+    {
+        assert(NULL != aSubNet);
+
+        if (0 != mHost)
+        {
+            return aSubNet->VerifyAddress(mHost);
+        }
+        else if (NULL != mSubNet)
+        {
+            return mSubNet == aSubNet;
+        }
+
+        return false;
     }
 
 }

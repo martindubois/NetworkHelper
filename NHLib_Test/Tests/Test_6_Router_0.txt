@@ -4,6 +4,8 @@
 ! Product   NetworkHelper
 ! File      NHLib_Test/Tests/Test_6_Router_0.txt
 
+! This file test error detection at parsing.
+
 encapsulation dot1q
 encapsulation dot1q 10
 interface
@@ -43,3 +45,21 @@ interface test4
 	ip address dhcp
 
 interface test4.1
+
+! TEST INFO Access.Error
+!           An access-list entry describes trafic not going on the network.
+
+ip access-list extended 101	permit ip host 192.168.0.10 host 192.168.0.10
+
+! TEST INFO Access.Error
+!           An access-list entry describes trafic not going through the router.
+
+ip access-list extended 102
+	permit ip 192.168.0.0 0.0.0.255 host 192.168.0.10
+	permit ip host 192.168.0.10 192.168.0.0 0.0.0.255
+exit
+
+! TEST INFO Access.Error
+!           An access-list entry use the established keywork but does not describe TCP stream.
+
+ip access-list extended 103 permit UDP host 192.168.0.10 eq 80 192.168.10.0 0.0.0.255 established
