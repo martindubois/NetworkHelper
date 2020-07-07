@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Parser.h
 
-// CODE REVIEW 2020-07-04 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-04 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -50,7 +50,7 @@ void Parser::ValidateCount(const char * aCommand, unsigned int aCount, unsigned 
         assert(               0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError("ERROR", __LINE__, lMessage);
+        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, lMessage);
     }
 
     if (aMax < aCount)
@@ -59,7 +59,7 @@ void Parser::ValidateCount(const char * aCommand, unsigned int aCount, unsigned 
         assert(               0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError("ERROR", __LINE__, lMessage);
+        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, lMessage);
     }
 }
 
@@ -106,7 +106,7 @@ unsigned int Parser::Walk(const char **aElements, unsigned int aCount, const Nod
         assert(               0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError("ERROR", __LINE__, lMessage);
+        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, lMessage);
     }
 
     return aNodes[lIndex].mCode;
@@ -131,7 +131,7 @@ void Parser::Parse(const char * aFileName)
     errno_t lErr = fopen_s(&lFile, aFileName, "r");
     if (0 != lErr)
     {
-        Utl_ThrowError("ERROR", __LINE__, "fopen_s( , ,  )  failed", lErr);
+        Utl_ThrowError(UTL_FILE_ERROR, __LINE__, "fopen_s( , ,  )  failed", lErr);
     }
 
     unsigned int lError = 0;
@@ -150,7 +150,7 @@ void Parser::Parse(const char * aFileName)
 
     if (0 < lError)
     {
-        Utl_ThrowError("ERROR", __LINE__, "Parsing errors", lError);
+        Utl_ThrowError(UTL_ERROR, __LINE__, "Parsing errors", lError);
     }
 }
 
@@ -298,7 +298,7 @@ unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_byte, co
             {
                 if (aMax <= lResult)
                 {
-                    Utl_ThrowError("ERROR", __LINE__, "The command contains too many elements");
+                    Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "The command contains too many elements");
                 }
 
                 aElements[lResult] = aOut + lOutIndex;
@@ -312,7 +312,7 @@ unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_byte, co
 
         if (aOutSize_byte <= lOutIndex)
         {
-            Utl_ThrowError("ERROR", __LINE__, "The command is too long");
+            Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "The command is too long");
         }
         lIn++;
     }

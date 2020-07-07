@@ -16,6 +16,9 @@
 #include <HI/Diagram.h>
 #include <HI/Shape.h>
 
+// ===== Includes ===========================================================
+#include <NH/Types.h>
+
 // ===== NHLib ==============================================================
 class ShapeMap;
 
@@ -30,15 +33,6 @@ namespace NH
     {
 
     public:
-
-        typedef enum
-        {
-            DIRECTION_IN ,
-            DIRECTION_OUT,
-
-            DIRECTION_QTY
-        }
-        Direction;
 
         /// \param aName The interface's name
         Interface(const char * aName);

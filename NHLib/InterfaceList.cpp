@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -162,6 +162,7 @@ namespace NH
     }
 
     // NOT TESTED NH.InterfaceList.Verify.Error
+    //            Two interface connected to the same subnet
 
     void InterfaceList::Verify() const
     {
@@ -193,24 +194,19 @@ namespace NH
                         assert(               0 < lRet);
                         assert(sizeof(lMessage) > lRet);
 
-                        Utl_ThrowError("ERROR", __LINE__, lMessage);
+                        Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                        lErrorCount++;
                     }
                 }
             }
             catch (std::exception eE)
             {
+                Utl_DisplayError(__LINE__, eE);
                 lErrorCount++;
-
-                COLOR(RED);
-                    fprintf(stderr, "EXCEPTION  %3d  %s\n", __LINE__, eE.what());
-                COLOR(WHITE);
             }
         }
 
-        if (0 < lErrorCount)
-        {
-            Utl_ThrowError("ERROR", __LINE__, "At least one interface is not correctly configured");
-        }
+        Utl_ThrowErrorIfNeeded(__LINE__, "Router's", "interfaces", lErrorCount);
     }
 
     // Internal

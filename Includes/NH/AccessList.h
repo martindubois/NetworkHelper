@@ -15,6 +15,7 @@
 
 // ===== Includes ===========================================================
 #include <NH/Access.h>
+#include <NH/Types.h>
 
 namespace NH
 {
@@ -37,14 +38,18 @@ namespace NH
 
         void Verify() const;
 
+        void Verify(uint32_t aAddr, Direction aDirection) const;
+
+        void Verify(const SubNet * aSubNet, Direction aDirection) const;
+
     private:
 
         AccessList(const AccessList &);
 
         const AccessList & operator = (const AccessList &);
 
-        void Error(int aCode, const char * aMessage) const;
-        void Error(int aCode, const char * aMessage, const Access * aA0, const Access * aA1) const;
+        void DisplayError(int aCode, const char * aMessage, const Access * aAccess) const;
+        void DisplayError(int aCode, const char * aMessage, const Access * aA0, const Access * aA1) const;
 
         typedef std::list<Access *> InternalList;
 

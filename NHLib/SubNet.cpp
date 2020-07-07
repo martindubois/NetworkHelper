@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/SubNet.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -17,6 +17,7 @@
 // ===== NHLib ==============================================================
 #include "IPv4.h"
 #include "ShapeMap.h"
+#include "Utilities.h"
 
 namespace NH
 {
@@ -89,27 +90,16 @@ namespace NH
     {
         assert(NULL != aRouter);
 
-        int  lRet;
-        char lWhat[128];
-
         if ((NULL != mDHCP_Router) && (mDHCP_Router != aRouter))
         {
-            lRet = sprintf_s(lWhat, "ERROR  %3u  Two DHCP server for the same SubNet", __LINE__);
-            assert(            0 < lRet);
-            assert(sizeof(lWhat) > lRet);
-
-            throw std::exception(lWhat);
+            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Two DHCP server for the same SubNet");
         }
 
         if (NULL != aInterface)
         {
             if ((NULL != mDHCP_Interface) && (mDHCP_Interface != aInterface))
             {
-                lRet = sprintf_s(lWhat, "ERROR  %3u  Two DHCP server for the same SubNet", __LINE__);
-                assert(            0 < lRet);
-                assert(sizeof(lWhat) > lRet);
-
-                throw std::exception(lWhat);
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Two DHCP server for the same SubNet");
             }
 
             mDHCP_Interface = aInterface;

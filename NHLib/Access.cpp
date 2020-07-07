@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -64,7 +64,7 @@ namespace NH
         {
             if (PROTOCOL_TCP != mProtocol)
             {
-                Utl_ThrowError("ERROR", __LINE__, "establish is valid with tcp only");
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "establish is valid with tcp only");
             }
 
             mFlags.mEstablished = true;

@@ -55,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NH", "NH", "{A1547218-640B-
 		Includes\NH\Router.h = Includes\NH\Router.h
 		Includes\NH\SubNet.h = Includes\NH\SubNet.h
 		Includes\NH\SubNetList.h = Includes\NH\SubNetList.h
+		Includes\NH\Types.h = Includes\NH\Types.h
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkHelper", "NetworkHelper\NetworkHelper.vcxproj", "{833BCEE7-7093-4B31-9A16-0AC2D381B017}"

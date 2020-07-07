@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Network.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// CODE COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -70,7 +70,7 @@ namespace NH
 
             if (*lIt == aDevice)
             {
-                Utl_ThrowError("ERROR", __LINE__, "Device already added");
+                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Device already added");
             }
         }
 
@@ -131,7 +131,7 @@ namespace NH
 
             if (*lIt == aRouter)
             {
-                Utl_ThrowError("ERROR", __LINE__, "Router already added");
+                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Router already added");
             }
         }
 

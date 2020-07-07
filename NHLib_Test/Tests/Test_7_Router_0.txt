@@ -2,7 +2,7 @@
 ! Authot    KMS - Martin Dubois, P.Eng.
 ! Copyright (C) 2020 KMS. All rights reserved.
 ! Product   NetworkHelper
-! File      NHLib_Test/Tests/Test_6_Router_0.txt
+! File      NHLib_Test/Tests/Test_7_Router_0.txt
 
 ! This file test error detected when verifying the router configuration by calling NH::Router::Verify.
 
@@ -13,4 +13,21 @@ ip access-list extended 103
 	permit tcp 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
 	permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.10 eq 80
 	permit udp host 192.168.20.1 192.168.10.0 0.0.0.255 neq 21
+exit
+
+! TEST INFO AccessList.Error
+!           The access-list is used in the bad direction
+
+ip access-list extended 104	permit tcp host 192.168.10.10 eq 80 192.168.0.0 0.0.0.255 established
+
+interface f0/0
+	ip address 192.168.0.1 255.255.255.0
+	ip access-group 104 in
+exit
+
+ip access-list extended 105 permit udp 192.168.10.0 0.0.0.255 192.168.0.0 0.0.0.255
+
+interface f0/1
+	ip address 192.168.10.1 255.255.255.0
+	ip access-group 105 out
 exit

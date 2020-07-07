@@ -4,7 +4,7 @@
 ! Product   NetworkHelper
 ! File      NHLib_Test/Tests/Test_6_Router_0.txt
 
-! This file test error detection at parsing.
+! This file test error detection when parsing configuration file.
 
 encapsulation dot1q
 encapsulation dot1q 10
@@ -63,6 +63,38 @@ exit
 !           An access-list entry use the established keywork but does not describe TCP stream.
 
 ip access-list extended 103 permit UDP host 192.168.0.10 eq 80 192.168.10.0 0.0.0.255 established
+
+! TEST INFO Access.Error
+!           Invalid port number
+
+ip access-list extended 104 permit UDP any any eq 65537
+
+! TEST INFO Access.Error
+!           Invalid IPv4 net mask
+
+ip access-list extended 105 permit IP 192.168.0.0 Invalid any
+
+! TEST INFO DHCP.Error
+!           Invalid network address
+
+ip dhcp pool Alice
+	network 192.168.0.1 255.255.255.0
+exit
+
+ip dhcp pool Bob
+	network 0.0.0.1 255.255.255.0
+exit
+
+! TEST INFO Interface.Error
+!           Invalid IPv4 address
+
+interface f0/1
+	ip address Invalid 255.255.255.0
+exit
+
+interface f0/2
+	ip address 0.0.0.0 255.255.255.0
+exit
 
 ! TEST INFO Interface.Error
 !           More than one access-list for the same direction

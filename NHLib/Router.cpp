@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -127,17 +127,39 @@ namespace NH
                 break;
 
             default:
-                Utl_ThrowError("ERROR", __LINE__, "Invalid information type", aType);
+                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Invalid information type", aType);
             }
 
             SetName(lName);
         }
     }
 
+    // NOT TESTED NH.Router.Verify
+    //            Useless route and unreachable next router
+
     void Router::Verify() const
     {
-        mAccessLists.Verify();
-        mInterfaces .Verify();
+        unsigned int lErrorCount = 0;
+
+        try
+        {
+            mAccessLists.Verify();
+        }
+        catch (std::exception eE)
+        {
+            Utl_DisplayError(__LINE__, eE);
+            lErrorCount++;
+        }
+
+        try
+        {
+            mInterfaces.Verify();
+        }
+        catch (std::exception eE)
+        {
+            Utl_DisplayError(__LINE__, eE);
+            lErrorCount++;
+        }
 
         for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
         {
@@ -156,7 +178,8 @@ namespace NH
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                Utl_ThrowError("ERROR", __LINE__, lMessage);
+                Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                lErrorCount++;
             }
 
             if (!CanReach(lIt->GetAddress()))
@@ -171,9 +194,12 @@ namespace NH
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                Utl_ThrowError("ERROR", __LINE__, lMessage);
+                Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                lErrorCount++;
             }
         }
+
+        Utl_ThrowErrorIfNeeded(__LINE__, "router", mName.c_str(), lErrorCount);
     }
 
     // Internal

@@ -4,6 +4,10 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+
 // ===== C ==================================================================
 #include <assert.h>
 
@@ -22,6 +26,9 @@ namespace NH
     // Public
     /////////////////////////////////////////////////////////////////////////
 
+    // NOT TESTED NH.Route.Error
+    //            The next router is on the destination network.
+
     Route::Route(const SubNet * aSubNet, const char * aAddr) : mSubNet(aSubNet)
     {
         assert(NULL != aSubNet);
@@ -30,7 +37,7 @@ namespace NH
 
         if (aSubNet->VerifyAddress(mAddr))
         {
-            Utl_ThrowError("ERROR", __LINE__, "The next router cannot be on the destination subnet");
+            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The next router cannot be on the destination subnet");
         }
     }
 

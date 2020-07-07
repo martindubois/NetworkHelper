@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -54,10 +54,10 @@ static const Parser::Node ENUM_ACCESS_END_OPERATOR[] =
     { NH::AccessEnd::OPERATOR_ANY, NULL, NULL },
 };
 
-static const Parser::Node ENUM_INTERFACE_DIRECTION[] =
+static const Parser::Node ENUM_DIRECTION[] =
 {
-    { NH::Interface::DIRECTION_IN , "in" , NULL },
-    { NH::Interface::DIRECTION_OUT, "out", NULL },
+    { NH::DIRECTION_IN , "in" , NULL },
+    { NH::DIRECTION_OUT, "out", NULL },
 
     { Parser::CODE_ERROR, NULL, NULL }
 };
@@ -281,7 +281,7 @@ namespace Cisco
                 }
                 else
                 {
-                    Utl_ThrowError("ERROR", __LINE__, "Unexexpected command element");
+                    Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Unexexpected command element");
                 }
             }
 
@@ -433,7 +433,7 @@ namespace Cisco
         Section_Interface(COMMAND);
         assert(NULL != mInterface);
 
-        NH::Interface::Direction lDirection = static_cast<NH::Interface::Direction>(Walk(aElements + 3, 1, ENUM_INTERFACE_DIRECTION));
+        NH::Direction lDirection = static_cast<NH::Direction>(Walk(aElements + 3, 1, ENUM_DIRECTION));
 
         NH::AccessList * lAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[2]);
         assert(NULL != lAccessList);
@@ -618,7 +618,7 @@ namespace Cisco
         assert(0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError("ERROR", __LINE__, lMessage);
+        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, lMessage);
     }
 
     void Parser::Section_Interface(const char * aCommand)

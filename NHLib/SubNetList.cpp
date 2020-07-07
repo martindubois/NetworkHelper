@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/SubNetList.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -123,7 +123,7 @@ namespace NH
                     assert(               0 < lRet);
                     assert(sizeof(lMessage) > lRet);
 
-                    Utl_ThrowError("ERROR", __LINE__, lMessage);
+                    Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, lMessage);
                 }
             }
         }

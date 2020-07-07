@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -16,6 +16,7 @@
 #include <HI/Link.h>
 
 // ===== Includes ===========================================================
+#include <NH/AccessList.h>
 #include <NH/SubNet.h>
 
 #include <NH/Interface.h>
@@ -92,7 +93,7 @@ namespace NH
 
         if (NULL != mAccessLists[aDirection])
         {
-            Utl_ThrowError("ERROR", __LINE__, "An access-list is already set for this direction");
+            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "An access-list is already set for this direction");
         }
 
         mAccessLists[aDirection] = aAccessList;
@@ -107,8 +108,8 @@ namespace NH
         {
             IPv4_Validate(aAddr);
 
-            if (mFlags.mDHCP           ) { Utl_ThrowError("ERROR", __LINE__, "Do not configure an IPv4 address on an interace with DHCP client enabled"); }
-            if (mFlags.mHasSubInterface) { Utl_ThrowError("ERROR", __LINE__, "Do not configure an IPv4 address on an interface with sub-interfaces"    ); }
+            if (mFlags.mDHCP           ) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not configure an IPv4 address on an interace with DHCP client enabled"); }
+            if (mFlags.mHasSubInterface) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not configure an IPv4 address on an interface with sub-interfaces"    ); }
 
             if (NULL != mSubNet)
             {
@@ -131,13 +132,16 @@ namespace NH
     {
         if (!mFlags.mDHCP)
         {
-            if (mFlags.mHasSubInterface) { Utl_ThrowError("ERROR", __LINE__, "Do not enable DHCP client on an interface with sub-interfaces"); }
+            if (mFlags.mHasSubInterface) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface with sub-interfaces"); }
 
-            if (0 != mAddr) { Utl_ThrowError("ERROR", __LINE__, "Do not enable DHCP client on an interface with a valid IPv4 address"); }
+            if (0 != mAddr)
+            {
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface with a valid IPv4 address");
+            }
 
             if ((NULL != mSubNet) && mSubNet->GetDHCP(this))
             {
-                Utl_ThrowError("ERROR", __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
             }
 
             mFlags.mDHCP = true;
@@ -151,12 +155,12 @@ namespace NH
     {
         if (!mFlags.mHasSubInterface)
         {
-            if (mFlags.mDHCP   ) { Utl_ThrowError("ERROR", __LINE__, "Do not create sub-interface for an interface with DHCP client enabled"); }
-            if (mFlags.mSub    ) { Utl_ThrowError("ERROR", __LINE__, "Do not create sub-interface for a sub-interface"                      ); }
-            if (mFlags.mVirtual) { Utl_ThrowError("ERROR", __LINE__, "Do not create sub-interface for a virtual interface"                  ); }
+            if (mFlags.mDHCP   ) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not create sub-interface for an interface with DHCP client enabled"); }
+            if (mFlags.mSub    ) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not create sub-interface for a sub-interface"                      ); }
+            if (mFlags.mVirtual) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not create sub-interface for a virtual interface"                  ); }
 
-            if (   0 != mAddr  ) { Utl_ThrowError("ERROR", __LINE__, "Do not create sub-interface for an interface with a IPv4 address configured"); }
-            if (NULL != mSubNet) { Utl_ThrowError("ERROR", __LINE__, "Do not create sub-interface for an interface connected to a subnet"         ); }
+            if (   0 != mAddr  ) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not create sub-interface for an interface with a IPv4 address configured"); }
+            if (NULL != mSubNet) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not create sub-interface for an interface connected to a subnet"         ); }
 
             mFlags.mHasSubInterface = true;
         }
@@ -179,7 +183,10 @@ namespace NH
     {
         if (!mFlags.mNAT_Inside)
         {
-            if (mFlags.mNAT_Outside) { Utl_ThrowError("ERROR", __LINE__, "A same interface cannot be NAT inside and NAT outside"); }
+            if (mFlags.mNAT_Outside)
+            {
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "A same interface cannot be NAT inside and NAT outside");
+            }
 
             mFlags.mNAT_Inside = true;
         }
@@ -189,7 +196,10 @@ namespace NH
     {
         if (!mFlags.mNAT_Outside)
         {
-            if (mFlags.mNAT_Inside) { Utl_ThrowError("ERROR", __LINE__, "A same interface cannot be NAT inside and NAT outside"); }
+            if (mFlags.mNAT_Inside)
+            {
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "A same interface cannot be NAT inside and NAT outside");
+            }
 
             mFlags.mNAT_Outside = true;
         }
@@ -206,7 +216,7 @@ namespace NH
         {
             if (mFlags.mHasSubInterface)
             {
-                Utl_ThrowError("ERROR", __LINE__, "Do not connect a subnet to and interface with sub-interfaces");
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not connect a subnet to and interface with sub-interfaces");
             }
 
             if (0 != mAddr)
@@ -216,7 +226,7 @@ namespace NH
 
             if (mFlags.mDHCP && aSubNet->GetDHCP(this))
             {
-                Utl_ThrowError("ERROR", __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
             }
 
             mSubNet = aSubNet;
@@ -230,14 +240,20 @@ namespace NH
         unsigned int lVLAN;
 
         int lRet = sscanf_s(aVLAN, "%u", &lVLAN);
-        if (1 != lRet) { Utl_ThrowError("ERROR", __LINE__, "Invalid VLAN", lVLAN); }
+        if (1 != lRet)
+        {
+            Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid VLAN", lVLAN);
+        }
 
-        if (4096 <= lVLAN) { Utl_ThrowError("ERROR", __LINE__, "Invalid VLAN", lVLAN); }
+        if (4096 <= lVLAN)
+        {
+            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid VLAN", lVLAN);
+        }
 
         if (mVLAN != lVLAN)
         {
-            if ( mFlags.mHasSubInterface) { Utl_ThrowError("ERROR", __LINE__, "Do not set a VLAN for an interface with sub-interface"); }
-            if (!mFlags.mSub            ) { Utl_ThrowError("ERROR", __LINE__, "VLAN must be set on sub-interface"                    ); }
+            if ( mFlags.mHasSubInterface) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not set a VLAN for an interface with sub-interface"); }
+            if (!mFlags.mSub            ) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "VLAN must be set on sub-interface"                    ); }
 
             mVLAN = lVLAN;
         }
@@ -247,6 +263,10 @@ namespace NH
     void Interface::SetWifi   () { mFlags.mWifi    = true; }
 
     // NOT TESTED NH.Interface.Verify.Error
+    //            Not configured interface
+
+    // NOT TESTED NH.Interface.Verify
+    //            Interface configured using DHCP with an access list.
 
     void Interface::Verify() const
     {
@@ -258,7 +278,30 @@ namespace NH
             assert(               0 < lRet);
             assert(sizeof(lMessage) > lRet);
 
-            Utl_ThrowError("ERROR", __LINE__, lMessage, mAddr);
+            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, lMessage, mAddr);
+        }
+
+        unsigned int i;
+
+        if (0 != mAddr)
+        {
+            for (i = 0; i < DIRECTION_QTY; i++)
+            {
+                if (NULL != mAccessLists[i])
+                {
+                    mAccessLists[i]->Verify(mAddr, static_cast<NH::Direction>(i));
+                }
+            }
+        }
+        else if (NULL != mSubNet)
+        {
+            for (i = 0; i < DIRECTION_QTY; i++)
+            {
+                if (NULL != mAccessLists[i])
+                {
+                    mAccessLists[i]->Verify(mSubNet, static_cast<NH::Direction>(i));
+                }
+            }
         }
     }
 
