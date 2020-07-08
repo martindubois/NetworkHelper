@@ -25,5 +25,5 @@
 extern void Utl_DisplayError(int aCode, const std::exception & aException);
 extern void Utl_DisplayError(const char * aErrorType, int aCode, const char * aMessage);
 
-extern void Utl_ThrowError(const char * aErrorType, int aCode, const char * aMessage, int aData = 0);
+extern void Utl_ThrowError(const char * aErrorType, int aCode, const char * aMessage);
 extern void Utl_ThrowErrorIfNeeded(int aCode, const char * aElement, const char * aName, unsigned int aErrorCount);

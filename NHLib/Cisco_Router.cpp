@@ -45,7 +45,7 @@ namespace Cisco
         case INFO_CONFIG_FILE: ParseConfigFile(aData, aFlags); break;
 
         default:
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "The specified information type is not supported", aType);
+            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "The specified information type is not supported");
         }
     }
 

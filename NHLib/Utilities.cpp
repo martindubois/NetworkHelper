@@ -26,7 +26,7 @@ void Utl_DisplayError(int aCode, const std::exception & aException)
 
     COLOR(RED);
     {
-        fprintf(stderr, "EXCEPTION  %4d  %s\n", aCode, aException.what());
+        fprintf(stderr, "%s (%d)\n", aException.what(), aCode);
     }
     COLOR(WHITE);
 }
@@ -45,7 +45,7 @@ void Utl_DisplayError(const char * aErrorType, int aCode, const char * aMessage)
     COLOR(WHITE);
 }
 
-void Utl_ThrowError(const char * aErrorType, int aCode, const char * aMessage, int aData)
+void Utl_ThrowError(const char * aErrorType, int aCode, const char * aMessage)
 {
     assert(NULL != aErrorType);
     assert(   0 != aCode     );
@@ -57,7 +57,7 @@ void Utl_ThrowError(const char * aErrorType, int aCode, const char * aMessage, i
     assert(            0 < lRet);
     assert(sizeof(lWhat) > lRet);
 
-    throw std::exception(lWhat, aData);
+    throw std::exception(lWhat);
 }
 
 void Utl_ThrowErrorIfNeeded(int aCode, const char * aElement, const char * aName, unsigned int aErrorCount)

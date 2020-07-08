@@ -52,13 +52,16 @@ exit
 ! ===== Expected error at verification ======================================
 ! ERROR   122  In 103 access-list, TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and TCP 192.168.20.0/255.255.255.0 ==> 192.168.10.10 == 80 describe opposed trafics
 ! ERROR   122  In 103 access-list, TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and UDP 192.168.20.1 ==> 192.168.10.0/255.255.255.0 != 21 describe opposed trafics
-! EXCEPTION   150  ERROR   133  access-list 103 - 2 errors
+! ERROR   133  access-list 103 - 2 errors (150)
 ! ERROR   162  In 104 access-list, TCP 192.168.10.10 == 80 ==> 192.168.0.0/255.255.255.0  describe trafic going out from the interace and the access list is using as "in"
-! EXCEPTION   312  ERROR   185  access-list 104 - 1 errors
-! EXCEPTION   204  ERROR   333  interface f0/0 - 1 errors
+! ERROR   185  access-list 104 - 1 errors (312)
+! ERROR   333  interface f0/0 - 1 errors (204)
 ! ERROR   170  In 105 access-list, UDP 192.168.10.0/255.255.255.0 ==> 192.168.0.0/255.255.255.0  describe trafic going in to the interace and the access list is using as "out"
-! EXCEPTION   312  ERROR   185  access-list 105 - 1 errors
-! EXCEPTION   204  ERROR   333  interface f0/1 - 1 errors
+! ERROR   185  access-list 105 - 1 errors (312)
+! ERROR   333  interface f0/1 - 1 errors (204)
 ! CONFIG ERROR   328  Interface f0/2 act as DHCP server but DHCP request are not allowed in
-! EXCEPTION   204  ERROR   333  interface f0/2 - 1 errors
-! EXCEPTION   160  ERROR   209  Router's interfaces - 3 errors
+! ERROR   333  interface f0/2 - 1 errors (204)
+! ERROR   209  Router's interfaces - 3 errors (160)
+
+! ===== Expected error at the end of processing =============================
+! ERROR   202  router Test_7_Router_0 - 2 errors

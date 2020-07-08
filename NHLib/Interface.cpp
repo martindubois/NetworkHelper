@@ -98,7 +98,7 @@ namespace NH
 
         if (NULL != mAccessLists[aDirection])
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "An access-list is already set for this direction");
+            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "An access-list is already set for this direction");
         }
 
         mAccessLists[aDirection] = aAccessList;
@@ -250,12 +250,12 @@ namespace NH
         int lRet = sscanf_s(aVLAN, "%u", &lVLAN);
         if (1 != lRet)
         {
-            Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid VLAN", lVLAN);
+            Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid VLAN");
         }
 
         if (4096 <= lVLAN)
         {
-            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid VLAN", lVLAN);
+            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid VLAN");
         }
 
         if (mVLAN != lVLAN)

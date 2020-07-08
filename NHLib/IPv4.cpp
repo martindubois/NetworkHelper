@@ -39,7 +39,7 @@ uint32_t IPv4_TextToAddress(const char * aIn, bool aValidate)
     int lRet = inet_pton(AF_INET, aIn, &lResult);
     if (1 != lRet)
     {
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed", lRet);
+        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed");
     }
 
     if (aValidate)
@@ -59,7 +59,7 @@ uint32_t IPv4_TextToAddress_Invert(const char * aIn)
     int lRet = inet_pton(AF_INET, aIn, &lResult);
     if (1 != lRet)
     {
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed", lRet);
+        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed");
     }
 
     lResult = ~lResult;
@@ -73,7 +73,7 @@ void IPv4_Validate(uint32_t aAddr)
 {
     if ((0 == aAddr) || (0xffffffff == aAddr))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid IPv4 address", aAddr);
+        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid IPv4 address");
     }
 }
 
@@ -84,12 +84,12 @@ void IPv4_Validate(uint32_t aSubNet, uint32_t aMask)
 
     if (0 == (aSubNet & aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The sub net address is not valid", aSubNet);
+        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The sub net address is not valid");
     }
 
     if (0 != (aSubNet & ~aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The sub net address is not a valid sub net address", aSubNet);
+        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The sub net address is not a valid sub net address");
     }
 }
 
@@ -100,11 +100,11 @@ void IPv4_Validate(uint32_t aAddr, uint32_t aSubNet, uint32_t aMask)
 
     if ((aAddr & aMask) != (aSubNet & aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The address is not on the sub net", aAddr);
+        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The address is not on the sub net");
     }
 
     if (0 == (aAddr & ~aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The address is not valid on the sub net", aAddr);
+        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The address is not valid on the sub net");
     }
 }

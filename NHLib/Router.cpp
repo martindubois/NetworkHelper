@@ -127,7 +127,7 @@ namespace NH
                 break;
 
             default:
-                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Invalid information type", aType);
+                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Invalid information type");
             }
 
             SetName(lName);
