@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Cisco_Parser.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Errors.h" />
     <ClInclude Include="IP.h" />
     <ClInclude Include="IPv4.h" />
     <ClInclude Include="Parser.h" />

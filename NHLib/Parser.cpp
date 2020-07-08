@@ -18,6 +18,7 @@
 
 // ===== NHLib ==============================================================
 #include "Color.h"
+#include "Errors.h"
 #include "Utilities.h"
 
 #include "Parser.h"
@@ -131,10 +132,10 @@ void Parser::Parse(const char * aFileName)
     errno_t lErr = fopen_s(&lFile, aFileName, "r");
     if (0 != lErr)
     {
-        Utl_ThrowError(UTL_FILE_ERROR, __LINE__, "fopen_s( , ,  )  failed", lErr);
+        Utl_ThrowError(UTL_FILE_ERROR, __LINE__, "fopen_s( , ,  )  failed");
     }
 
-    unsigned int lError = 0;
+    unsigned int lErrorCount = 0;
 
     assert(NULL != lFile);
 
@@ -142,15 +143,19 @@ void Parser::Parse(const char * aFileName)
 
     while (NULL != fgets(lLine, sizeof(lLine), lFile))
     {
-        lError += ParseLine(lLine);
+        lErrorCount += ParseLine(lLine);
     }
 
     int lRet = fclose(lFile);
     assert(0 == lRet);
 
-    if (0 < lError)
+    if (0 < lErrorCount)
     {
-        Utl_ThrowError(UTL_ERROR, __LINE__, "Parsing errors", lError);
+        char lMessage[1024];
+
+        int lRet = sprintf_s(lMessage, ERROR_1_FMT, aFileName, lErrorCount);
+
+        Utl_ThrowError(UTL_ERROR, ERROR_1, lMessage);
     }
 }
 
