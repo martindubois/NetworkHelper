@@ -112,28 +112,38 @@ namespace NH
         /// \param aSubNet
         void SetSubNet(const SubNet * aSubNet);
 
-        void Verify() const;
-
-        /// \param aAddr
+        /// \param aSubNet
+        /// \param aPort
         /// \retval false
         /// \retval true
-        bool VerifyAddress(uint32_t aAddr) const;
+        bool Match(const SubNet & aSubNet, uint16_t aPort) const;
+
+        /// \param aAddress
+        /// \prama aPort
+        /// \retval false
+        /// \retval true
+        bool Match(uint32_t aAddress, uint16_t aPort) const;
 
         /// \param aSubNet
         /// \retval false
         /// \retval true
-        bool VerifySubNet(const SubNet * aSubNet) const;
+        bool Match(const SubNet & aSubNet) const;
+
+        /// \param aAddress
+        /// \retval false
+        /// \retval true
+        bool Match(uint32_t aAddress) const;
+
+        /// \param aPort
+        /// \retval false
+        /// \retval true
+        bool Match(uint16_t aPort) const;
+
+        void Verify() const;
 
     private:
 
-        struct
-        {
-            unsigned mAny : 1;
-
-            unsigned mReserved0 : 31;
-        }
-        mFlags;
-
+        Filter         mFilter ;
         uint32_t       mHost   ;
         uint16_t       mPort_A ;
         uint16_t       mPort_B ;

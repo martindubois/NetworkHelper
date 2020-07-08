@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-08 KMS - Martin Dubois, P.Eng
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -86,6 +86,11 @@ namespace NH
     const char   * Interface::GetName  () const { return mName.c_str(); }
     const SubNet * Interface::GetSubNet() const { return mSubNet; }
 
+    bool Interface::IsDHCPServer() const
+    {
+        return (NULL != mSubNet) && mSubNet->GetDHCP(this);
+    }
+
     void Interface::SetAccessList(Direction aDirection, const AccessList * aAccessList)
     {
         assert(DIRECTION_QTY >  aDirection );
@@ -132,14 +137,17 @@ namespace NH
     {
         if (!mFlags.mDHCP)
         {
-            if (mFlags.mHasSubInterface) { Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface with sub-interfaces"); }
+            if (mFlags.mHasSubInterface)
+            {
+                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface with sub-interfaces");
+            }
 
             if (0 != mAddr)
             {
                 Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface with a valid IPv4 address");
             }
 
-            if ((NULL != mSubNet) && mSubNet->GetDHCP(this))
+            if (IsDHCPServer())
             {
                 Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
             }
@@ -270,39 +278,59 @@ namespace NH
 
     void Interface::Verify() const
     {
+        unsigned int lErrorCount = 0;
+        char         lMessage[128];
+        int          lRet;
+
         if ((0 == mAddr) && (!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
         {
-            char lMessage[128];
-
-            int lRet = sprintf_s(lMessage, "Interface %s - No IPv4 address set and DHCP client not enabled", mName.c_str());
+            lRet = sprintf_s(lMessage, "Interface %s - No IPv4 address set and DHCP client not enabled", mName.c_str());
             assert(               0 < lRet);
             assert(sizeof(lMessage) > lRet);
 
-            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, lMessage, mAddr);
+            Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+            lErrorCount++;
         }
 
-        unsigned int i;
-
-        if (0 != mAddr)
+        for(unsigned int i = 0; i < DIRECTION_QTY; i ++)
         {
-            for (i = 0; i < DIRECTION_QTY; i++)
+            if (NULL != mAccessLists[i])
             {
-                if (NULL != mAccessLists[i])
+                try
                 {
-                    mAccessLists[i]->Verify(mAddr, static_cast<NH::Direction>(i));
+                    if (0 != mAddr)
+                    {
+                        mAccessLists[i]->Verify(mAddr, static_cast<NH::Direction>(i));
+                    }
+                    else if (NULL != mSubNet)
+                    {
+                        mAccessLists[i]->Verify(*mSubNet, static_cast<NH::Direction>(i));
+                    }
+                }
+                catch (std::exception eE)
+                {
+                    Utl_DisplayError(__LINE__, eE);
+                    lErrorCount++;
                 }
             }
         }
-        else if (NULL != mSubNet)
+
+        if (IsDHCPServer() && (NULL != mAccessLists[DIRECTION_IN]))
         {
-            for (i = 0; i < DIRECTION_QTY; i++)
+            assert(NULL != mSubNet);
+
+            if (!mAccessLists[DIRECTION_IN]->IsAllowed(Access::PROTOCOL_UDP, *mSubNet, 68, 0, 67))
             {
-                if (NULL != mAccessLists[i])
-                {
-                    mAccessLists[i]->Verify(mSubNet, static_cast<NH::Direction>(i));
-                }
+                lRet = sprintf_s(lMessage, "Interface %s act as DHCP server but DHCP request are not allowed in", mName.c_str());
+                assert(               0 < lRet);
+                assert(sizeof(lMessage) > lRet);
+
+                Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                lErrorCount++;
             }
         }
+
+        Utl_ThrowErrorIfNeeded(__LINE__, "interface", mName.c_str(), lErrorCount);
     }
 
     // Internal
@@ -436,7 +464,10 @@ namespace NH
             assert(sizeof(lStr) > lRet);
         }
 
-        if ((NULL != mSubNet) && mSubNet->GetDHCP(this)) { assert(!mFlags.mDHCP); lTitle += EOL "DHCP Server"; }
+        if (IsDHCPServer())
+        {
+            assert(!mFlags.mDHCP); lTitle += EOL "DHCP Server";
+        }
 
         if (mFlags.mNAT_Inside)
         {

@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-08 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -33,9 +33,8 @@ namespace NH
     // Public
     ////////////////////////////////////////////////////////////////////////
 
-    AccessEnd::AccessEnd() : mHost(0), mPort_A(0), mPort_B(0), mPort_Op(OPERATOR_INVALID), mSubNet(NULL)
+    AccessEnd::AccessEnd() : mFilter(FILTER_INVALID), mHost(0), mPort_A(0), mPort_B(0), mPort_Op(OPERATOR_INVALID), mSubNet(NULL)
     {
-        mFlags.mAny = false;
     }
 
     // NOT TESTED NH.Access.End.SetPort
@@ -48,13 +47,13 @@ namespace NH
 
         memset(aOut, 0, aOutSize_byte);
 
-        if (0 != mHost)
+        switch (mFilter)
         {
-            GetHost(aOut, aOutSize_byte);
-        }
-        else if (NULL != mSubNet)
-        {
-            mSubNet->GetFullName(aOut, aOutSize_byte);
+        case FILTER_ANY   : break;
+        case FILTER_HOST  : GetHost             (aOut, aOutSize_byte); break;
+        case FILTER_SUBNET: mSubNet->GetFullName(aOut, aOutSize_byte); break;
+
+        default: assert(false);
         }
 
         unsigned int lLen = strlen(aOut);
@@ -85,28 +84,11 @@ namespace NH
 
     AccessEnd::Filter AccessEnd::GetFilter() const
     {
-        if (mFlags.mAny)
-        {
-            return FILTER_ANY;
-        }
-
-        if (0 != mHost)
-        {
-            return FILTER_HOST;
-        }
-
-        if (NULL != mSubNet)
-        {
-            return FILTER_SUBNET;
-        }
-
-        return FILTER_INVALID;
+        return mFilter;
     }
 
     uint32_t AccessEnd::GetHost() const
     {
-        assert(0 != mHost);
-
         return mHost;
     }
 
@@ -131,7 +113,7 @@ namespace NH
 
     bool AccessEnd::IsInitialized() const
     {
-        return mFlags.mAny || (0 != mHost) || (NULL != mSubNet);
+        return FILTER_INVALID != mFilter;
     }
 
     // NOT TESTED NH.AccessEnd.Error
@@ -144,30 +126,30 @@ namespace NH
             Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end already initialized");
         }
 
-        assert(!mFlags.mAny);
+        assert(FILTER_INVALID == mFilter);
 
-        mFlags.mAny = true;
+        mFilter = FILTER_ANY;
     }
 
     void AccessEnd::SetHost(uint32_t aHost)
     {
-        IPv4_Validate(aHost);
-
         if (IsInitialized())
         {
             Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end already initialized");
         }
 
-        assert(0 == mHost);
+        assert(FILTER_INVALID == mFilter);
+        assert(             0 == mHost  );
 
-        mHost = aHost;
+        mFilter = FILTER_HOST;
+        mHost   = aHost;
     }
 
     void AccessEnd::SetHost(const char * aHost)
     {
         assert(NULL != aHost);
 
-        SetHost(IPv4_TextToAddress(aHost));
+        SetHost(IPv4_TextToAddress(aHost, false));
     }
 
     // NOT TESTED NH.AccessEnd.Error
@@ -258,9 +240,70 @@ namespace NH
             Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end already initialized");
         }
 
-        assert(NULL == mSubNet);
+        assert(FILTER_INVALID == mFilter);
+        assert(NULL           == mSubNet);
 
+        mFilter = FILTER_SUBNET;
         mSubNet = aSubNet;
+    }
+
+    bool AccessEnd::Match(const SubNet & aSubNet, unsigned short aPort) const
+    {
+        return Match(aSubNet) && Match(aPort);
+    }
+
+    bool AccessEnd::Match(uint32_t aAddress, uint16_t aPort) const
+    {
+        return Match(aAddress) && Match(aPort);
+    }
+
+    bool AccessEnd::Match(const SubNet & aSubNet) const
+    {
+        assert(NULL != &aSubNet);
+
+        switch (mFilter)
+        {
+        case FILTER_ANY   : return true;
+        case FILTER_HOST  : return aSubNet.VerifyAddress(mHost);
+        case FILTER_SUBNET: return mSubNet == &aSubNet;
+
+        default: assert(false);
+        }
+
+        return false;
+    }
+
+    bool AccessEnd::Match(uint32_t aAddress) const
+    {
+        switch (mFilter)
+        {
+        case FILTER_ANY   : return true;
+        case FILTER_HOST  : return mHost ==               aAddress ;
+        case FILTER_SUBNET: return mSubNet->VerifyAddress(aAddress);
+
+        default: assert(false);
+        }
+
+        return false;
+    }
+
+    bool AccessEnd::Match(uint16_t aPort) const
+    {
+        assert(0 != aPort);
+
+        switch (mPort_Op)
+        {
+        case OPERATOR_ANY  : return true;
+        case OPERATOR_EQ   : return  mPort_A == aPort;
+        case OPERATOR_GT   : return  mPort_A <  aPort;
+        case OPERATOR_LT   : return  mPort_A >  aPort;
+        case OPERATOR_NEQ  : return  mPort_A != aPort;
+        case OPERATOR_RANGE: return (mPort_A <= aPort) && (mPort_B >= aPort);
+
+        default: assert(false);
+        }
+
+        return false;
     }
 
     void AccessEnd::Verify() const
@@ -269,39 +312,6 @@ namespace NH
         {
             Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end is not correctly initialized");
         }
-    }
-
-    bool AccessEnd::VerifyAddress(uint32_t aAddr) const
-    {
-        if (0 != mHost)
-        {
-            return mHost == aAddr;
-        }
-        else if (NULL != mSubNet)
-        {
-            return mSubNet->VerifyAddress(aAddr);
-        }
-
-        return false;
-    }
-
-    // NOT TESTED NH.AccessEnd.VerifySubNet
-    //            FILTER_ANY
-
-    bool AccessEnd::VerifySubNet(const SubNet * aSubNet) const
-    {
-        assert(NULL != aSubNet);
-
-        if (0 != mHost)
-        {
-            return aSubNet->VerifyAddress(mHost);
-        }
-        else if (NULL != mSubNet)
-        {
-            return mSubNet == aSubNet;
-        }
-
-        return false;
     }
 
 }

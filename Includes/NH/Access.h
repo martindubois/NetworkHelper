@@ -57,10 +57,27 @@ namespace NH
         /// \param aOutSize_byte
         void GetDescription(char * aOut, unsigned int aOutSize_byte) const;
 
+        /// \return See Type
+        Type GetType() const;
+
         void SetEstablished();
 
         /// \param aProtocol See Protocol
         void SetProtocol(Protocol aProtocol);
+
+        /// \param aProtocol  See Protocol
+        /// \param aSrcSubNet
+        /// \param aSrcPort
+        /// \param aDstAddr
+        /// \param aDstPort
+        /// \retval false
+        /// \retval true
+        bool Match(Protocol aProtocol, const SubNet & aSrcSubNet, uint16_t aSrcPort, uint32_t aDstAddr, uint16_t aDstPort) const;
+
+        /// \param aProtocol  See Protocol
+        /// \retval false
+        /// \retval true
+        bool Match(Protocol aProtocol) const;
 
         void Verify() const;
 

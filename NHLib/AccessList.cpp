@@ -48,9 +48,31 @@ namespace NH
         Access * lResult = new Access(aType);
         assert(NULL != lResult);
 
-        mAccess.push_front(lResult);
+        mAccess.push_back(lResult);
 
         return lResult;
+    }
+
+    bool AccessList::IsAllowed(Access::Protocol aProtocol, const SubNet & aSrcSubNet, uint16_t aSrcPort, uint32_t aDstAddr, uint16_t aDstPort) const
+    {
+        for (InternalList::const_iterator lIt = mAccess.begin(); lIt != mAccess.end(); lIt++)
+        {
+            Access * lAccess = (*lIt);
+            assert(NULL != lAccess);
+
+            if (lAccess->Match(aProtocol, aSrcSubNet, aSrcPort, aDstAddr, aDstPort))
+            {
+                switch (lAccess->GetType())
+                {
+                case Access::TYPE_DENY  : return false;
+                case Access::TYPE_PERMIT: return true ;
+
+                default: assert(false);
+                }
+            }
+        }
+
+        return false;
     }
 
     void AccessList::Undo()
@@ -83,19 +105,21 @@ namespace NH
                     Access * lA1 = (*lIt1);
                     assert(NULL != lA1);
 
+                    AccessEnd::Filter lDF1 = lA1->mDestination.GetFilter();
+
                     switch (lSF0)
                     {
                     case AccessEnd::FILTER_HOST  :
-                        if (lA1->mDestination.VerifyAddress(lA0->mSource.GetHost()))
+                        if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(lA0->mSource.GetHost()))
                         {
-                            DisplayError(__LINE__, "describe opposed trafics", lA0, lA1);
+                            DisplayError(__LINE__, "describe opposed trafics", *lA0, *lA1);
                             lErrorCount++;
                         }
                         break;
                     case AccessEnd::FILTER_SUBNET:
-                        if (lA1->mDestination.VerifySubNet(lA0->mSource.GetSubNet()))
+                        if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(*lA0->mSource.GetSubNet()))
                         {
-                            DisplayError(__LINE__, "describe opposed trafics", lA0, lA1);
+                            DisplayError(__LINE__, "describe opposed trafics", *lA0, *lA1);
                             lErrorCount++;
                         }
                         break;
@@ -121,32 +145,35 @@ namespace NH
             Access * lAccess = (*lIt);
             assert(NULL != lAccess);
 
+            AccessEnd::Filter lDF = lAccess->mDestination.GetFilter();
+            AccessEnd::Filter lSF = lAccess->mSource     .GetFilter();
+
             switch (aDirection)
             {
             case DIRECTION_IN:
-                if ((AccessEnd::FILTER_HOST == lAccess->mSource.GetFilter()) && lAccess->mSource.VerifyAddress(aAddr))
+                if ((AccessEnd::FILTER_HOST == lSF) && lAccess->mSource.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", lAccess);
+                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", *lAccess);
                     lErrorCount++;
                 }
 
-                if ((AccessEnd::FILTER_SUBNET == lAccess->mDestination.GetFilter()) && lAccess->mDestination.VerifyAddress(aAddr))
+                if ((AccessEnd::FILTER_SUBNET == lDF) && lAccess->mDestination.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", lAccess);
+                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
 
             case DIRECTION_OUT:
-                if ((AccessEnd::FILTER_SUBNET == lAccess->mSource.GetFilter()) && lAccess->mSource.VerifyAddress(aAddr))
+                if ((AccessEnd::FILTER_SUBNET == lSF) && lAccess->mSource.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", lAccess);
+                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", *lAccess);
                     lErrorCount++;
                 }
 
-                if ((AccessEnd::FILTER_HOST == lAccess->mDestination.GetFilter()) && lAccess->mDestination.VerifyAddress(aAddr))
+                if ((AccessEnd::FILTER_HOST == lDF) && lAccess->mDestination.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", lAccess);
+                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
@@ -161,9 +188,9 @@ namespace NH
     // NOT TESTED NH.AccessList.Verify
     //            Access associated to an interface using DHCP.
 
-    void AccessList::Verify(const SubNet * aSubNet, Direction aDirection) const
+    void AccessList::Verify(const SubNet & aSubNet, Direction aDirection) const
     {
-        assert(NULL != aSubNet);
+        assert(NULL != &aSubNet);
 
         unsigned int lErrorCount = 0;
 
@@ -175,17 +202,17 @@ namespace NH
             switch (aDirection)
             {
             case DIRECTION_IN:
-                if (lAccess->mSource.VerifySubNet(aSubNet))
+                if (lAccess->mSource.Match(aSubNet))
                 {
-                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", lAccess);
+                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
 
             case DIRECTION_OUT:
-                if (lAccess->mDestination.VerifySubNet(aSubNet))
+                if (lAccess->mDestination.Match(aSubNet))
                 {
-                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", lAccess);
+                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
@@ -200,33 +227,33 @@ namespace NH
     // Private
     /////////////////////////////////////////////////////////////////////////
 
-    void AccessList::DisplayError(int aCode, const char * aMessage, const Access * aAccess) const
+    void AccessList::DisplayError(int aCode, const char * aMessage, const Access & aAccess) const
     {
         assert(NULL != aMessage);
-        assert(NULL != aAccess);
+        assert(NULL != &aAccess);
 
         char lMessage[256];
         char lDesc   [ 64];
 
-        aAccess->GetDescription(lDesc, sizeof(lDesc));
+        aAccess.GetDescription(lDesc, sizeof(lDesc));
 
         sprintf_s(lMessage, "In %s access-list, %s %s", mName.c_str(), lDesc, aMessage);
 
         Utl_DisplayError("ERROR", aCode, lMessage);
     }
 
-    void AccessList::DisplayError(int aCode, const char * aMessage, const Access * aA0, const Access * aA1) const
+    void AccessList::DisplayError(int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const
     {
         assert(NULL != aMessage);
-        assert(NULL != aA0);
-        assert(NULL != aA1);
+        assert(NULL != &aA0);
+        assert(NULL != &aA1);
 
         char lMessage[256];
         char lDesc0  [ 64];
         char lDesc1  [ 64];
 
-        aA0->GetDescription(lDesc0, sizeof(lDesc0));
-        aA1->GetDescription(lDesc1, sizeof(lDesc1));
+        aA0.GetDescription(lDesc0, sizeof(lDesc0));
+        aA1.GetDescription(lDesc1, sizeof(lDesc1));
 
         sprintf_s(lMessage, "In %s access-list, %s and %s %s", mName.c_str(), lDesc0, lDesc1, aMessage);
 

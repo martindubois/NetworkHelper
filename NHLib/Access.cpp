@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-08 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -56,6 +56,13 @@ namespace NH
         sprintf_s(aOut, aOutSize_byte, "%s %s ==> %s", PROTOCOL_NAMES[mProtocol], lSrc, lDst);
     }
 
+    Access::Type Access::GetType() const
+    {
+        assert(TYPE_QTY > mType);
+
+        return mType;
+    }
+
     void Access::SetEstablished()
     {
         assert(PROTOCOL_QTY > mProtocol);
@@ -76,6 +83,22 @@ namespace NH
         assert(PROTOCOL_QTY > aProtocol);
 
         mProtocol = aProtocol;
+    }
+
+    bool Access::Match(Protocol aProtocol, const SubNet & aSrcSubNet, uint16_t aSrcPort, uint32_t aDstAddr, uint16_t aDstPort) const
+    {
+        assert((PROTOCOL_TCP == aProtocol) || (PROTOCOL_UDP == aProtocol));
+
+        return Match(aProtocol) & mSource.Match(aSrcSubNet, aSrcPort) && mDestination.Match(aDstAddr, aDstPort);
+    }
+
+    bool Access::Match(Protocol aProtocol) const
+    {
+        assert(PROTOCOL_QTY > aProtocol);
+
+        assert(PROTOCOL_QTY > mProtocol);
+
+        return mProtocol == aProtocol;
     }
 
     // NOT TESTED NH.Access

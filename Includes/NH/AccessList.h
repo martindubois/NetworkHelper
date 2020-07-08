@@ -34,13 +34,22 @@ namespace NH
         /// \param aType
         Access * Add(Access::Type aType);
 
+        /// \param aProtocol
+        /// \param aSrcSubNet
+        /// \param aSrcPort
+        /// \param aDstAddr
+        /// \param aDstPort
+        /// \retval false
+        /// \retval true
+        bool IsAllowed(Access::Protocol aProtocol, const SubNet & aSrcSubNet, uint16_t aSrcPort, uint32_t aDstAddr, uint16_t aDstPort) const;
+
         void Undo();
 
         void Verify() const;
 
         void Verify(uint32_t aAddr, Direction aDirection) const;
 
-        void Verify(const SubNet * aSubNet, Direction aDirection) const;
+        void Verify(const SubNet & aSubNet, Direction aDirection) const;
 
     private:
 
@@ -48,8 +57,8 @@ namespace NH
 
         const AccessList & operator = (const AccessList &);
 
-        void DisplayError(int aCode, const char * aMessage, const Access * aAccess) const;
-        void DisplayError(int aCode, const char * aMessage, const Access * aA0, const Access * aA1) const;
+        void DisplayError(int aCode, const char * aMessage, const Access & aAccess) const;
+        void DisplayError(int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const;
 
         typedef std::list<Access *> InternalList;
 

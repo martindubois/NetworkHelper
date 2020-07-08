@@ -56,6 +56,10 @@ namespace NH
         /// \return This methode returns the pointer to an internal stored into the SubNetList instance associated to the Network.
         const SubNet * GetSubNet() const;
 
+        /// \retval false
+        /// \retval true
+        bool IsDHCPServer() const;
+
         /// \aDirection  See Direction
         /// \aAccessList
         void SetAccessList(Direction aDirection, const AccessList * aAccessList);

@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/IPv4.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -30,7 +30,7 @@ void IPv4_AddressToText(char * aOut, unsigned int aOutSize_byte, uint32_t aIn)
     assert(aOutSize_byte > static_cast<unsigned int>(lRet));
 }
 
-uint32_t IPv4_TextToAddress(const char * aIn)
+uint32_t IPv4_TextToAddress(const char * aIn, bool aValidate)
 {
     assert(NULL != aIn);
 
@@ -42,7 +42,10 @@ uint32_t IPv4_TextToAddress(const char * aIn)
         Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed", lRet);
     }
 
-    IPv4_Validate(lResult);
+    if (aValidate)
+    {
+        IPv4_Validate(lResult);
+    }
 
     return lResult;
 }
