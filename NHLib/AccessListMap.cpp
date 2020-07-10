@@ -4,12 +4,11 @@
 // Product    NetworkHelper
 // File       NHLib/AccessListMap.cpp
 
-// CODE REVIEW 2020-07-05 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-05 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/AccessList.h>

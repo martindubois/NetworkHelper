@@ -4,12 +4,13 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-08 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <memory.h>
 
 // ===== Includes ===========================================================
@@ -18,12 +19,15 @@
 #include <NH/AccessEnd.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IP.h"
 #include "IPv4.h"
 #include "Utilities.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Access end"
 
 static const char * OPERATORS[NH::AccessEnd::OPERATOR_QTY - 1] = { "", "==", ">", "<", "!=" };
 
@@ -123,7 +127,7 @@ namespace NH
     {
         if (IsInitialized())
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end already initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Filter already initialized");
         }
 
         assert(FILTER_INVALID == mFilter);
@@ -135,7 +139,7 @@ namespace NH
     {
         if (IsInitialized())
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end already initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Filter already initialized");
         }
 
         assert(FILTER_INVALID == mFilter);
@@ -159,7 +163,7 @@ namespace NH
     {
         if (OPERATOR_INVALID != mPort_Op)
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Port already initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Port already initialized");
         }
 
         switch (aOp)
@@ -176,7 +180,7 @@ namespace NH
     {
         if (OPERATOR_INVALID != mPort_Op)
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Port already initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Port already initialized");
         }
 
         assert(0 == mPort_A);
@@ -199,7 +203,7 @@ namespace NH
     {
         if (OPERATOR_INVALID != mPort_Op)
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Port already initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Port already initialized");
         }
 
         assert(0 == mPort_A);
@@ -210,7 +214,7 @@ namespace NH
         case OPERATOR_RANGE:
             if (aPortA > aPortB)
             {
-                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid port range");
+                Utl_ThrowError(ERROR_CONFIG, __LINE__, ELEMENT " - Invalid port range");
             }
             mPort_A  = aPortA;
             mPort_B  = aPortB;
@@ -237,7 +241,7 @@ namespace NH
 
         if (IsInitialized())
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end already initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Filter already initialized");
         }
 
         assert(FILTER_INVALID == mFilter);
@@ -310,7 +314,7 @@ namespace NH
     {
         if (!IsInitialized())
         {
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Access end is not correctly initialized");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " is not correctly initialized");
         }
     }
 

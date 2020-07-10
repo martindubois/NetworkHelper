@@ -60,8 +60,8 @@ namespace NH
         /// \retval true
         bool IsDHCPServer() const;
 
-        /// \aDirection  See Direction
-        /// \aAccessList
+        /// \param aDirection  See Direction
+        /// \param aAccessList
         void SetAccessList(Direction aDirection, const AccessList * aAccessList);
 
         /// \param aAddr The address

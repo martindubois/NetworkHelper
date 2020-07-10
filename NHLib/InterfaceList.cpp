@@ -4,12 +4,11 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Import/Includes ====================================================
 #include <HI/Line.h>
@@ -23,7 +22,13 @@
 
 // ===== NHLib ==============================================================
 #include "Color.h"
+#include "Errors.h"
 #include "Utilities.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Interfaces"
 
 namespace NH
 {
@@ -194,7 +199,7 @@ namespace NH
                         assert(               0 < lRet);
                         assert(sizeof(lMessage) > lRet);
 
-                        Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                        Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                         lErrorCount++;
                     }
                 }
@@ -206,7 +211,7 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(__LINE__, "Router's", "interfaces", lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_003, ELEMENT, "", lErrorCount);
     }
 
     // Internal

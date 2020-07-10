@@ -4,12 +4,14 @@
 // Product    NetworkHelper
 // File       NHLib/Device.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+// TODO NH.Device
+//      Use image (computer, phone, printer, server...)
+
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/Device.h>

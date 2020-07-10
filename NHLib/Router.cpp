@@ -4,12 +4,11 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/Route.h>
@@ -18,11 +17,14 @@
 #include <NH/Router.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Router"
 
 #define NAME_DEFAULT "Router"
 
@@ -127,14 +129,19 @@ namespace NH
                 break;
 
             default:
-                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Invalid information type");
+                Utl_ThrowError(ERROR_CALLER, __LINE__, "Invalid information type");
             }
 
             SetName(lName);
         }
     }
 
-    // NOT TESTED NH.Router.Verify
+    // TODO NH.Router.Verify
+    //      Is tunel desintation reachable through the tunnel source interface?
+    //      Does NAT pool access list match the nat inside interface?
+    //      Does NAT pool address really public?
+
+    // NOT TESTED NH.Router.Verify.Error
     //            Useless route and unreachable next router
 
     void Router::Verify() const
@@ -178,7 +185,7 @@ namespace NH
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                 lErrorCount++;
             }
 
@@ -194,12 +201,12 @@ namespace NH
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                Utl_DisplayError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                 lErrorCount++;
             }
         }
 
-        Utl_ThrowErrorIfNeeded(__LINE__, "router", mName.c_str(), lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_002, ELEMENT, mName.c_str(), lErrorCount);
     }
 
     // Internal
@@ -209,6 +216,9 @@ namespace NH
     {
         return &mRoutes;
     }
+
+    // TODO NH.Router
+    //      Use images
 
     void Router::Prepare(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap)
     {

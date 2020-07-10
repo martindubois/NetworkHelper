@@ -4,12 +4,11 @@
 // Product    NetworkHelper
 // File       NHLib/AccessList.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/Access.h>
@@ -18,7 +17,13 @@
 
 // ===== NHLib ==============================================================
 #include "Color.h"
+#include "Errors.h"
 #include "Utilities.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Access list"
 
 namespace NH
 {
@@ -112,14 +117,14 @@ namespace NH
                     case AccessEnd::FILTER_HOST  :
                         if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(lA0->mSource.GetHost()))
                         {
-                            DisplayError(__LINE__, "describe opposed trafics", *lA0, *lA1);
+                            DisplayError(__LINE__, "describe opposed traffics", *lA0, *lA1);
                             lErrorCount++;
                         }
                         break;
                     case AccessEnd::FILTER_SUBNET:
                         if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(*lA0->mSource.GetSubNet()))
                         {
-                            DisplayError(__LINE__, "describe opposed trafics", *lA0, *lA1);
+                            DisplayError(ERROR_208, *lA0, *lA1);
                             lErrorCount++;
                         }
                         break;
@@ -130,7 +135,7 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(__LINE__, "access-list", mName.c_str(), lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_006, ELEMENT, mName.c_str(), lErrorCount);
     }
 
     // NOT TESTED NH.AccessList.Verify
@@ -153,13 +158,13 @@ namespace NH
             case DIRECTION_IN:
                 if ((AccessEnd::FILTER_HOST == lSF) && lAccess->mSource.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", *lAccess);
+                    DisplayError(__LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
                     lErrorCount++;
                 }
 
                 if ((AccessEnd::FILTER_SUBNET == lDF) && lAccess->mDestination.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", *lAccess);
+                    DisplayError(ERROR_207, *lAccess);
                     lErrorCount++;
                 }
                 break;
@@ -167,13 +172,13 @@ namespace NH
             case DIRECTION_OUT:
                 if ((AccessEnd::FILTER_SUBNET == lSF) && lAccess->mSource.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", *lAccess);
+                    DisplayError(ERROR_206, *lAccess);
                     lErrorCount++;
                 }
 
                 if ((AccessEnd::FILTER_HOST == lDF) && lAccess->mDestination.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", *lAccess);
+                    DisplayError(__LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
@@ -182,7 +187,7 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(__LINE__, "access-list", mName.c_str(), lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_005, ELEMENT, mName.c_str(), lErrorCount);
     }
 
     // NOT TESTED NH.AccessList.Verify
@@ -204,7 +209,7 @@ namespace NH
             case DIRECTION_IN:
                 if (lAccess->mSource.Match(aSubNet))
                 {
-                    DisplayError(__LINE__, " describe trafic going out from the interace and the access list is using as \"in\"", *lAccess);
+                    DisplayError(__LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
@@ -212,7 +217,7 @@ namespace NH
             case DIRECTION_OUT:
                 if (lAccess->mDestination.Match(aSubNet))
                 {
-                    DisplayError(__LINE__, " describe trafic going in to the interace and the access list is using as \"out\"", *lAccess);
+                    DisplayError(__LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
                     lErrorCount++;
                 }
                 break;
@@ -221,7 +226,7 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(__LINE__, "access-list", mName.c_str(), lErrorCount);
+        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, mName.c_str(), lErrorCount);
     }
 
     // Private
@@ -237,9 +242,9 @@ namespace NH
 
         aAccess.GetDescription(lDesc, sizeof(lDesc));
 
-        sprintf_s(lMessage, "In %s access-list, %s %s", mName.c_str(), lDesc, aMessage);
+        sprintf_s(lMessage, ELEMENT " %s - %s %s", mName.c_str(), lDesc, aMessage);
 
-        Utl_DisplayError("ERROR", aCode, lMessage);
+        Utl_DisplayError(ERROR_CONFIG, aCode, lMessage);
     }
 
     void AccessList::DisplayError(int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const
@@ -255,9 +260,9 @@ namespace NH
         aA0.GetDescription(lDesc0, sizeof(lDesc0));
         aA1.GetDescription(lDesc1, sizeof(lDesc1));
 
-        sprintf_s(lMessage, "In %s access-list, %s and %s %s", mName.c_str(), lDesc0, lDesc1, aMessage);
+        sprintf_s(lMessage, ELEMENT " %s - %s and %s %s", mName.c_str(), lDesc0, lDesc1, aMessage);
 
-        Utl_DisplayError("ERROR", aCode, lMessage);
+        Utl_DisplayError(ERROR_CONFIG, aCode, lMessage);
     }
 
 }

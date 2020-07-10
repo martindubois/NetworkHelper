@@ -5,4 +5,4 @@ License   https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
 Product   NetworkHelper
 File      NetworkHelper/_DocUser/NetworkHelper.NetworkHelper.ReadMe.txt
 
-1.0.1 Windows
+1.0.0 Beta Windows

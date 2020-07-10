@@ -4,12 +4,13 @@
 // Product    NetworkHelper
 // File       NHLib/Network.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// CODE COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+// TODO NH.Network.AddKnownDevices
+
+#include "Component.h"
 
 // ===== Import/Includes ====================================================
 #include <HI/Diagram.h>
@@ -21,6 +22,7 @@
 #include <NH/Network.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IPv4.h"
 #include "ShapeMap.h"
 #include "Utilities.h"
@@ -70,7 +72,7 @@ namespace NH
 
             if (*lIt == aDevice)
             {
-                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Device already added");
+                Utl_ThrowError(ERROR_CALLER, __LINE__, "Device already added");
             }
         }
 
@@ -131,7 +133,7 @@ namespace NH
 
             if (*lIt == aRouter)
             {
-                Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "Router already added");
+                Utl_ThrowError(ERROR_CALLER, __LINE__, "Router already added");
             }
         }
 

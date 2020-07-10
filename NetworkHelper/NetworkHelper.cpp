@@ -141,7 +141,7 @@ static void ReportInvalidCommand(KmsLib::ToolBase * aToolBase, int aCode, const 
     catch (std::exception eE)                                                 \
     {                                                                         \
         char lDesc[128];                                                      \
-        sprintf_s(lDesc, "Exception - %s", eE.what());                        \
+        sprintf_s(lDesc, "%s (%u)", eE.what(), __LINE__);                     \
         aToolBase->SetError(__LINE__, lDesc, KmsLib::ToolBase::REPORT_ERROR); \
     }
 
@@ -176,7 +176,7 @@ int main(int aCount, const char ** aVector)
     {
         char lDesc[ARG_MAX_SIZE_byte];
 
-        int lRet = sprintf_s(lDesc, "Unexpected exception - %s", eE.what());
+        int lRet = sprintf_s(lDesc, "Unexpected exception - %s (%u)", eE.what(), __LINE__);
         assert(            0 < lRet);
         assert(sizeof(lDesc) > lRet);
 

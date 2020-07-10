@@ -4,19 +4,20 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Router.cpp
 
-// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-06 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <Cisco/Router.h>
 
 // ===== NHLib ==============================================================
-#include "Cisco_Parser.h"
+#include "Errors.h"
 #include "Utilities.h"
+
+#include "Cisco_Parser.h"
 
 namespace Cisco
 {
@@ -45,7 +46,7 @@ namespace Cisco
         case INFO_CONFIG_FILE: ParseConfigFile(aData, aFlags); break;
 
         default:
-            Utl_ThrowError(UTL_CALLER_ERROR, __LINE__, "The specified information type is not supported");
+            Utl_ThrowError(ERROR_CALLER, __LINE__, "The specified information type is not supported");
         }
     }
 

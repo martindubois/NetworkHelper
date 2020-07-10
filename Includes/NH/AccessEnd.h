@@ -73,7 +73,7 @@ namespace NH
         /// \return See Operator
         Operator GetPortOperator() const;
 
-        /// \returnt This method returns the subnet
+        /// \return This method returns the subnet
         const SubNet * GetSubNet() const;
 
         /// \retval false
@@ -119,7 +119,7 @@ namespace NH
         bool Match(const SubNet & aSubNet, uint16_t aPort) const;
 
         /// \param aAddress
-        /// \prama aPort
+        /// \param aPort
         /// \retval false
         /// \retval true
         bool Match(uint32_t aAddress, uint16_t aPort) const;

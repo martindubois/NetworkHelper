@@ -4,12 +4,11 @@
 // Product    NetworkHelper
 // File       NHLib/SubNetList.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Windows ============================================================
 #include <ws2tcpip.h>
@@ -20,6 +19,7 @@
 #include <NH/SubNetList.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
 
@@ -123,7 +123,7 @@ namespace NH
                     assert(               0 < lRet);
                     assert(sizeof(lMessage) > lRet);
 
-                    Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+                    Utl_ThrowError(ERROR_CONFIG, __LINE__, lMessage);
                 }
             }
         }

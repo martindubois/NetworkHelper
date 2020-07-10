@@ -17,7 +17,7 @@ rem ===== Dependencies ======================================================
 set KMS_BASE_VERSION=3.0.20
 set KMS_BASE="%EXPORT_FOLDER%\KmsBase\%KMS_BASE_VERSION%_Windows"
 
-set HTML_INTERFACE_VERSION=1.0.0
+set HTML_INTERFACE_VERSION=1.0.1
 set HTML_INTERFACE="%EXPORT_FOLDER%\HTML_Interface\%HTML_INTERFACE_VERSION%_Windows"
 
 if not exist %EXPORT_FOLDER% (

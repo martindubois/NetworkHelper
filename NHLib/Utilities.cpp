@@ -4,16 +4,18 @@
 // Product    NetworkHelper
 // File       NHLib/Utilities.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdio.h>
 
 // ===== NHLib ==============================================================
 #include "Color.h"
+#include "Errors.h"
 
 #include "Utilities.h"
 
@@ -72,6 +74,6 @@ void Utl_ThrowErrorIfNeeded(int aCode, const char * aElement, const char * aName
 
         int lRet = sprintf_s(lMessage, "%s %s - %u errors", aElement, aName, aErrorCount);
 
-        Utl_ThrowError(UTL_ERROR, aCode, lMessage);
+        Utl_ThrowError(ERROR_ERROR, aCode, lMessage);
     }
 }

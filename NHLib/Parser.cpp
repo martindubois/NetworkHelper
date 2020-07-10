@@ -4,12 +4,13 @@
 // Product    NetworkHelper
 // File       NHLib/Parser.h
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -47,20 +48,20 @@ void Parser::ValidateCount(const char * aCommand, unsigned int aCount, unsigned 
 
     if (aMin > aCount)
     {
-        lRet = sprintf_s(lMessage, "The command \"%s\" must have at least %u elements", aCommand, aMin);
+        lRet = sprintf_s(lMessage, ERROR_401_FMT, aCommand, aMin);
         assert(               0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, lMessage);
+        Utl_ThrowError(ERROR_401, lMessage);
     }
 
     if (aMax < aCount)
     {
-        lRet = sprintf_s(lMessage, "The command \"%s\" must have %u elements or less", aCommand, aMax);
+        lRet = sprintf_s(lMessage, ERROR_402_FMT, aCommand, aMax);
         assert(               0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, lMessage);
+        Utl_ThrowError(ERROR_402, lMessage);
     }
 }
 
@@ -107,7 +108,7 @@ unsigned int Parser::Walk(const char **aElements, unsigned int aCount, const Nod
         assert(               0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, lMessage);
+        Utl_ThrowError(ERROR_PARSE, __LINE__, lMessage);
     }
 
     return aNodes[lIndex].mCode;
@@ -132,7 +133,7 @@ void Parser::Parse(const char * aFileName)
     errno_t lErr = fopen_s(&lFile, aFileName, "r");
     if (0 != lErr)
     {
-        Utl_ThrowError(UTL_FILE_ERROR, __LINE__, "fopen_s( , ,  )  failed");
+        Utl_ThrowError(ERROR_FILE, __LINE__, "fopen_s( , ,  )  failed");
     }
 
     unsigned int lErrorCount = 0;
@@ -153,9 +154,9 @@ void Parser::Parse(const char * aFileName)
     {
         char lMessage[1024];
 
-        int lRet = sprintf_s(lMessage, ERROR_1_FMT, aFileName, lErrorCount);
+        int lRet = sprintf_s(lMessage, ERROR_001_FMT, aFileName, lErrorCount);
 
-        Utl_ThrowError(UTL_ERROR, ERROR_1, lMessage);
+        Utl_ThrowError(ERROR_001, lMessage);
     }
 }
 
@@ -303,7 +304,7 @@ unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_byte, co
             {
                 if (aMax <= lResult)
                 {
-                    Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "The command contains too many elements");
+                    Utl_ThrowError(ERROR_PARSE, __LINE__, "The command contains too many elements");
                 }
 
                 aElements[lResult] = aOut + lOutIndex;
@@ -317,7 +318,7 @@ unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_byte, co
 
         if (aOutSize_byte <= lOutIndex)
         {
-            Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "The command is too long");
+            Utl_ThrowError(ERROR_PARSE, __LINE__, "The command is too long");
         }
         lIn++;
     }

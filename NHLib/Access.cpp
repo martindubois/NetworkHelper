@@ -4,12 +4,13 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-08 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdio.h>
 
 // ===== Includes ===========================================================
@@ -17,11 +18,14 @@
 #include <NH/SubNet.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IP.h"
 #include "Utilities.h"
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Access rule"
 
 static const char * PROTOCOL_NAMES[NH::Access::PROTOCOL_QTY] = { "ICMP", "IP", "TCP", "UDP" };
 
@@ -71,7 +75,7 @@ namespace NH
         {
             if (PROTOCOL_TCP != mProtocol)
             {
-                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "establish is valid with tcp only");
+                Utl_ThrowError(ERROR_214);
             }
 
             mFlags.mEstablished = true;
@@ -122,8 +126,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { Error(__LINE__, "describes trafic not going through the network"); } break;
-            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { Error(__LINE__, "describes trafic not going through the router" ); } break;
+            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { Error(ERROR_217); } break;
+            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { Error(ERROR_216); } break;
 
             default: assert(false);
             }
@@ -139,8 +143,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { Error(__LINE__, "describes trafic not going through the router"); } break;
-            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { Error(__LINE__, "describes trafic not going through the router"); } break;
+            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { Error(ERROR_215); } break;
+            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { Error(__LINE__, "Describes traffic not going through the router"); } break;
 
             default: assert(false);
             }
@@ -162,9 +166,9 @@ namespace NH
 
         GetDescription(lDesc, sizeof(lDesc));
 
-        sprintf_s(lMessage, "The access rules %s %s", lDesc, aMessage);
+        sprintf_s(lMessage, ELEMENT " %s - %s", lDesc, aMessage);
 
-        Utl_ThrowError("ERROR", __LINE__, lMessage);
+        Utl_ThrowError(ERROR_ERROR, aCode, lMessage);
     }
 
 }

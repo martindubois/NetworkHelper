@@ -4,12 +4,11 @@
 // Product   NetworkHelper
 // File      NHLib/ShapeMap.cpp
 
-// CODE REVIEW 2020-06-30 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-06-30 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== NHLib ==============================================================
 #include "ShapeMap.h"

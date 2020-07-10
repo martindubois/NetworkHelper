@@ -4,18 +4,21 @@
 // Product    NetworkHelper
 // File       NHLib/IPv4.cpp
 
-// CODE REVIEW 2020-07-08 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+
+#include "Component.h"
 
 // ===== C ==================================================================
-#include <assert.h>
 #include <stdio.h>
 
 // ===== Windows ============================================================
 #include <WS2tcpip.h>
 
 // ===== NHLib ==============================================================
-#include "IPv4.h"
+#include "Errors.h"
 #include "Utilities.h"
+
+#include "IPv4.h"
 
 // Functions
 /////////////////////////////////////////////////////////////////////////////
@@ -39,7 +42,7 @@ uint32_t IPv4_TextToAddress(const char * aIn, bool aValidate)
     int lRet = inet_pton(AF_INET, aIn, &lResult);
     if (1 != lRet)
     {
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed");
+        Utl_ThrowError(ERROR_404);
     }
 
     if (aValidate)
@@ -59,7 +62,7 @@ uint32_t IPv4_TextToAddress_Invert(const char * aIn)
     int lRet = inet_pton(AF_INET, aIn, &lResult);
     if (1 != lRet)
     {
-        Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Invalid IPv4 address - inet_pton( , ,  ) failed");
+        Utl_ThrowError(ERROR_405);
     }
 
     lResult = ~lResult;
@@ -73,7 +76,7 @@ void IPv4_Validate(uint32_t aAddr)
 {
     if ((0 == aAddr) || (0xffffffff == aAddr))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Invalid IPv4 address");
+        Utl_ThrowError(ERROR_210);
     }
 }
 
@@ -84,12 +87,12 @@ void IPv4_Validate(uint32_t aSubNet, uint32_t aMask)
 
     if (0 == (aSubNet & aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The sub net address is not valid");
+        Utl_ThrowError(ERROR_211);
     }
 
     if (0 != (aSubNet & ~aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The sub net address is not a valid sub net address");
+        Utl_ThrowError(ERROR_212);
     }
 }
 
@@ -100,11 +103,11 @@ void IPv4_Validate(uint32_t aAddr, uint32_t aSubNet, uint32_t aMask)
 
     if ((aAddr & aMask) != (aSubNet & aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The address is not on the sub net");
+        Utl_ThrowError(ERROR_CONFIG, __LINE__, "The address is not on the sub net");
     }
 
     if (0 == (aAddr & ~aMask))
     {
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The address is not valid on the sub net");
+        Utl_ThrowError(ERROR_CONFIG, __LINE__, "The address is not valid on the sub net");
     }
 }

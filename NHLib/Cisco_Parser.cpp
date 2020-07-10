@@ -4,12 +4,11 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/Router.h>
@@ -17,6 +16,7 @@
 #include <NH/SubNetList.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
 
@@ -281,7 +281,7 @@ namespace Cisco
                 }
                 else
                 {
-                    Utl_ThrowError(UTL_PARSE_ERROR, __LINE__, "Unexexpected command element");
+                    Utl_ThrowError(ERROR_PARSE, __LINE__, "Unexexpected command element");
                 }
             }
 
@@ -614,11 +614,11 @@ namespace Cisco
 
         char lMessage[128];
 
-        int lRet = sprintf_s(lMessage, "\"%s\" command outside of an \"%s\" section", aCommand, aSection);
+        int lRet = sprintf_s(lMessage, ERROR_225_FMT, aCommand, aSection);
         assert(0 < lRet);
         assert(sizeof(lMessage) > lRet);
 
-        Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, lMessage);
+        Utl_ThrowError(ERROR_225, lMessage);
     }
 
     void Parser::Section_Interface(const char * aCommand)

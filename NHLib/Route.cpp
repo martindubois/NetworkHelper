@@ -4,12 +4,11 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/SubNet.h>
@@ -17,6 +16,7 @@
 #include <NH/Route.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
 
@@ -37,7 +37,7 @@ namespace NH
 
         if (aSubNet->VerifyAddress(mAddr))
         {
-            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "The next router cannot be on the destination subnet");
+            Utl_ThrowError(ERROR_CONFIG, __LINE__, "The next router cannot be on the destination subnet");
         }
     }
 

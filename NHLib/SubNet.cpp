@@ -4,17 +4,17 @@
 // Product   NetworkHelper
 // File      NHLib/SubNet.cpp
 
-// CODE REVIEW 2020-07-07 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-07 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
 
-// ===== C ==================================================================
-#include <assert.h>
+#include "Component.h"
 
 // ===== Includes ===========================================================
 #include <NH/SubNet.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "IPv4.h"
 #include "ShapeMap.h"
 #include "Utilities.h"
@@ -82,6 +82,9 @@ namespace NH
         return (mAddr == aAddr) && (mMask == aMask);
     }
 
+    // TODO NH.SubNet.SetDHCP
+    //      DHCP set twice
+
     // NOT TESTED NH.SubNet.SetDHCP.Error
 
     // aRouter    [-K-;---]
@@ -92,14 +95,14 @@ namespace NH
 
         if ((NULL != mDHCP_Router) && (mDHCP_Router != aRouter))
         {
-            Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Two DHCP server for the same SubNet");
+            Utl_ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
         }
 
         if (NULL != aInterface)
         {
             if ((NULL != mDHCP_Interface) && (mDHCP_Interface != aInterface))
             {
-                Utl_ThrowError(UTL_CONFIG_ERROR, __LINE__, "Two DHCP server for the same SubNet");
+                Utl_ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
             }
 
             mDHCP_Interface = aInterface;
@@ -120,6 +123,9 @@ namespace NH
 
     // Internal
     /////////////////////////////////////////////////////////////////////////
+
+    // TODO NH.SubNet
+    //      Make private and public subnet look differently
 
     void SubNet::Prepare(HI::Diagram * aDiagram, ShapeMap * aSubNetMap)
     {

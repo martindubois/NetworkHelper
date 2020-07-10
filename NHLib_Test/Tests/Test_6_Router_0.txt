@@ -7,69 +7,69 @@
 ! This file test error detection when parsing configuration file.
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    53  The command "encapsulation dot1q" must have at least 3 elements
+! >>>>> PARSE ERROR  -401  The command "encapsulation dot1q" must have at least 3 elements
 encapsulation dot1q
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> CONFIG ERROR   621  "encapsulation dot1q" command outside of an "interface" section
+! >>>>> CONFIG ERROR  -225  "encapsulation dot1q" command outside of an "interface" section
 encapsulation dot1q 10
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    53  The command "interface" must have at least 2 elements
+! >>>>> PARSE ERROR  -401  The command "interface" must have at least 2 elements
 interface
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    53  The command "interface tunnel" must have at least 3 elements
+! >>>>> PARSE ERROR  -401  The command "interface tunnel" must have at least 3 elements
 interface tunnel
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    53  The command "ip address" must have at least 4 elements
+! >>>>> PARSE ERROR  -401  The command "ip address" must have at least 4 elements
 ip address
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> CONFIG ERROR   621  "ip address" command outside of an "interface" section
+! >>>>> CONFIG ERROR  -225  "ip address" command outside of an "interface" section
 ip address 192.168.0.1 255.255.255.0
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    62  The command "ip address dhcp" must have 3 elements or less
+! >>>>> PARSE ERROR  -402  The command "ip address dhcp" must have 3 elements or less
 ip address dhcp invalid
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    62  The command "ip nat outside" must have 3 elements or less
+! >>>>> PARSE ERROR  -402  The command "ip nat outside" must have 3 elements or less
 ip nat outside invalid
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    53  The command "ip route" must have at least 5 elements
+! >>>>> PARSE ERROR  -401  The command "ip route" must have at least 5 elements
 ip route
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    53  The command "network" must have at least 3 elements
+! >>>>> PARSE ERROR  -401  The command "network" must have at least 3 elements
 network
 
 interface test1
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> PARSE ERROR   253  Invalid VLAN
+	! >>>>> PARSE ERROR  -403  Invalid VLAN number
 	encapsulation dot1q invalid
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   258  Invalid VLAN
+	! >>>>> CONFIG ERROR  -201  A VLAN number must be below 4096
 	encapsulation dot1q 4096
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   264  VLAN must be set on sub-interface
+	! >>>>> CONFIG ERROR  -202  A VLAN must be set on sub-interface
 	encapsulation dot1q 10
 
 	ip address dhcp
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   116  Do not configure an IPv4 address on an interace with DHCP client enabled
+	! >>>>> CONFIG ERROR  -224  Do not configure an IPv4 address on an interace with DHCP client enabled
 	ip address 1.2.3.4 255.255.255.0
 
 	ip nat outside
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   196  A same interface cannot be NAT inside and NAT outside
+	! >>>>> CONFIG ERROR  -203  A same interface cannot be NAT outside and NAT inside
 	ip nat inside
 
 interface test2
@@ -77,17 +77,17 @@ interface test2
 	ip address 1.2.3.4 255.255.255.0
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   147  Do not enable DHCP client on an interface with a valid IPv4 address
+	! >>>>> CONFIG ERROR  -223  Do not enable DHCP client on an interface with a valid IPv4 address
 	ip address dhcp
 
 	ip nat inside
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   209  A same interface cannot be NAT inside and NAT outside
+	! >>>>> CONFIG ERROR  -204  A same interface cannot be NAT inside and NAT outside
 	ip nat outside
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> CONFIG ERROR   170  Do not create sub-interface for an interface with a IPv4 address configured
+! >>>>> CONFIG ERROR  -222  Do not create sub-interface for an interface with a IPv4 address configured
 interface test2.1
 
 interface test3.1
@@ -95,15 +95,15 @@ interface test3.1
 interface test3
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   263  Do not set a VLAN for an interface with sub-interface
+	! >>>>> CONFIG ERROR  -221  Do not set a VLAN for an interface with sub-interfaces
 	encapsulation dot1q 10
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   117  Do not configure an IPv4 address on an interface with sub-interfaces
+	! >>>>> CONFIG ERROR  -220  Do not configure an IPv4 address on an interface with sub-interfaces
 	ip address 1.2.3.4 255.255.255.0
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   142  Do not enable DHCP client on an interface with sub-interfaces
+	! >>>>> CONFIG ERROR  -219  Do not enable DHCP client on an interface with sub-interfaces
 	ip address dhcp
 
 interface test4
@@ -111,27 +111,27 @@ interface test4
 	ip address dhcp
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> CONFIG ERROR   166  Do not create sub-interface for an interface with DHCP client enabled
+! >>>>> CONFIG ERROR  -218  Do not create sub-interface for an interface with DHCP client enabled
 interface test4.1
 
 ! TEST INFO Access.Error
-!           An access-list entry describes trafic not going on the network.
+!           An access-list entry describes traffic not going on the network.
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> ERROR   167  The access rules IP 192.168.0.10 ==> 192.168.0.10 describes trafic not going through the network
+! >>>>> ERROR  -217  Access rule IP 192.168.0.10 ==> 192.168.0.10 - Describes traffic not going through the network
 ip access-list extended 101	permit ip host 192.168.0.10 host 192.168.0.10
 
 ! TEST INFO Access.Error
-!           An access-list entry describes trafic not going through the router.
+!           An access-list entry describes traffic not going through the router.
 
 ip access-list extended 102
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> ERROR   167  The access rules IP 192.168.0.0/255.255.255.0 ==> 192.168.0.10 describes trafic not going through the router
+	! >>>>> ERROR  -216  Access rule IP 192.168.0.0/255.255.255.0 ==> 192.168.0.10 - Describes traffic not going through the router
 	permit ip 192.168.0.0 0.0.0.255 host 192.168.0.10
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> ERROR   167  The access rules IP 192.168.0.10 ==> 192.168.0.0/255.255.255.0 describes trafic not going through the router
+	! >>>>> ERROR  -215  Access rule IP 192.168.0.10 ==> 192.168.0.0/255.255.255.0 - Describes traffic not going through the router
 	permit ip host 192.168.0.10 192.168.0.0 0.0.0.255
 
 exit
@@ -140,21 +140,21 @@ exit
 !           An access-list entry use the established keywork but does not describe TCP stream.
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> CONFIG ERROR    74  establish is valid with tcp only
+! >>>>> CONFIG ERROR  -214  Only the TCP rule can use the "establish" flag
 ip access-list extended 103 permit UDP host 192.168.0.10 eq 80 192.168.10.0 0.0.0.255 established
 
 ! TEST INFO Access.Error
 !           Invalid port number
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    30  Invalid port number
+! >>>>> CONFIG ERROR  -213  Invalid port number
 ip access-list extended 104 permit UDP any any eq 65537
 
 ! TEST INFO Access.Error
 !           Invalid IPv4 net mask
 
 ! ===== Expected error at parsing ===========================================
-! >>>>> PARSE ERROR    62  Invalid IPv4 address - inet_pton( , ,  ) failed
+! >>>>> PARSE ERROR  -405  Invalid IPv4 inverted net mask format
 ip access-list extended 105 permit IP 192.168.0.0 Invalid any
 
 ! TEST INFO DHCP.Error
@@ -163,7 +163,7 @@ ip access-list extended 105 permit IP 192.168.0.0 Invalid any
 ip dhcp pool Alice
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR    92  The sub net address is not a valid sub net address
+	! >>>>> CONFIG ERROR  -212  The subnet address is not a valid subnet address
 	network 192.168.0.1 255.255.255.0
 
 exit
@@ -171,7 +171,7 @@ exit
 ip dhcp pool Bob
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR    87  The sub net address is not valid
+	! >>>>> CONFIG ERROR  -211  The subnet address is not valid
 	network 0.0.0.1 255.255.255.0
 exit
 
@@ -181,7 +181,7 @@ exit
 interface f0/1
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> PARSE ERROR    42  Invalid IPv4 address - inet_pton( , ,  ) failed
+	! >>>>> PARSE ERROR  -404  Invalid IPv4 address format
 	ip address Invalid 255.255.255.0
 
 exit
@@ -189,7 +189,7 @@ exit
 interface f0/2
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR    76  Invalid IPv4 address
+	! >>>>> CONFIG ERROR  -210  Invalid IPv4 address
 	ip address 0.0.0.0 255.255.255.0
 
 exit
@@ -202,10 +202,10 @@ interface f0/0
 	ip access-group 101 in
 
 	! ===== Expected error at parsing =======================================
-	! >>>>> CONFIG ERROR   101  An access-list is already set for this direction
+	! >>>>> CONFIG ERROR  -209  An access list is already set for this direction
 	ip access-group 102 in
 
 exit
 
 ! ===== Expected error at the end of parsing ================================
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 33 lines with parsing error
+! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 33 lines with error
