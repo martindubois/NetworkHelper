@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -79,10 +79,11 @@ static const Parser::Node ENUM_DIRECTION[] =
 #define CMD_IP_NAT_OUTSIDE          (12)
 #define CMD_IP_NAT_POOL             (13)
 #define CMD_IP_ROUTE                (14)
-#define CMD_NETWORK                 (15)
-#define CMD_PERMIT                  (16)
-#define CMD_TUNNEL_DESTINATION      (17)
-#define CMD_TUNNEL_SOURCE           (18)
+#define CMD_IP_ROUTING              (15)
+#define CMD_NETWORK                 (16)
+#define CMD_PERMIT                  (17)
+#define CMD_TUNNEL_DESTINATION      (18)
+#define CMD_TUNNEL_SOURCE           (19)
 
 static const Parser::Node CMDS_ACCESS[] =
 {
@@ -136,6 +137,7 @@ static const Parser::Node CMDS_IP[] =
     { CMD_IP_ADDRESS     , "address"     , CMDS_IP_ADDRESS     },
     { Parser::CODE_IGNORE, "nat"         , CMDS_IP_NAT         },
     { CMD_IP_ROUTE       , "route"       , NULL                },
+    { CMD_IP_ROUTING     , "routing"     , NULL                },
 
     { Parser::CODE_IGNORE, NULL, NULL }
 };
@@ -227,6 +229,7 @@ namespace Cisco
         case CMD_IP_NAT_INSIDE          : return Cmd_Ip_Nat_Inside         (aElements, aCount);
         case CMD_IP_NAT_OUTSIDE         : return Cmd_Ip_Nat_Outside        (aElements, aCount);
         case CMD_IP_ROUTE               : return Cmd_Ip_Route              (aElements, aCount);
+        case CMD_IP_ROUTING             : return Cmd_Ip_Routing            (aElements, aCount);
         case CMD_NETWORK                : return Cmd_Network               (aElements, aCount);
         case CMD_PERMIT                 : return Cmd_Permit                (aElements, aCount);
 
@@ -579,6 +582,17 @@ namespace Cisco
         assert(NULL != lSubNet);
 
         lRouter->AddRoute(lSubNet, aElements[4]);
+
+        return true;
+    }
+
+    bool Parser::Cmd_Ip_Routing(const char ** aElements, unsigned int aCount)
+    {
+        assert(2 <= aCount);
+
+        ValidateCount("ip routing", aCount, 2, 2);
+
+        GetRouter()->SetIpRouting();
 
         return true;
     }

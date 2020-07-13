@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NetworkHelper/NetworkHelper.cpp
 
-// CODE REVIEW 2020-07-02 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-02 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -224,6 +224,8 @@ void AddRouter_Network(KmsLib::ToolBase * aToolBase, const char * aArg)
             assert(NULL != sRouter);
 
             InitRouter(lName);
+
+            sRouter->SetIpRouting();
         }
         CATCH;
     }

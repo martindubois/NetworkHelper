@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -41,8 +41,9 @@ namespace NH
 
     const unsigned int Router::FLAG_NO_ECHO = 0x00000001;
 
-    Router::Router() : mName(NAME_DEFAULT)
+    Router::Router() : mName(NAME_DEFAULT), mSubNets(NULL)
     {
+        mFlags.mIpRouting = false;
     }
 
     Router::~Router()
@@ -77,6 +78,16 @@ namespace NH
         assert(NULL != mSubNets);
 
         return mSubNets;
+    }
+
+    void Router::SetIpRouting()
+    {
+        if (mFlags.mIpRouting)
+        {
+            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - IP routing already enabled");
+        }
+
+        mFlags.mIpRouting = true;
     }
 
     void Router::SetName(const char * aName)
@@ -141,8 +152,8 @@ namespace NH
     //      Does NAT pool access list match the nat inside interface?
     //      Does NAT pool address really public?
 
-    // NOT TESTED NH.Router.Verify.Error
-    //            Useless route and unreachable next router
+    // NOT TESTED Router.Verify.Error
+    //            IP routing is not enabled and routes are configured
 
     void Router::Verify() const
     {
@@ -168,40 +179,19 @@ namespace NH
             lErrorCount++;
         }
 
-        for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
+        lErrorCount += Verify_Routes();
+
+        if (!mFlags.mIpRouting)
         {
-            char lMessage[128];
-            int  lRet;
-            char lSubNet [ 64];
-
-            const SubNet * lDestSubNet = lIt->GetSubNet();
-            assert(NULL != lDestSubNet);
-
-            if (NULL != mInterfaces.Find(lDestSubNet))
+            if (1 < mInterfaces.GetCount())
             {
-                lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
-
-                lRet = sprintf_s(lMessage, "Useless route because the %s subnet is directly connected", lSubNet);
-                assert(               0 < lRet);
-                assert(sizeof(lMessage) > lRet);
-
-                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                Utl_DisplayError(ERROR_229, ELEMENT " - " ERROR_229_MSG);
                 lErrorCount++;
             }
 
-            if (!CanReach(lIt->GetAddress()))
+            if (!mRoutes.empty())
             {
-                char lAddr   [ 32];
-
-                lIt->GetAddress(lAddr, sizeof(lAddr));
-
-                lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
-
-                lRet = sprintf_s(lMessage, "Cannot reach %s, the next router for %s", lAddr, lSubNet);
-                assert(               0 < lRet);
-                assert(sizeof(lMessage) > lRet);
-
-                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                Utl_DisplayError(ERROR_CONFIG, __LINE__, "IP routing is not enabled and at least one route is configured");
                 lErrorCount++;
             }
         }
@@ -250,6 +240,57 @@ namespace NH
         lShape->SetTitle(lTitle.c_str());
 
         mInterfaces.Prepare(aDiagram, aColor, lShape, aSubNetMap);
+    }
+
+    // Privates
+    /////////////////////////////////////////////////////////////////////////
+
+    // NOT TESTED NH.Router.Verify.Error
+    //            Useless route and unreachable next router
+
+    unsigned int Router::Verify_Routes() const
+    {
+        unsigned int lResult = 0;
+
+        for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
+        {
+            char lMessage[128];
+            int  lRet;
+            char lSubNet[64];
+
+            const SubNet * lDestSubNet = lIt->GetSubNet();
+            assert(NULL != lDestSubNet);
+
+            if (NULL != mInterfaces.Find(lDestSubNet))
+            {
+                lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
+
+                lRet = sprintf_s(lMessage, "Useless route because the %s subnet is directly connected", lSubNet);
+                assert(               0 < lRet);
+                assert(sizeof(lMessage) > lRet);
+
+                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                lResult++;
+            }
+
+            if (!CanReach(lIt->GetAddress()))
+            {
+                char lAddr[32];
+
+                lIt->GetAddress(lAddr, sizeof(lAddr));
+
+                lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
+
+                lRet = sprintf_s(lMessage, "Cannot reach %s, the next router for %s", lAddr, lSubNet);
+                assert(               0 < lRet);
+                assert(sizeof(lMessage) > lRet);
+
+                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                lResult++;
+            }
+        }
+
+        return lResult;
     }
 
 }

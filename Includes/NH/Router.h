@@ -75,6 +75,8 @@ namespace NH
         /// \return This method returns the SubNetList associated to the network the router is in.
         SubNetList * GetSubNetList();
 
+        void SetIpRouting();
+
         /// \param aName The name
         void SetName(const char * aName);
 
@@ -105,6 +107,16 @@ namespace NH
         Router(const Router &);
 
         const Router & operator = (const Router &);
+
+        unsigned int Verify_Routes() const;
+
+        struct
+        {
+            unsigned mIpRouting : 1;
+
+            unsigned mReserved0 : 31;
+        }
+        mFlags;
 
         std::string  mName   ;
         RouteList    mRoutes ;

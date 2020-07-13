@@ -71,6 +71,9 @@
 #define ERROR_228     ERROR_CONFIG, (-228)
 #define ERROR_228_MSG "Invalid next router IPv4 address"
 
+#define ERROR_229     ERROR_CONFIG, (-229)
+#define ERROR_229_MSG "IP routing is not enabled and the router use more than one interface"
+
 // ===== FILE ERROR =========================================================
 
 #define ERROR_FILE ("FILE ERROR")

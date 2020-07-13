@@ -52,6 +52,9 @@ namespace NH
         /// \return A pointer to an internal instance
         Interface * FindOrCreate(const char * aName);
 
+        /// \return This method returns the number of interface in the list.
+        unsigned int GetCount() const;
+
         /// \param aName
         /// \return This methode return the zero base index of the interface.
         unsigned int GetIndex(const char * aName) const;

@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -127,6 +127,11 @@ namespace NH
         }
 
         return lResult;
+    }
+
+    unsigned int InterfaceList::GetCount() const
+    {
+        return mInterfaces.size();
     }
 
     // NOT TESTED NH.InterfaceList.GetIndex

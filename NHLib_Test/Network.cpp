@@ -43,6 +43,7 @@ KMS_TEST_BEGIN(Network_MyNetwork)
     NH::SubNet * lSN_ASUS = lN.mSubNets.FindOrCreate("192.168.0.0", "255.255.255.0");
     NH::SubNet * lSN_Bell = lN.mSubNets.FindOrCreate("192.168.2.0", "255.255.255.0");
 
+    lR_ASUS.SetIpRouting();
     lR_ASUS.SetName("ASUS");
 
     NH::Interface * lI_ASUS_WAN = lR_ASUS.mInterfaces.FindOrCreate("WAN");
@@ -56,6 +57,7 @@ KMS_TEST_BEGIN(Network_MyNetwork)
 
     lSN_ASUS->SetDHCP(&lR_ASUS, lI_ASUS_1);
 
+    lR_Bell.SetIpRouting();
     lR_Bell.SetName("Bell");
 
     NH::Interface * lI_Bell_WAN = lR_Bell.mInterfaces.FindOrCreate("WAN");

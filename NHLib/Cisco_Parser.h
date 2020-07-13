@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.h
 
-// CODE REVIEW 2020-07-06 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -50,6 +50,7 @@ namespace Cisco
         bool Cmd_Ip_Nat_Inside         (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Nat_Outside        (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Route              (const char ** aElements, unsigned int aCount);
+        bool Cmd_Ip_Routing            (const char ** aElements, unsigned int aCount);
         bool Cmd_Network               (const char ** aElements, unsigned int aCount);
         bool Cmd_No                    (const char ** aElements, unsigned int aCount);
         bool Cmd_Permit                (const char ** aElements, unsigned int aCount);
