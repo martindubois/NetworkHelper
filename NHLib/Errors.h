@@ -62,6 +62,15 @@
 #define ERROR_225     ERROR_CONFIG, (-225)
 #define ERROR_225_FMT "\"%s\" command outside of an \"%s\" section"
 
+#define ERROR_226     ERROR_CONFIG, (-226)
+#define ERROR_226_MSG "Invalid IPv4 address"
+
+#define ERROR_227     ERROR_CONFIG, (-227)
+#define ERROR_227_MSG "Invalid IPv4 address"
+
+#define ERROR_228     ERROR_CONFIG, (-228)
+#define ERROR_228_MSG "Invalid next router IPv4 address"
+
 // ===== FILE ERROR =========================================================
 
 #define ERROR_FILE ("FILE ERROR")

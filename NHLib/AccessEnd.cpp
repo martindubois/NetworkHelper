@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -137,6 +137,16 @@ namespace NH
 
     void AccessEnd::SetHost(uint32_t aHost)
     {
+        switch (IPv4_GetAddressType(aHost))
+        {
+        case IPv4_PRIVATE:
+        case IPv4_PUBLIC:
+            break;
+
+        default:
+            Utl_ThrowError(ERROR_226, ELEMENT " - " ERROR_226_MSG);
+        }
+
         if (IsInitialized())
         {
             Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - Filter already initialized");

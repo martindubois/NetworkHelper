@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -19,6 +19,11 @@
 #include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Route"
 
 namespace NH
 {
@@ -34,6 +39,16 @@ namespace NH
         assert(NULL != aSubNet);
 
         mAddr = IPv4_TextToAddress(aAddr);
+
+        switch (IPv4_GetAddressType(mAddr))
+        {
+        case IPv4_PRIVATE:
+        case IPv4_PUBLIC:
+            break;
+
+        default:
+            Utl_ThrowError(ERROR_228, ELEMENT " - " ERROR_228_MSG);
+        }
 
         if (aSubNet->VerifyAddress(mAddr))
         {

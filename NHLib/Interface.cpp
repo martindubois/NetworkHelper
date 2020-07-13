@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -115,20 +115,25 @@ namespace NH
 
     void Interface::SetAddress(uint32_t aAddr)
     {
-        if (mAddr != aAddr)
+        switch (IPv4_GetAddressType(aAddr))
         {
-            IPv4_Validate(aAddr);
+        case IPv4_PRIVATE:
+        case IPv4_PUBLIC:
+            break;
 
-            if (mFlags.mDHCP           ) { Utl_ThrowError(ERROR_224); }
-            if (mFlags.mHasSubInterface) { Utl_ThrowError(ERROR_220); }
-
-            if (NULL != mSubNet)
-            {
-                mSubNet->ValidateAddress(aAddr);
-            }
-
-            mAddr = aAddr;
+        default:
+            Utl_ThrowError(ERROR_227, ELEMENT " - " ERROR_227_MSG);
         }
+
+        if (mFlags.mDHCP           ) { Utl_ThrowError(ERROR_224); }
+        if (mFlags.mHasSubInterface) { Utl_ThrowError(ERROR_220); }
+
+        if (NULL != mSubNet)
+        {
+            mSubNet->ValidateAddress(aAddr);
+        }
+
+        mAddr = aAddr;
     }
 
     void Interface::SetAddress(const char * aAddr)
