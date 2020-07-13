@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessList.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -89,16 +89,26 @@ namespace NH
         mAccess.pop_back();
     }
 
+    // NOT TESTED NH.AccessList.Verify
+
     void AccessList::Verify() const
     {
-        unsigned int lErrorCount = 0;
+        Utl_ThrowErrorIfNeeded(ERROR_006, ELEMENT, mName.c_str(), Verify_Internal());
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    unsigned int AccessList::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
 
         for (InternalList::const_iterator lIt0 = mAccess.begin(); lIt0 != mAccess.end(); lIt0++)
         {
             Access * lA0 = (*lIt0);
             assert(NULL != lA0);
 
-            lA0->Verify();
+            lResult += lA0->Verify_Internal();
 
             AccessEnd::Filter lSF0 = lA0->mSource.GetFilter();
             if (AccessEnd::FILTER_ANY != lSF0)
@@ -114,18 +124,18 @@ namespace NH
 
                     switch (lSF0)
                     {
-                    case AccessEnd::FILTER_HOST  :
+                    case AccessEnd::FILTER_HOST:
                         if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(lA0->mSource.GetHost()))
                         {
                             DisplayError(__LINE__, "describe opposed traffics", *lA0, *lA1);
-                            lErrorCount++;
+                            lResult++;
                         }
                         break;
                     case AccessEnd::FILTER_SUBNET:
                         if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(*lA0->mSource.GetSubNet()))
                         {
                             DisplayError(ERROR_208, *lA0, *lA1);
-                            lErrorCount++;
+                            lResult++;
                         }
                         break;
 
@@ -135,15 +145,15 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(ERROR_006, ELEMENT, mName.c_str(), lErrorCount);
+        return lResult;
     }
 
     // NOT TESTED NH.AccessList.Verify
     //            Some case of inverted data stream
 
-    void AccessList::Verify(uint32_t aAddr, Direction aDirection) const
+    unsigned int AccessList::Verify_Internal(uint32_t aAddr, Direction aDirection) const
     {
-        unsigned int lErrorCount = 0;
+        unsigned int lResult = 0;
 
         for (InternalList::const_iterator lIt = mAccess.begin(); lIt != mAccess.end(); lIt++)
         {
@@ -159,13 +169,13 @@ namespace NH
                 if ((AccessEnd::FILTER_HOST == lSF) && lAccess->mSource.Match(aAddr))
                 {
                     DisplayError(__LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
-                    lErrorCount++;
+                    lResult++;
                 }
 
                 if ((AccessEnd::FILTER_SUBNET == lDF) && lAccess->mDestination.Match(aAddr))
                 {
                     DisplayError(ERROR_207, *lAccess);
-                    lErrorCount++;
+                    lResult++;
                 }
                 break;
 
@@ -173,13 +183,13 @@ namespace NH
                 if ((AccessEnd::FILTER_SUBNET == lSF) && lAccess->mSource.Match(aAddr))
                 {
                     DisplayError(ERROR_206, *lAccess);
-                    lErrorCount++;
+                    lResult++;
                 }
 
                 if ((AccessEnd::FILTER_HOST == lDF) && lAccess->mDestination.Match(aAddr))
                 {
                     DisplayError(__LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
-                    lErrorCount++;
+                    lResult++;
                 }
                 break;
 
@@ -187,17 +197,17 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(ERROR_005, ELEMENT, mName.c_str(), lErrorCount);
+        return lResult;
     }
 
     // NOT TESTED NH.AccessList.Verify
     //            Access associated to an interface using DHCP.
 
-    void AccessList::Verify(const SubNet & aSubNet, Direction aDirection) const
+    unsigned int AccessList::Verify_Internal(const SubNet & aSubNet, Direction aDirection) const
     {
         assert(NULL != &aSubNet);
 
-        unsigned int lErrorCount = 0;
+        unsigned int lResult = 0;
 
         for (InternalList::const_iterator lIt = mAccess.begin(); lIt != mAccess.end(); lIt++)
         {
@@ -210,7 +220,7 @@ namespace NH
                 if (lAccess->mSource.Match(aSubNet))
                 {
                     DisplayError(__LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
-                    lErrorCount++;
+                    lResult++;
                 }
                 break;
 
@@ -218,7 +228,7 @@ namespace NH
                 if (lAccess->mDestination.Match(aSubNet))
                 {
                     DisplayError(__LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
-                    lErrorCount++;
+                    lResult++;
                 }
                 break;
 
@@ -226,7 +236,7 @@ namespace NH
             }
         }
 
-        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, mName.c_str(), lErrorCount);
+        return lResult;
     }
 
     // Private

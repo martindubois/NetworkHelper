@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/SubNetList.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -22,6 +22,11 @@
 #include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "SubNet list"
 
 namespace NH
 {
@@ -93,10 +98,32 @@ namespace NH
         return FindOrCreate(lAddr, lMask);
     }
 
-    // NOT TESTED NH.SubNetList.Verify.Error
+    // NOT TESTED NH.SubNetList.Verify
 
     void SubNetList::Verify() const
     {
+        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+    }
+
+    // Internal
+    ////////////////////////////////////////////////////////////////////////
+
+    void SubNetList::Prepare(HI::Diagram * aDiagram, ShapeMap * aShapeMap)
+    {
+        for (InternalList::iterator lIt = mSubNets.begin(); lIt != mSubNets.end(); lIt++)
+        {
+            assert(NULL != *lIt);
+
+            (*lIt)->Prepare(aDiagram, aShapeMap);
+        }
+    }
+
+    // NOT TESTED NH.SubNetList.Verify.Error
+
+    unsigned int SubNetList::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
         for (InternalList::const_iterator lIt0 = mSubNets.begin(); lIt0 != mSubNets.end(); lIt0++)
         {
             SubNet * lSN0 = *lIt0;
@@ -114,7 +141,7 @@ namespace NH
                 if (lSN1->VerifyAddress(lSN0->GetAddress()))
                 {
                     char lMessage[128];
-                    char lName[2][ 64];
+                    char lName[2][64];
 
                     lSN0->GetFullName(lName[0], sizeof(lName[0]));
                     lSN1->GetFullName(lName[1], sizeof(lName[1]));
@@ -123,23 +150,13 @@ namespace NH
                     assert(               0 < lRet);
                     assert(sizeof(lMessage) > lRet);
 
-                    Utl_ThrowError(ERROR_CONFIG, __LINE__, lMessage);
+                    Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                    lResult++;
                 }
             }
         }
-    }
 
-    // Internal
-    ////////////////////////////////////////////////////////////////////////
-
-    void SubNetList::Prepare(HI::Diagram * aDiagram, ShapeMap * aShapeMap)
-    {
-        for (InternalList::iterator lIt = mSubNets.begin(); lIt != mSubNets.end(); lIt++)
-        {
-            assert(NULL != *lIt);
-
-            (*lIt)->Prepare(aDiagram, aShapeMap);
-        }
+        return lResult;
     }
 
 }

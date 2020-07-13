@@ -84,6 +84,10 @@ namespace NH
         AccessEnd mDestination;
         AccessEnd mSource     ;
 
+    // Internal
+
+        unsigned int Verify_Internal() const;
+
     private:
 
         void Error(int aCode, const char * aMessage) const;

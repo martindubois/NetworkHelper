@@ -299,67 +299,9 @@ namespace NH
     void Interface::SetVirtual() { mFlags.mVirtual = true; }
     void Interface::SetWifi   () { mFlags.mWifi    = true; }
 
-    // NOT TESTED NH.Interface.Verify.Error
-    //            Not configured interface
-
-    // NOT TESTED NH.Interface.Verify
-    //            Interface configured using DHCP with an access list.
-
     void Interface::Verify() const
     {
-        unsigned int lErrorCount = 0;
-        char         lMessage[128];
-        int          lRet;
-
-        if ((0 == mAddr) && (!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
-        {
-            lRet = sprintf_s(lMessage, ELEMENT " %s - No IPv4 address set and DHCP client not enabled", mName.c_str());
-            assert(               0 < lRet);
-            assert(sizeof(lMessage) > lRet);
-
-            Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
-            lErrorCount++;
-        }
-
-        for(unsigned int i = 0; i < DIRECTION_QTY; i ++)
-        {
-            if (NULL != mAccessLists[i])
-            {
-                try
-                {
-                    if (0 != mAddr)
-                    {
-                        mAccessLists[i]->Verify(mAddr, static_cast<NH::Direction>(i));
-                    }
-                    else if (NULL != mSubNet)
-                    {
-                        mAccessLists[i]->Verify(*mSubNet, static_cast<NH::Direction>(i));
-                    }
-                }
-                catch (std::exception eE)
-                {
-                    Utl_DisplayError(__LINE__, eE);
-                    lErrorCount++;
-                }
-            }
-        }
-
-        if (IsDHCPServer() && (NULL != mAccessLists[DIRECTION_IN]))
-        {
-            assert(NULL != mSubNet);
-
-            if (!mAccessLists[DIRECTION_IN]->IsAllowed(Access::PROTOCOL_UDP, *mSubNet, 68, 0, 67))
-            {
-                lRet = sprintf_s(lMessage, ELEMENT " %s - " ERROR_205_MSG, mName.c_str());
-                assert(               0 < lRet);
-                assert(sizeof(lMessage) > lRet);
-
-                Utl_DisplayError(ERROR_205, lMessage);
-                lErrorCount++;
-            }
-        }
-
-        Utl_ThrowErrorIfNeeded(ERROR_004, ELEMENT, mName.c_str(), lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_004, ELEMENT, mName.c_str(), Verify_Internal());
     }
 
     // Internal
@@ -391,6 +333,61 @@ namespace NH
         lResult->SetFillColor(aColor);
 
         Prepare(aDiagram, lResult, aSubNetMap);
+
+        return lResult;
+    }
+
+    // NOT TESTED NH.Interface.Verify.Error
+    //            Not configured interface
+
+    // NOT TESTED NH.Interface.Verify
+    //            Interface configured using DHCP with an access list.
+
+    unsigned int Interface::Verify_Internal() const
+    {
+        char         lMessage[128];
+        unsigned int lResult = 0;
+        int          lRet;
+
+        if ((0 == mAddr) && (!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
+        {
+            lRet = sprintf_s(lMessage, ELEMENT " %s - No IPv4 address set and DHCP client not enabled", mName.c_str());
+            assert(0 < lRet);
+            assert(sizeof(lMessage) > lRet);
+
+            Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+            lResult++;
+        }
+
+        for (unsigned int i = 0; i < DIRECTION_QTY; i++)
+        {
+            if (NULL != mAccessLists[i])
+            {
+                if (0 != mAddr)
+                {
+                    lResult += mAccessLists[i]->Verify_Internal(mAddr, static_cast<NH::Direction>(i));
+                }
+                else if (NULL != mSubNet)
+                {
+                    lResult += mAccessLists[i]->Verify_Internal(*mSubNet, static_cast<NH::Direction>(i));
+                }
+            }
+        }
+
+        if (IsDHCPServer() && (NULL != mAccessLists[DIRECTION_IN]))
+        {
+            assert(NULL != mSubNet);
+
+            if (!mAccessLists[DIRECTION_IN]->IsAllowed(Access::PROTOCOL_UDP, *mSubNet, 68, 0, 67))
+            {
+                lRet = sprintf_s(lMessage, ELEMENT " %s - " ERROR_205_MSG, mName.c_str());
+                assert(0 < lRet);
+                assert(sizeof(lMessage) > lRet);
+
+                Utl_DisplayError(ERROR_205, lMessage);
+                lResult++;
+            }
+        }
 
         return lResult;
     }

@@ -33,6 +33,10 @@ namespace NH
 
         void Verify() const;
 
+    // Internal
+
+        unsigned int Verify_Internal() const;
+
     private:
 
         AccessListMap(const AccessListMap &);

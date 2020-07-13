@@ -69,6 +69,8 @@ namespace NH
 
         void Prepare(HI::Diagram * aDiagram, HI::CSS_Color aColor, const HI::Shape * aParent, const ShapeMap & aSubNetMap);
 
+        unsigned int Verify_Internal() const;
+
     private:
 
         InterfaceList(const InterfaceList &);

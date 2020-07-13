@@ -100,6 +100,8 @@ namespace NH
         void        PrepareLink (HI::Diagram * aDiagram, HI::Shape * aShape, const HI::Shape * aParent);
         HI::Shape * PrepareShape(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap);
 
+        unsigned int Verify_Internal() const;
+
     protected:
 
         void Prepare(HI::Diagram * aDiagram, HI::Shape * aShape, const ShapeMap & aSubNetMap);

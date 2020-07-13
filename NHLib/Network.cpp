@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Network.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// CODE COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 // TODO NH.Network.AddKnownDevices
 
@@ -29,6 +29,8 @@
 
 // Constants
 /////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Network"
 
 #define ROUTER_COLOR_QTY (6)
 
@@ -207,14 +209,18 @@ namespace NH
 
     void Network::Verify() const
     {
+        unsigned int lResult = 0;
+
         for (RouterList::const_iterator lIt = mRouters.begin(); lIt != mRouters.end(); lIt++)
         {
             assert(NULL != *lIt);
 
-            (*lIt)->Verify();
+            lResult += (*lIt)->Verify_Internal();
         }
 
-        mSubNets.Verify();
+        lResult += mSubNets.Verify_Internal();
+
+        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", lResult);
     }
 
     // Private

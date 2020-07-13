@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessListMap.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -14,6 +14,14 @@
 #include <NH/AccessList.h>
 
 #include <NH/AccessListMap.h>
+
+// ===== NHLib ==============================================================
+#include "Utilities.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define ELEMENT "Access list map"
 
 namespace NH
 {
@@ -58,14 +66,28 @@ namespace NH
         return lResult;
     }
 
+    // NOT TESTED NH.AccessListMap.Verify
+
     void AccessListMap::Verify() const
     {
+        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    unsigned int AccessListMap::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
         for (InternalMap::const_iterator lIt = mAccessLists.begin(); lIt != mAccessLists.end(); lIt++)
         {
             assert(NULL != lIt->second);
 
-            lIt->second->Verify();
+            lResult += lIt->second->Verify_Internal();
         }
+
+        return lResult;
     }
 
 }

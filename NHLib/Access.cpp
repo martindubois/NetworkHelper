@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -105,13 +105,23 @@ namespace NH
         return mProtocol == aProtocol;
     }
 
+    void Access::Verify() const
+    {
+        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
     // NOT TESTED NH.Access
     //            FILTER_ANY on source
 
-    void Access::Verify() const
+    unsigned int Access::Verify_Internal() const
     {
-        mDestination.Verify();
-        mSource     .Verify();
+        unsigned int lResult = 0;
+
+        lResult += mDestination.Verify_Internal();
+        lResult += mSource     .Verify_Internal();
 
         switch (mDestination.GetFilter())
         {
@@ -126,8 +136,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { Error(ERROR_217); } break;
-            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { Error(ERROR_216); } break;
+            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { lResult++; Error(ERROR_217); } break;
+            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { lResult++; Error(ERROR_216); } break;
 
             default: assert(false);
             }
@@ -135,7 +145,7 @@ namespace NH
 
         case AccessEnd::FILTER_SUBNET:
             const SubNet * lDstSN;
-            
+
             lDstSN = mDestination.GetSubNet();
             assert(NULL != lDstSN);
 
@@ -143,8 +153,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { Error(ERROR_215); } break;
-            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { Error(__LINE__, "Describes traffic not going through the router"); } break;
+            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { lResult++; Error(ERROR_215); } break;
+            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { lResult++; Error(__LINE__, "Describes traffic not going through the router"); } break;
 
             default: assert(false);
             }
@@ -152,6 +162,8 @@ namespace NH
 
         default: assert(false);
         }
+
+        return lResult;
     }
 
     // Private
@@ -168,7 +180,7 @@ namespace NH
 
         sprintf_s(lMessage, ELEMENT " %s - %s", lDesc, aMessage);
 
-        Utl_ThrowError(ERROR_ERROR, aCode, lMessage);
+        Utl_DisplayError(ERROR_ERROR, aCode, lMessage);
     }
 
 }

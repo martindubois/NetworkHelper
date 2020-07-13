@@ -58,6 +58,8 @@ namespace NH
 
         void Prepare(HI::Diagram * aDiagram, ShapeMap * aShapeMap);
 
+        unsigned int Verify_Internal() const;
+
     private:
 
         SubNetList(const SubNetList &);

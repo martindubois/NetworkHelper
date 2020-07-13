@@ -147,56 +147,11 @@ namespace NH
         }
     }
 
-    // TODO NH.Router.Verify
-    //      Is tunel desintation reachable through the tunnel source interface?
-    //      Does NAT pool access list match the nat inside interface?
-    //      Does NAT pool address really public?
-
-    // NOT TESTED Router.Verify.Error
-    //            IP routing is not enabled and routes are configured
+    // NOT TESTED NH.Router.Verify
 
     void Router::Verify() const
     {
-        unsigned int lErrorCount = 0;
-
-        try
-        {
-            mAccessLists.Verify();
-        }
-        catch (std::exception eE)
-        {
-            Utl_DisplayError(__LINE__, eE);
-            lErrorCount++;
-        }
-
-        try
-        {
-            mInterfaces.Verify();
-        }
-        catch (std::exception eE)
-        {
-            Utl_DisplayError(__LINE__, eE);
-            lErrorCount++;
-        }
-
-        lErrorCount += Verify_Routes();
-
-        if (!mFlags.mIpRouting)
-        {
-            if (1 < mInterfaces.GetCount())
-            {
-                Utl_DisplayError(ERROR_229, ELEMENT " - " ERROR_229_MSG);
-                lErrorCount++;
-            }
-
-            if (!mRoutes.empty())
-            {
-                Utl_DisplayError(ERROR_CONFIG, __LINE__, "IP routing is not enabled and at least one route is configured");
-                lErrorCount++;
-            }
-        }
-
-        Utl_ThrowErrorIfNeeded(ERROR_002, ELEMENT, mName.c_str(), lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_002, ELEMENT, mName.c_str(), Verify_Internal());
     }
 
     // Internal
@@ -240,6 +195,41 @@ namespace NH
         lShape->SetTitle(lTitle.c_str());
 
         mInterfaces.Prepare(aDiagram, aColor, lShape, aSubNetMap);
+    }
+
+    // TODO NH.Router.Verify
+    //      Is tunel desintation reachable through the tunnel source interface?
+    //      Does NAT pool access list match the nat inside interface?
+    //      Does NAT pool address really public?
+
+    // NOT TESTED Router.Verify.Error
+    //            IP routing is not enabled and routes are configured
+
+    unsigned int Router::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
+        lResult += mAccessLists.Verify_Internal();
+        lResult += mInterfaces .Verify_Internal();
+
+        lResult += Verify_Routes();
+
+        if (!mFlags.mIpRouting)
+        {
+            if (1 < mInterfaces.GetCount())
+            {
+                Utl_DisplayError(ERROR_229, ELEMENT " - " ERROR_229_MSG);
+                lResult++;
+            }
+
+            if (!mRoutes.empty())
+            {
+                Utl_DisplayError(ERROR_CONFIG, __LINE__, "IP routing is not enabled and at least one route is configured");
+                lResult++;
+            }
+        }
+
+        return lResult;
     }
 
     // Privates

@@ -52,17 +52,10 @@ exit
 ! ===== Expected error at verification ======================================
 ! CONFIG ERROR  -208  Access list 103 - TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and TCP 192.168.20.0/255.255.255.0 ==> 192.168.10.10 == 80 describe opposed traffics
 ! CONFIG ERROR  -208  Access list 103 - TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and UDP 192.168.20.1 ==> 192.168.10.0/255.255.255.0 != 21 describe opposed traffics
-! ERROR    -6  Access list 103 - 2 errors (150)
 ! CONFIG ERROR  -207  Access list 104 - TCP 192.168.10.10 == 80 ==> 192.168.0.0/255.255.255.0  describe traffic going out from the interace and the access list is used as "in"
-! ERROR    -5  Access list 104 - 1 errors (312)
-! ERROR    -4  Interface f0/0 - 1 errors (204)
 ! CONFIG ERROR  -206  Access list 105, UDP 192.168.10.0/255.255.255.0 ==> 192.168.0.0/255.255.255.0  describe traffic going into the interace and the access list is used as "out"
-! ERROR    -5  Access list 105 - 1 errors (312)
-! ERROR    -4  Interface f0/1 - 1 errors (204)
 ! CONFIG ERROR  -205  Interface f0/2 - Act as DHCP server but DHCP request are not allowed in
-! ERROR    -4  Interface f0/2 - 1 errors (204)
-! ERROR    -3  Router's interfaces - 3 errors (160)
 ! CONFIG ERROR  -229  Router - IP routing is not enabled and the router use more than one interface
 
 ! ===== Expected error at the end of processing =============================
-! ERROR    -2  Router Test_7_Router_0 - 3 errors
+! ERROR    -2  Router Test_7_Router_0 - 6 errors

@@ -320,12 +320,27 @@ namespace NH
         return false;
     }
 
+    // NOT TESTED NH.AccessEnd.Verify
+
     void AccessEnd::Verify() const
     {
+        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    unsigned int AccessEnd::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
         if (!IsInitialized())
         {
-            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " is not correctly initialized");
+            Utl_DisplayError(ERROR_CALLER, __LINE__, ELEMENT " is not correctly initialized");
+            lResult++;
         }
+
+        return lResult;
     }
 
 }

@@ -102,6 +102,8 @@ namespace NH
 
         void Prepare(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap);
 
+        unsigned int Verify_Internal() const;
+
     private:
 
         Router(const Router &);

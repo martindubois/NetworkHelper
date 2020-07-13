@@ -171,52 +171,11 @@ namespace NH
         return lIt->second;
     }
 
-    // NOT TESTED NH.InterfaceList.Verify.Error
-    //            Two interface connected to the same subnet
+    // NOT TESTED NH.AccessList.Verify
 
     void InterfaceList::Verify() const
     {
-        unsigned int lErrorCount = 0;
-
-        for (InterfaceMap::const_iterator lIt0 = mInterfaces.begin(); lIt0 != mInterfaces.end(); lIt0++)
-        {
-            try
-            {
-                const Interface * lI0 = lIt0->second;
-                assert(NULL != lI0);
-
-                lI0->Verify();
-
-                InterfaceMap::const_iterator lIt1 = lIt0;
-
-                lIt1++;
-
-                for (; lIt1 != mInterfaces.end(); lIt1++)
-                {
-                    const Interface * lI1 = lIt1->second;
-                    assert(NULL != lI1);
-
-                    if (lI0->GetSubNet() == lI1->GetSubNet())
-                    {
-                        char lMessage[128];
-
-                        int lRet = sprintf_s(lMessage, "Interface %s and %s are connected to the same subnet", lI0->GetName(), lI1->GetName());
-                        assert(               0 < lRet);
-                        assert(sizeof(lMessage) > lRet);
-
-                        Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
-                        lErrorCount++;
-                    }
-                }
-            }
-            catch (std::exception eE)
-            {
-                Utl_DisplayError(__LINE__, eE);
-                lErrorCount++;
-            }
-        }
-
-        Utl_ThrowErrorIfNeeded(ERROR_003, ELEMENT, "", lErrorCount);
+        Utl_ThrowErrorIfNeeded(ERROR_003, ELEMENT, "", Verify_Internal());
     }
 
     // Internal
@@ -269,6 +228,46 @@ namespace NH
 
             delete[] lShapes;
         }
+    }
+
+    // NOT TESTED NH.InterfaceList.Verify.Error
+    //            Two interface connected to the same subnet
+
+    unsigned int InterfaceList::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
+        for (InterfaceMap::const_iterator lIt0 = mInterfaces.begin(); lIt0 != mInterfaces.end(); lIt0++)
+        {
+            const Interface * lI0 = lIt0->second;
+            assert(NULL != lI0);
+
+            lResult += lI0->Verify_Internal();
+
+            InterfaceMap::const_iterator lIt1 = lIt0;
+
+            lIt1++;
+
+            for (; lIt1 != mInterfaces.end(); lIt1++)
+            {
+                const Interface * lI1 = lIt1->second;
+                assert(NULL != lI1);
+
+                if (lI0->GetSubNet() == lI1->GetSubNet())
+                {
+                    char lMessage[128];
+
+                    int lRet = sprintf_s(lMessage, "Interface %s and %s are connected to the same subnet", lI0->GetName(), lI1->GetName());
+                    assert(               0 < lRet);
+                    assert(sizeof(lMessage) > lRet);
+
+                    Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                    lResult++;
+                }
+            }
+        }
+
+        return lResult;
     }
 
     // Private

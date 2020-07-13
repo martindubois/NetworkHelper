@@ -62,7 +62,7 @@ exit
 ! ===== Interface ===========================================================
 
 ! TEST INFO Interface.Error
-!           -1, -209 -210, -225, -401, -402, -404
+!           -209 -210, -225, -401, -402, -404
 
 ! >>>>> PARSE ERROR  -401  The command "encapsulation dot1q" must have at least 3 elements
 encapsulation dot1q
@@ -103,8 +103,6 @@ interface f0/3
 	ip access-group 102 in
 
 exit
-
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 33 lines with error
 
 ! ===== NAT =================================================================
 

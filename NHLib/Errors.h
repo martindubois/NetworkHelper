@@ -17,7 +17,6 @@
 #define ERROR_002 (-2)
 #define ERROR_003 (-3)
 #define ERROR_004 (-4)
-#define ERROR_005 (-5)
 #define ERROR_006 (-6)
 
 // ===== CALLER ERROR =======================================================

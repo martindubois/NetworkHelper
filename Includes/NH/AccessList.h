@@ -47,9 +47,11 @@ namespace NH
 
         void Verify() const;
 
-        void Verify(uint32_t aAddr, Direction aDirection) const;
+    // Internal
 
-        void Verify(const SubNet & aSubNet, Direction aDirection) const;
+        unsigned int Verify_Internal() const;
+        unsigned int Verify_Internal(uint32_t       aAddr  , Direction aDirection) const;
+        unsigned int Verify_Internal(const SubNet & aSubNet, Direction aDirection) const;
 
     private:
 
