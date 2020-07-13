@@ -39,6 +39,7 @@ namespace Cisco
         // ===== Commands ===================================================
         bool Cmd_Deny                  (const char ** aElements, unsigned int aCount);
         bool Cmd_Encapsulation_Dot1Q   (const char ** aElements, unsigned int aCount);
+        bool Cmd_Hostname              (const char ** aElements, unsigned int aCount);
         bool Cmd_Interface             (const char ** aElements, unsigned int aCount);
         bool Cmd_Interface_Tunnel      (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip                    (const char ** aElements, unsigned int aCount);

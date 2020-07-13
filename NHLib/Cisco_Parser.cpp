@@ -68,20 +68,21 @@ static const Parser::Node ENUM_DIRECTION[] =
 #define CMD_ACCESS_LIST             ( 1)
 #define CMD_DENY                    ( 2)
 #define CMD_ENCAPSULATION_DOT1Q     ( 3)
-#define CMD_INTERFACE               ( 4)
-#define CMD_INTERFACE_TUNNEL        ( 5)
-#define CMD_IP_ACCESS_GROUP         ( 6)
-#define CMD_IP_ACCESS_LIST_EXTENDED ( 7)
-#define CMD_IP_ADDRESS              ( 8)
-#define CMD_IP_ADDRESS_DHCP         ( 9)
-#define CMD_IP_NAT_INSIDE           (10)
-#define CMD_IP_NAT_OUTSIDE          (11)
-#define CMD_IP_NAT_POOL             (12)
-#define CMD_IP_ROUTE                (13)
-#define CMD_NETWORK                 (14)
-#define CMD_PERMIT                  (15)
-#define CMD_TUNNEL_DESTINATION      (16)
-#define CMD_TUNNEL_SOURCE           (17)
+#define CMD_HOSTNAME                ( 4)
+#define CMD_INTERFACE               ( 5)
+#define CMD_INTERFACE_TUNNEL        ( 6)
+#define CMD_IP_ACCESS_GROUP         ( 7)
+#define CMD_IP_ACCESS_LIST_EXTENDED ( 8)
+#define CMD_IP_ADDRESS              ( 9)
+#define CMD_IP_ADDRESS_DHCP         (10)
+#define CMD_IP_NAT_INSIDE           (11)
+#define CMD_IP_NAT_OUTSIDE          (12)
+#define CMD_IP_NAT_POOL             (13)
+#define CMD_IP_ROUTE                (14)
+#define CMD_NETWORK                 (15)
+#define CMD_PERMIT                  (16)
+#define CMD_TUNNEL_DESTINATION      (17)
+#define CMD_TUNNEL_SOURCE           (18)
 
 static const Parser::Node CMDS_ACCESS[] =
 {
@@ -152,6 +153,7 @@ static const Parser::Node COMMANDS[] =
     { CMD_ACCESS_LIST    , "access-list"  , NULL               },
     { CMD_DENY           , "deny"         , NULL               },
     { Parser::CODE_IGNORE, "encapsulation", CMDS_ENCAPSULATION },
+    { CMD_HOSTNAME       , "hostname"     , NULL               },
     { CMD_INTERFACE      , "interface"    , CMDS_INTERFACE     },
     { Parser::CODE_IGNORE, "ip"           , CMDS_IP            },
     { CMD_NETWORK        , "network"      , NULL               },
@@ -215,6 +217,7 @@ namespace Cisco
         {
         case CMD_DENY                   : return Cmd_Deny                  (aElements, aCount);
         case CMD_ENCAPSULATION_DOT1Q    : return Cmd_Encapsulation_Dot1Q   (aElements, aCount);
+        case CMD_HOSTNAME               : return Cmd_Hostname              (aElements, aCount);
         case CMD_INTERFACE              : return Cmd_Interface             (aElements, aCount);
         case CMD_INTERFACE_TUNNEL       : return Cmd_Interface_Tunnel      (aElements, aCount);
         case CMD_IP_ACCESS_GROUP        : return Cmd_Ip_AccessGroup        (aElements, aCount);
@@ -380,6 +383,19 @@ namespace Cisco
         assert(NULL != mInterface);
 
         mInterface->SetVLAN(aElements[2]);
+
+        return true;
+    }
+
+    bool Parser::Cmd_Hostname(const char ** aElements, unsigned int aCount)
+    {
+        assert(NULL != aElements);
+        assert(   1 <= aCount   );
+
+        ValidateCount("hostname", aCount, 2, 2);
+        assert(NULL != aElements[1]);
+
+        GetRouter()->SetName(aElements[1]);
 
         return true;
     }
