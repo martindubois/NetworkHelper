@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -20,18 +20,13 @@
 #include "IPv4.h"
 #include "Utilities.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define ELEMENT "Route"
-
 namespace NH
 {
 
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Route::Route(const SubNet * aSubNet, const char * aAddr) : mSubNet(aSubNet)
+    Route::Route(const SubNet * aSubNet, const char * aAddr) : Object("Route"), mSubNet(aSubNet)
     {
         assert(NULL != aSubNet);
 
@@ -44,12 +39,12 @@ namespace NH
             break;
 
         default:
-            Utl_ThrowError(ERROR_228, ELEMENT " - " ERROR_228_MSG);
+            ThrowError(ERROR_228);
         }
 
         if (aSubNet->VerifyAddress(mAddr))
         {
-            Utl_ThrowError(ERROR_CONFIG, __LINE__, "The next router cannot be on the destination subnet");
+            ThrowError(ERROR_CONFIG, __LINE__, "The next router cannot be on the destination subnet");
         }
     }
 

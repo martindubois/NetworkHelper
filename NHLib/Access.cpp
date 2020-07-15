@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -25,8 +25,6 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define ELEMENT "Access rule"
-
 static const char * PROTOCOL_NAMES[NH::Access::PROTOCOL_QTY] = { "ICMP", "IP", "TCP", "UDP" };
 
 namespace NH
@@ -35,7 +33,7 @@ namespace NH
     // Public
     ////////////////////////////////////////////////////////////////////////
 
-    Access::Access(Type aType) : mProtocol(PROTOCOL_INVALID)
+    Access::Access(Type aType) : Object("Access rule"), mProtocol(PROTOCOL_INVALID)
     {
         assert(TYPE_QTY > aType);
 
@@ -75,7 +73,7 @@ namespace NH
         {
             if (PROTOCOL_TCP != mProtocol)
             {
-                Utl_ThrowError(ERROR_214);
+                ThrowError(ERROR_214);
             }
 
             mFlags.mEstablished = true;
@@ -107,7 +105,7 @@ namespace NH
 
     void Access::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_007, Verify_Internal());
     }
 
     // Internal
@@ -136,8 +134,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { lResult++; Error(ERROR_217); } break;
-            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { lResult++; Error(ERROR_216); } break;
+            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { lResult++; DisplayError(ERROR_217); } break;
+            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { lResult++; DisplayError(ERROR_216); } break;
 
             default: assert(false);
             }
@@ -153,8 +151,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { lResult++; Error(ERROR_215); } break;
-            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { lResult++; Error(__LINE__, "Describes traffic not going through the router"); } break;
+            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { lResult++; DisplayError(ERROR_215); } break;
+            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { lResult++; DisplayError(ERROR_CONFIG, __LINE__, "Describes traffic not going through the router"); } break;
 
             default: assert(false);
             }
@@ -166,19 +164,21 @@ namespace NH
         return lResult;
     }
 
-    // Private
+    // Protected
     /////////////////////////////////////////////////////////////////////////
 
-    void Access::Error(int aCode, const char * aMessage) const
+    // ===== Object =========================================================
+
+    void Access::DisplayError(const char * aErrorType, int aCode, const char * aMessage) const
     {
         assert(NULL != aMessage);
 
         char lDesc   [128];
-        char lMessage[128];
+        char lMessage[256];
 
         GetDescription(lDesc, sizeof(lDesc));
 
-        sprintf_s(lMessage, ELEMENT " %s - %s", lDesc, aMessage);
+        sprintf_s(lMessage, "%s %s - %s", GetObjectType(), lDesc, aMessage);
 
         Utl_DisplayError(ERROR_ERROR, aCode, lMessage);
     }

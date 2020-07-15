@@ -22,6 +22,7 @@
 // ===== Includes ===========================================================
 #include <NH/AccessListMap.h>
 #include <NH/InterfaceList.h>
+#include <NH/NamedObject.h>
 #include <NH/Route.h>
 
 // ===== NHLib ==============================================================
@@ -33,7 +34,7 @@ namespace NH
     class SubNetList;
 
     /// \brief NH::Rooter
-    class Router
+    class Router : public NamedObject
     {
 
     public:
@@ -77,9 +78,6 @@ namespace NH
 
         void SetIpRouting();
 
-        /// \param aName The name
-        void SetName(const char * aName);
-
         /// \param aSubNets The list of subnet associated to the network
         void SetSubNetList(SubNetList * aSubNets);
 
@@ -120,7 +118,6 @@ namespace NH
         }
         mFlags;
 
-        std::string  mName   ;
         RouteList    mRoutes ;
         SubNetList * mSubNets;
 

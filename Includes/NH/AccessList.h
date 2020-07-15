@@ -15,13 +15,14 @@
 
 // ===== Includes ===========================================================
 #include <NH/Access.h>
+#include <NH/NamedObject.h>
 #include <NH/Types.h>
 
 namespace NH
 {
 
     /// \brief NH::AccessList
-    class AccessList
+    class AccessList : public NamedObject
     {
 
     public:
@@ -59,13 +60,12 @@ namespace NH
 
         const AccessList & operator = (const AccessList &);
 
-        void DisplayError(int aCode, const char * aMessage, const Access & aAccess) const;
-        void DisplayError(int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const;
+        void DisplayError(const char * aErrorType, int aCode, const char * aMessage, const Access & aAccess) const;
+        void DisplayError(const char * aErrorType, int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const;
 
         typedef std::list<Access *> InternalList;
 
         InternalList mAccess;
-        std::string  mName  ;
 
     };
 

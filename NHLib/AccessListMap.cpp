@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessListMap.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -18,18 +18,13 @@
 // ===== NHLib ==============================================================
 #include "Utilities.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define ELEMENT "Access list map"
-
 namespace NH
 {
 
     // Public
     ////////////////////////////////////////////////////////////////////////
 
-    AccessListMap::AccessListMap()
+    AccessListMap::AccessListMap() : Object("Access lists")
     {
     }
 
@@ -70,7 +65,7 @@ namespace NH
 
     void AccessListMap::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+        ThrowErrorIfNeeded(__LINE__, Verify_Internal());
     }
 
     // Internal

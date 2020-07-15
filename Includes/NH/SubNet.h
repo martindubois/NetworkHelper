@@ -13,6 +13,9 @@
 #include <HI/Diagram.h>
 #include <HI/Shape.h>
 
+// ===== Includes ===========================================================
+#include <NH/Object.h>
+
 // ===== NHLib ==============================================================
 class ShapeMap;
 
@@ -23,7 +26,7 @@ namespace NH
     class Router   ;
 
     /// \brief NH::SubNet
-    class SubNet
+    class SubNet : public Object
     {
 
     public:

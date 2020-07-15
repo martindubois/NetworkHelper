@@ -14,20 +14,23 @@ ip address 192.168.0.1 255.255.255.0
 ! TEST INFO Access.Error
 !           -213, -214, -215, -216, -217, -226, -405
 
-! >>>>> ERROR  -217  Access rule IP 192.168.0.10 ==> 192.168.0.10 - Describes traffic not going through the network
+! ERROR  -217  Access rule IP 192.168.0.10 ==> 192.168.0.10 - Describes traffic not going through the network
+! >>>>> ERROR    -7  Access rule - 1 errors
 ip access-list extended 101	permit ip host 192.168.0.10 host 192.168.0.10
 
 ip access-list extended 102
 
-	! >>>>> ERROR  -216  Access rule IP 192.168.0.0/255.255.255.0 ==> 192.168.0.10 - Describes traffic not going through the router
+	! ERROR  -216  Access rule IP 192.168.0.0/255.255.255.0 ==> 192.168.0.10 - Describes traffic not going through the router
+	! >>>>> ERROR    -7  Access rule - 1 errors
 	permit ip 192.168.0.0 0.0.0.255 host 192.168.0.10
 
-	! >>>>> ERROR  -215  Access rule IP 192.168.0.10 ==> 192.168.0.0/255.255.255.0 - Describes traffic not going through the router
+	! ERROR  -215  Access rule IP 192.168.0.10 ==> 192.168.0.0/255.255.255.0 - Describes traffic not going through the router
+	! >>>>> ERROR    -7  Access rule - 1 errors
 	permit ip host 192.168.0.10 192.168.0.0 0.0.0.255
 
 exit
 
-! >>>>> CONFIG ERROR  -214  Only the TCP rule can use the "establish" flag
+! >>>>> CONFIG ERROR  -214  Access rule - Only the TCP rule can use the "establish" flag
 ip access-list extended 103 permit UDP host 192.168.0.10 eq 80 192.168.10.0 0.0.0.255 established
 
 ! >>>>> CONFIG ERROR  -213  Invalid port number
@@ -39,7 +42,7 @@ ip access-list extended 105 permit IP 192.168.0.0 Invalid any
 ! >>>>> CONFIG ERROR  -226  Access end - Invalid IP address
 ip access-list extended 106 permit IP any host 240.0.0.1
 
-// ===== DHCP ===============================================================
+! ===== DHCP ================================================================
 
 ! TEST INFO DHCP.Error
 !           -211, -212, -401
@@ -87,7 +90,7 @@ interface f0/1
 	! >>>>> PARSE ERROR  -404  Invalid IPv4 address format
 	ip address Invalid 255.255.255.0
 
-	! >>>>> CONFIG ERROR  -227  Interface - Invalid IPv4 address
+	! >>>>> CONFIG ERROR  -227  Interface f0/1 - Invalid IPv4 address
 	ip address 0.0.0.1 255.255.255.0
 
 interface f0/2
@@ -99,7 +102,7 @@ interface f0/3
 
 	ip access-group 101 in
 
-	! >>>>> CONFIG ERROR  -209  An access list is already set for this direction
+	! >>>>> CONFIG ERROR  -209  Interface f0/3 - An access list is already set for this direction
 	ip access-group 102 in
 
 exit
@@ -116,14 +119,14 @@ interface f0/4
 
 	ip nat outside
 
-	! >>>>> CONFIG ERROR  -203  A same interface cannot be NAT outside and NAT inside
+	! >>>>> CONFIG ERROR  -203  Interface f0/4 - A same interface cannot be NAT outside and NAT inside
 	ip nat inside
 
 interface f0/5
 
 	ip nat inside
 
-	! >>>>> CONFIG ERROR  -204  A same interface cannot be NAT inside and NAT outside
+	! >>>>> CONFIG ERROR  -204  Interface f0/5 - A same interface cannot be NAT inside and NAT outside
 	ip nat outside
 
 exit
@@ -146,48 +149,48 @@ ip route 192.168.10.0 255.255.255.0 0.0.0.1
 
 interface test1
 
-	! >>>>> PARSE ERROR  -403  Invalid VLAN number
+	! >>>>> PARSE ERROR  -403  Interface test1 - Invalid VLAN number
 	encapsulation dot1q invalid
 
-	! >>>>> CONFIG ERROR  -201  A VLAN number must be below 4096
+	! >>>>> CONFIG ERROR  -201  Interface test1 - A VLAN number must be below 4096
 	encapsulation dot1q 4096
 
-	! >>>>> CONFIG ERROR  -202  A VLAN must be set on sub-interface
+	! >>>>> CONFIG ERROR  -202  Interface test1 - A VLAN must be set on sub-interface
 	encapsulation dot1q 10
 
 	ip address dhcp
 
-	! >>>>> CONFIG ERROR  -224  Do not configure an IPv4 address on an interace with DHCP client enabled
+	! >>>>> CONFIG ERROR  -224  Interface test1 - Do not configure an IPv4 address on an interace with DHCP client enabled
 	ip address 1.2.3.4 255.255.255.0
 
 interface test2
 
 	ip address 1.2.3.4 255.255.255.0
 
-	! >>>>> CONFIG ERROR  -223  Do not enable DHCP client on an interface with a valid IPv4 address
+	! >>>>> CONFIG ERROR  -223  Interface test2 - Do not enable DHCP client on an interface with a valid IPv4 address
 	ip address dhcp
 
-! >>>>> CONFIG ERROR  -222  Do not create sub-interface for an interface with a IPv4 address configured
+! >>>>> CONFIG ERROR  -222  Interface test2 - Do not create sub-interface for an interface with an IPv4 address configured
 interface test2.1
 
 interface test3.1
 
 interface test3
 
-	! >>>>> CONFIG ERROR  -221  Do not set a VLAN for an interface with sub-interfaces
+	! >>>>> CONFIG ERROR  -221  Interface test3 - Do not set a VLAN for an interface with sub-interfaces
 	encapsulation dot1q 10
 
-	! >>>>> CONFIG ERROR  -220  Do not configure an IPv4 address on an interface with sub-interfaces
+	! >>>>> CONFIG ERROR  -220  Interface test3 - Do not configure an IPv4 address on an interface with sub-interfaces
 	ip address 1.2.3.4 255.255.255.0
 
-	! >>>>> CONFIG ERROR  -219  Do not enable DHCP client on an interface with sub-interfaces
+	! >>>>> CONFIG ERROR  -219  Interface test3 - Do not enable DHCP client on an interface with sub-interfaces
 	ip address dhcp
 
 interface test4
 
 	ip address dhcp
 
-! >>>>> CONFIG ERROR  -218  Do not create sub-interface for an interface with DHCP client enabled
+! >>>>> CONFIG ERROR  -218  Interface test4 - Do not create sub-interface for an interface with DHCP client enabled
 interface test4.1
 
 exit

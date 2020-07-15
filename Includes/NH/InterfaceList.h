@@ -16,6 +16,9 @@
 // ===== Import/Includes ====================================================
 #include <HI/Diagram.h>
 
+// ===== Includes ===========================================================
+#include <NH/Object.h>
+
 // ===== NHLib ==============================================================
 class ShapeMap;
 
@@ -26,7 +29,7 @@ namespace NH
     class SubNet   ;
 
     /// \brief NH::InterfaceList
-    class InterfaceList
+    class InterfaceList : public Object
     {
 
     public:

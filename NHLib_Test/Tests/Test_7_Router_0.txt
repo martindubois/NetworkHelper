@@ -58,7 +58,7 @@ exit
 ! CONFIG ERROR  -206  Access list 105, UDP 192.168.10.0/255.255.255.0 ==> 192.168.0.0/255.255.255.0  describe traffic going into the interace and the access list is used as "out"
 ! WARNING  -501  Interface f0/2 - Disabled but configured using IPv4 static address
 ! CONFIG ERROR  -205  Interface f0/2 - Act as DHCP server but DHCP request are not allowed in
-! CONFIG ERROR  -229  Router - IP routing is not enabled and the router use more than one interface
+! CONFIG ERROR  -229  Router Test_7_Router_0 - IP routing is not enabled and the router use more than one interface
 
 ! ===== Expected error at the end of processing =============================
 ! ERROR    -5  Network - 9 errors

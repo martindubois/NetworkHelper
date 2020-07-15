@@ -41,7 +41,9 @@
     <ClCompile Include="InterfaceList.cpp" />
     <ClCompile Include="IP.cpp" />
     <ClCompile Include="IPv4.cpp" />
+    <ClCompile Include="NamedObject.cpp" />
     <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Route.cpp" />
     <ClCompile Include="Router.cpp" />

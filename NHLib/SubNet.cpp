@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/SubNet.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -19,11 +19,6 @@
 #include "ShapeMap.h"
 #include "Utilities.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define ELEMENT "SubNet"
-
 namespace NH
 {
 
@@ -31,7 +26,8 @@ namespace NH
     /////////////////////////////////////////////////////////////////////////
 
     SubNet::SubNet(uint32_t aAddr, uint32_t aMask)
-        : mAddr(aAddr)
+        : Object("SubNet")
+        , mAddr(aAddr)
         , mMask(aMask)
         , mDHCP_Interface(NULL)
         , mDHCP_Router   (NULL)
@@ -45,7 +41,7 @@ namespace NH
             break;
 
         default:
-            Utl_ThrowError(ERROR_CONFIG, __LINE__, ELEMENT " - Invalid IPv4 address");
+            ThrowError(ERROR_CONFIG, __LINE__, "Invalid IPv4 address");
         }
     }
 
@@ -108,14 +104,14 @@ namespace NH
 
         if ((NULL != mDHCP_Router) && (mDHCP_Router != aRouter))
         {
-            Utl_ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
+            ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
         }
 
         if (NULL != aInterface)
         {
             if ((NULL != mDHCP_Interface) && (mDHCP_Interface != aInterface))
             {
-                Utl_ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
+                ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
             }
 
             mDHCP_Interface = aInterface;

@@ -12,13 +12,16 @@
 // ===== C++ ================================================================
 #include <Map>
 
+// ===== Includes ===========================================================
+#include <NH/Object.h>
+
 namespace NH
 {
 
     class AccessList;
 
     /// \brief NH::AccessListMap
-    class AccessListMap
+    class AccessListMap : public Object
     {
 
     public:

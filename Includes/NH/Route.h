@@ -12,13 +12,16 @@
 // ===== C ==================================================================
 #include <stdint.h>
 
+// ===== Includes ===========================================================
+#include <NH/Object.h>
+
 namespace NH
 {
 
     class SubNet;
 
     /// \brief NH::Route
-    class Route
+    class Route : public Object
     {
 
     public:

@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessList.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -20,22 +20,17 @@
 #include "Errors.h"
 #include "Utilities.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define ELEMENT "Access list"
-
 namespace NH
 {
 
     // Public
     ////////////////////////////////////////////////////////////////////////
 
-    AccessList::AccessList(const char * aName)
+    AccessList::AccessList(const char * aName) : NamedObject("Access list")
     {
         assert(NULL != aName);
 
-        mName = aName;
+        SetName(aName);
     }
 
     AccessList::~AccessList()
@@ -93,7 +88,7 @@ namespace NH
 
     void AccessList::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(ERROR_006, ELEMENT, mName.c_str(), Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_006, Verify_Internal());
     }
 
     // Internal
@@ -127,7 +122,7 @@ namespace NH
                     case AccessEnd::FILTER_HOST:
                         if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(lA0->mSource.GetHost()))
                         {
-                            DisplayError(__LINE__, "describe opposed traffics", *lA0, *lA1);
+                            DisplayError(ERROR_CONFIG, __LINE__, "describe opposed traffics", *lA0, *lA1);
                             lResult++;
                         }
                         break;
@@ -168,7 +163,7 @@ namespace NH
             case DIRECTION_IN:
                 if ((AccessEnd::FILTER_HOST == lSF) && lAccess->mSource.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
+                    DisplayError(ERROR_CONFIG, __LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
                     lResult++;
                 }
 
@@ -188,7 +183,7 @@ namespace NH
 
                 if ((AccessEnd::FILTER_HOST == lDF) && lAccess->mDestination.Match(aAddr))
                 {
-                    DisplayError(__LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
+                    DisplayError(ERROR_CONFIG, __LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
                     lResult++;
                 }
                 break;
@@ -219,7 +214,7 @@ namespace NH
             case DIRECTION_IN:
                 if (lAccess->mSource.Match(aSubNet))
                 {
-                    DisplayError(__LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
+                    DisplayError(ERROR_CONFIG, __LINE__, " describe traffic going out from the interace and the access list is used as \"in\"", *lAccess);
                     lResult++;
                 }
                 break;
@@ -227,7 +222,7 @@ namespace NH
             case DIRECTION_OUT:
                 if (lAccess->mDestination.Match(aSubNet))
                 {
-                    DisplayError(__LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
+                    DisplayError(ERROR_CONFIG, __LINE__, " describe traffic going into the interace and the access list is used as \"out\"", *lAccess);
                     lResult++;
                 }
                 break;
@@ -242,7 +237,7 @@ namespace NH
     // Private
     /////////////////////////////////////////////////////////////////////////
 
-    void AccessList::DisplayError(int aCode, const char * aMessage, const Access & aAccess) const
+    void AccessList::DisplayError(const char * aErrorType, int aCode, const char * aMessage, const Access & aAccess) const
     {
         assert(NULL != aMessage);
         assert(NULL != &aAccess);
@@ -252,12 +247,12 @@ namespace NH
 
         aAccess.GetDescription(lDesc, sizeof(lDesc));
 
-        sprintf_s(lMessage, ELEMENT " %s - %s %s", mName.c_str(), lDesc, aMessage);
+        sprintf_s(lMessage, "%s %s", lDesc, aMessage);
 
-        Utl_DisplayError(ERROR_CONFIG, aCode, lMessage);
+        NamedObject::DisplayError(aErrorType, aCode, lMessage);
     }
 
-    void AccessList::DisplayError(int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const
+    void AccessList::DisplayError(const char * aErrorType, int aCode, const char * aMessage, const Access & aA0, const Access & aA1) const
     {
         assert(NULL != aMessage);
         assert(NULL != &aA0);
@@ -270,9 +265,9 @@ namespace NH
         aA0.GetDescription(lDesc0, sizeof(lDesc0));
         aA1.GetDescription(lDesc1, sizeof(lDesc1));
 
-        sprintf_s(lMessage, ELEMENT " %s - %s and %s %s", mName.c_str(), lDesc0, lDesc1, aMessage);
+        sprintf_s(lMessage, "%s and %s %s", lDesc0, lDesc1, aMessage);
 
-        Utl_DisplayError(ERROR_CONFIG, aCode, lMessage);
+        NamedObject::DisplayError(aErrorType, aCode, lMessage);
     }
 
 }

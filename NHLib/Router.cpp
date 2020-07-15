@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -24,8 +24,6 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define ELEMENT "Router"
-
 #define NAME_DEFAULT "Router"
 
 // Static function declaration
@@ -41,9 +39,11 @@ namespace NH
 
     const unsigned int Router::FLAG_NO_ECHO = 0x00000001;
 
-    Router::Router() : mName(NAME_DEFAULT), mSubNets(NULL)
+    Router::Router() : NamedObject("Router"), mSubNets(NULL)
     {
         mFlags.mIpRouting = false;
+
+        SetName(NAME_DEFAULT);
     }
 
     Router::~Router()
@@ -84,17 +84,10 @@ namespace NH
     {
         if (mFlags.mIpRouting)
         {
-            Utl_ThrowError(ERROR_CALLER, __LINE__, ELEMENT " - IP routing already enabled");
+            ThrowError(ERROR_CALLER, __LINE__, "IP routing already enabled");
         }
 
         mFlags.mIpRouting = true;
-    }
-
-    void Router::SetName(const char * aName)
-    {
-        assert(NULL != aName);
-
-        mName = aName;
     }
 
     void Router::SetSubNetList(SubNetList * aSubNets)
@@ -111,7 +104,7 @@ namespace NH
     {
         assert(NULL != aData);
 
-        if (0 == strcmp(NAME_DEFAULT, mName.c_str()))
+        if (0 == strcmp(NAME_DEFAULT, GetName()))
         {
             char lName[64];
 
@@ -137,7 +130,7 @@ namespace NH
                 break;
 
             default:
-                Utl_ThrowError(ERROR_CALLER, __LINE__, "Invalid information type");
+                ThrowError(ERROR_CALLER, __LINE__, "Invalid information type");
             }
 
             SetName(lName);
@@ -148,7 +141,7 @@ namespace NH
 
     void Router::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(ERROR_002, ELEMENT, mName.c_str(), Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_002, Verify_Internal());
     }
 
     // Internal
@@ -166,7 +159,7 @@ namespace NH
     {
         assert(NULL != aDiagram);
 
-        HI::Shape * lShape = aDiagram->mShapes.AddShape("Router", mName.c_str());
+        HI::Shape * lShape = aDiagram->mShapes.AddShape("Router", GetName());
         assert(NULL != lShape);
 
         lShape->SetFillColor (aColor);
@@ -212,13 +205,13 @@ namespace NH
         {
             if (1 < mInterfaces.GetCount())
             {
-                Utl_DisplayError(ERROR_229, ELEMENT " - " ERROR_229_MSG);
+                DisplayError(ERROR_229);
                 lResult++;
             }
 
             if (!mRoutes.empty())
             {
-                Utl_DisplayError(ERROR_CONFIG, __LINE__, "IP routing is not enabled and at least one route is configured");
+                DisplayError(ERROR_CONFIG, __LINE__, "IP routing is not enabled and at least one route is configured");
                 lResult++;
             }
         }
@@ -250,7 +243,7 @@ namespace NH
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                 lResult++;
             }
 
@@ -266,7 +259,7 @@ namespace NH
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                 lResult++;
             }
         }

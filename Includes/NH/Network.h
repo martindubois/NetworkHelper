@@ -17,6 +17,7 @@
 
 // ===== Includes ===========================================================
 #include <NH/Device.h>
+#include <NH/Object.h>
 #include <NH/Router.h>
 #include <NH/SubNetList.h>
 
@@ -24,7 +25,7 @@ namespace NH
 {
 
     /// \brief NH::Network
-    class Network
+    class Network : public Object
     {
 
     public:

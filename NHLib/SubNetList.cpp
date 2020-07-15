@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/SubNetList.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -23,18 +23,13 @@
 #include "IPv4.h"
 #include "Utilities.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define ELEMENT "SubNet list"
-
 namespace NH
 {
 
     // Public
     ////////////////////////////////////////////////////////////////////////
 
-    SubNetList::SubNetList()
+    SubNetList::SubNetList() : Object("SubNets")
     {
     }
 
@@ -100,7 +95,7 @@ namespace NH
 
     void SubNetList::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
+        ThrowErrorIfNeeded(__LINE__, Verify_Internal());
     }
 
     // Internal
@@ -146,7 +141,7 @@ namespace NH
                     assert(               0 < lRet);
                     assert(sizeof(lMessage) > lRet);
 
-                    Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                    DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                     lResult++;
                 }
             }

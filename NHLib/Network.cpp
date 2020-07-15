@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Network.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// CODE COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 // TODO NH.Network.AddKnownDevices
 
@@ -30,8 +30,6 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define ELEMENT "Network"
-
 #define ROUTER_COLOR_QTY (6)
 
 static const HI::CSS_Color ROUTER_COLORS[ROUTER_COLOR_QTY] =
@@ -52,7 +50,7 @@ namespace NH
 
     const unsigned int Network::FLAG_DEBUG = 0x00000001;
 
-    Network::Network()
+    Network::Network() : Object("Network")
     {
     }
 
@@ -71,7 +69,7 @@ namespace NH
 
             if (*lIt == aDevice)
             {
-                Utl_ThrowError(ERROR_CALLER, __LINE__, "Device already added");
+                ThrowError(ERROR_CALLER, __LINE__, "Device already added");
             }
         }
 
@@ -130,7 +128,7 @@ namespace NH
 
             if (*lIt == aRouter)
             {
-                Utl_ThrowError(ERROR_CALLER, __LINE__, "Router already added");
+                ThrowError(ERROR_CALLER, __LINE__, "Router already added");
             }
         }
 
@@ -204,18 +202,18 @@ namespace NH
 
     void Network::Verify() const
     {
-        unsigned int lResult = 0;
+        unsigned int lErrorCount = 0;
 
         for (RouterList::const_iterator lIt = mRouters.begin(); lIt != mRouters.end(); lIt++)
         {
             assert(NULL != *lIt);
 
-            lResult += (*lIt)->Verify_Internal();
+            lErrorCount += (*lIt)->Verify_Internal();
         }
 
-        lResult += mSubNets.Verify_Internal();
+        lErrorCount += mSubNets.Verify_Internal();
 
-        Utl_ThrowErrorIfNeeded(ERROR_005, ELEMENT, "", lResult);
+        ThrowErrorIfNeeded(ERROR_005, lErrorCount);
     }
 
     // Private

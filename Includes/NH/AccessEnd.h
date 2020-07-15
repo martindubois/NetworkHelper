@@ -15,13 +15,16 @@
 // ===== C ==================================================================
 #include <stdint.h>
 
+// ===== Includes ===========================================================
+#include <NH/Object.h>
+
 namespace NH
 {
 
     class SubNet;
 
     /// \brief NH::AccessEnd
-    class AccessEnd
+    class AccessEnd : public Object
     {
 
     public:

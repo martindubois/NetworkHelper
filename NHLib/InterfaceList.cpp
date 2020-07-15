@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -25,18 +25,13 @@
 #include "Errors.h"
 #include "Utilities.h"
 
-// Constants
-/////////////////////////////////////////////////////////////////////////////
-
-#define ELEMENT "Interfaces"
-
 namespace NH
 {
 
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    InterfaceList::InterfaceList()
+    InterfaceList::InterfaceList() : Object("Interfaces")
     {
     }
 
@@ -175,7 +170,7 @@ namespace NH
 
     void InterfaceList::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(ERROR_003, ELEMENT, "", Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_003, Verify_Internal());
     }
 
     // Internal
@@ -258,7 +253,7 @@ namespace NH
                     assert(               0 < lRet);
                     assert(sizeof(lMessage) > lRet);
 
-                    Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                    DisplayError(ERROR_CONFIG, __LINE__, lMessage);
                     lResult++;
                 }
             }

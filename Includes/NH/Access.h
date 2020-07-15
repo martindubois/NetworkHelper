@@ -17,6 +17,7 @@
 
 // ===== Includes ===========================================================
 #include <NH/AccessEnd.h>
+#include <NH/Object.h>
 
 namespace NH
 {
@@ -24,7 +25,7 @@ namespace NH
     class SubNet;
 
     /// \brief NH::Access
-    class Access
+    class Access : public Object
     {
 
     public:
@@ -88,9 +89,12 @@ namespace NH
 
         unsigned int Verify_Internal() const;
 
-    private:
+    // Protected
 
-        void Error(int aCode, const char * aMessage) const;
+        // ===== Object =====================================================
+        virtual void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
+
+    private:
 
         struct
         {

@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -29,8 +29,6 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define ELEMENT "Interface"
-
 #define EOL "\n"
 
 namespace NH
@@ -39,7 +37,7 @@ namespace NH
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Interface::Interface(const char * aName)
+    Interface::Interface(const char * aName) : NamedObject("Interface")
     {
         Init();
 
@@ -69,9 +67,11 @@ namespace NH
 
         if (!mFlags.mHasSubInterface)
         {
-            for (unsigned int i = 0; i < mName.size(); i++)
+            const char * lName = GetName();
+
+            for (unsigned int i = 0; '\0' != lName[i]; i++)
             {
-                char lC = mName[i];
+                char lC = lName[i];
 
                 if ('.' == lC)
                 {
@@ -85,7 +85,6 @@ namespace NH
         return false;
     }
 
-    const char   * Interface::GetName  () const { return mName.c_str(); }
     const SubNet * Interface::GetSubNet() const { return mSubNet; }
 
     bool Interface::IsDHCPServer() const
@@ -100,7 +99,7 @@ namespace NH
 
         if (NULL != mAccessLists[aDirection])
         {
-            Utl_ThrowError(ERROR_209);
+            ThrowError(ERROR_209);
         }
 
         mAccessLists[aDirection] = aAccessList;
@@ -122,11 +121,18 @@ namespace NH
             break;
 
         default:
-            Utl_ThrowError(ERROR_227, ELEMENT " - " ERROR_227_MSG);
+            ThrowError(ERROR_227);
         }
 
-        if (mFlags.mDHCP           ) { Utl_ThrowError(ERROR_224); }
-        if (mFlags.mHasSubInterface) { Utl_ThrowError(ERROR_220); }
+        if (mFlags.mDHCP)
+        {
+            ThrowError(ERROR_224);
+        }
+
+        if (mFlags.mHasSubInterface)
+        {
+            ThrowError(ERROR_220);
+        }
 
         if (NULL != mSubNet)
         {
@@ -150,17 +156,17 @@ namespace NH
         {
             if (mFlags.mHasSubInterface)
             {
-                Utl_ThrowError(ERROR_219);
+                ThrowError(ERROR_219);
             }
 
             if (0 != mAddr)
             {
-                Utl_ThrowError(ERROR_223);
+                ThrowError(ERROR_223);
             }
 
             if (IsDHCPServer())
             {
-                Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
+                ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
             }
 
             mFlags.mDHCP = true;
@@ -176,31 +182,15 @@ namespace NH
     {
         if (!mFlags.mHasSubInterface)
         {
-            if (mFlags.mDHCP   ) { Utl_ThrowError(ERROR_218); }
-            if (mFlags.mSub    ) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a sub-interface"    ); }
-            if (mFlags.mVirtual) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a virtual interface"); }
+            if (mFlags.mDHCP   ) { ThrowError(ERROR_218); }
+            if (mFlags.mSub    ) { ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a sub-interface"    ); }
+            if (mFlags.mVirtual) { ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a virtual interface"); }
 
-            if (   0 != mAddr  ) { Utl_ThrowError(ERROR_222); }
-            if (NULL != mSubNet) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for an interface connected to a subnet"); }
+            if (   0 != mAddr  ) { ThrowError(ERROR_222); }
+            if (NULL != mSubNet) { ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for an interface connected to a subnet"); }
 
             mFlags.mHasSubInterface = true;
         }
-    }
-
-    // TODO NH.Interface.SetName.Error
-    //      Name already set
-
-    void Interface::SetName(const char * aName)
-    {
-        assert(NULL != aName);
-
-        if (NULL != strchr(aName, '.'))
-        {
-            mFlags.mSub     = true;
-            mFlags.mVirtual = true;
-        }
-
-        mName = aName;
     }
 
     // TODO NH.Interface.SetNAT_Inside.Error
@@ -212,7 +202,7 @@ namespace NH
         {
             if (mFlags.mNAT_Outside)
             {
-                Utl_ThrowError(ERROR_203);
+                ThrowError(ERROR_203);
             }
 
             mFlags.mNAT_Inside = true;
@@ -228,7 +218,7 @@ namespace NH
         {
             if (mFlags.mNAT_Inside)
             {
-                Utl_ThrowError(ERROR_204);
+                ThrowError(ERROR_204);
             }
 
             mFlags.mNAT_Outside = true;
@@ -246,7 +236,7 @@ namespace NH
         {
             if (mFlags.mHasSubInterface)
             {
-                Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not connect a subnet to and interface with sub-interfaces");
+                ThrowError(ERROR_CONFIG, __LINE__, "Do not connect a subnet to and interface with sub-interfaces");
             }
 
             if (0 != mAddr)
@@ -256,7 +246,7 @@ namespace NH
 
             if (mFlags.mDHCP && aSubNet->GetDHCP(this))
             {
-                Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
+                ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
             }
 
             mSubNet = aSubNet;
@@ -275,18 +265,25 @@ namespace NH
         int lRet = sscanf_s(aVLAN, "%u", &lVLAN);
         if (1 != lRet)
         {
-            Utl_ThrowError(ERROR_403);
+            ThrowError(ERROR_403);
         }
 
         if (4096 <= lVLAN)
         {
-            Utl_ThrowError(ERROR_201);
+            ThrowError(ERROR_201);
         }
 
         if (mVLAN != lVLAN)
         {
-            if ( mFlags.mHasSubInterface) { Utl_ThrowError(ERROR_221); }
-            if (!mFlags.mSub            ) { Utl_ThrowError(ERROR_202); }
+            if ( mFlags.mHasSubInterface)
+            {
+                ThrowError(ERROR_221);
+            }
+
+            if (!mFlags.mSub)
+            {
+                ThrowError(ERROR_202);
+            }
 
             mVLAN = lVLAN;
         }
@@ -297,7 +294,25 @@ namespace NH
 
     void Interface::Verify() const
     {
-        Utl_ThrowErrorIfNeeded(ERROR_004, ELEMENT, mName.c_str(), Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_004, Verify_Internal());
+    }
+
+    // ===== NamedObject ====================================================
+
+    // TODO NH.Interface.SetName.Error
+    //      Name already set
+
+    void Interface::SetName(const char * aName)
+    {
+        assert(NULL != aName);
+
+        if (NULL != strchr(aName, '.'))
+        {
+            mFlags.mSub     = true;
+            mFlags.mVirtual = true;
+        }
+
+        NamedObject::SetName(aName);
     }
 
     // Internal
@@ -323,7 +338,7 @@ namespace NH
 
     HI::Shape * Interface::PrepareShape(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap)
     {
-        HI::Shape * lResult = new HI::Shape("Interface", mName.c_str());
+        HI::Shape * lResult = new HI::Shape("Interface", GetName());
         assert(NULL != lResult);
 
         lResult->SetFillColor(aColor);
@@ -422,19 +437,6 @@ namespace NH
 
         memset(&mFlags      , 0, sizeof(mFlags      ));
         memset(&mAccessLists, 0, sizeof(mAccessLists));
-    }
-
-    void Interface::DisplayError(const char * aErrorType, int aCode, const char * aMessage) const
-    {
-        assert(NULL != aMessage);
-
-        char lMessage[128];
-
-        int lRet = sprintf_s(lMessage, ELEMENT " %s - %s", mName.c_str(), aMessage);
-        assert(               0 < lRet);
-        assert(sizeof(lMessage) > lRet);
-
-        Utl_DisplayError(aErrorType, aCode, lMessage);
     }
 
     void Interface::Prepare_Link_SubNet(HI::Shape * aShape, HI::Diagram * aDiagram, const ShapeMap & aSubNetMap)

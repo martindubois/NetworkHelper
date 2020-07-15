@@ -17,6 +17,7 @@
 #include <HI/Shape.h>
 
 // ===== Includes ===========================================================
+#include <NH/NamedObject.h>
 #include <NH/Types.h>
 
 // ===== NHLib ==============================================================
@@ -29,13 +30,15 @@ namespace NH
     class SubNet;
 
     /// \brief NH::Interface
-    class Interface
+    class Interface : public NamedObject
     {
 
     public:
 
         /// \param aName The interface's name
         Interface(const char * aName);
+
+        ~Interface();
 
         /// \return This method return the configured address
         uint32_t GetAddress() const;
@@ -49,9 +52,6 @@ namespace NH
         /// \retval false This interface is not a sub-interface
         /// \retval true  This interface is a sub-interface
         bool GetBaseName(char * aOut, unsigned int aOutSize_byte);
-
-        /// \return This method returns the address of an internal buffer.
-        const char * GetName() const;
 
         /// \return This methode returns the pointer to an internal stored into the SubNetList instance associated to the Network.
         const SubNet * GetSubNet() const;
@@ -77,9 +77,6 @@ namespace NH
 
         void SetHasSubInterface();
 
-        /// \param aName The name
-        void SetName(const char * aName);
-
         void SetNAT_Inside ();
         void SetNAT_Outside();
 
@@ -95,9 +92,9 @@ namespace NH
 
         void Verify() const;
 
-        // ===== HI::Shape ==================================================
+        // ===== NamedObject ================================================
 
-        ~Interface();
+        virtual void SetName(const char * aName);
 
     // Internal
 
@@ -117,8 +114,6 @@ namespace NH
         const Interface & operator = (const Interface &);
 
         void Init();
-
-        void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
 
         void Prepare_Link_SubNet(HI::Shape * aShape, HI::Diagram * aDiagram, const ShapeMap & aSubNetMap);
         void Prepare_Title      (HI::Shape * aShape);
@@ -141,7 +136,6 @@ namespace NH
         mFlags;
 
         uint32_t       mAddr  ;
-        std::string    mName  ;
         const SubNet * mSubNet;
         uint16_t       mVLAN  ;
 

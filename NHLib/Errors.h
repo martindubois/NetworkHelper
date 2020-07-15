@@ -19,6 +19,7 @@
 #define ERROR_004 (-4)
 #define ERROR_005 (-5)
 #define ERROR_006 (-6)
+#define ERROR_007 (-7)
 
 // ===== CALLER ERROR =======================================================
 
@@ -33,22 +34,18 @@
 #define ERROR_203 ERROR_CONFIG, (-203), ("A same interface cannot be NAT outside and NAT inside")
 #define ERROR_204 ERROR_CONFIG, (-204), ("A same interface cannot be NAT inside and NAT outside")
 #define ERROR_205 ERROR_CONFIG, (-205), ("Act as DHCP server but DHCP request are not allowed in")
-
-#define ERROR_206 (-206), ("describes traffic going into the interace and the access list is used as \"out\"")
-#define ERROR_207 (-207), ("describe traffic going out from the interace and the access list is used as \"in\"")
-#define ERROR_208 (-208), ("describe opposed traffics")
-
+#define ERROR_206 ERROR_CONFIG, (-206), ("describes traffic going into the interace and the access list is used as \"out\"")
+#define ERROR_207 ERROR_CONFIG, (-207), ("describe traffic going out from the interace and the access list is used as \"in\"")
+#define ERROR_208 ERROR_CONFIG, (-208), ("describe opposed traffics")
 #define ERROR_209 ERROR_CONFIG, (-209), ("An access list is already set for this direction")
 #define ERROR_210 ERROR_CONFIG, (-210), ("Invalid IPv4 address")
 #define ERROR_211 ERROR_CONFIG, (-211), ("The subnet address is not valid")
 #define ERROR_212 ERROR_CONFIG, (-212), ("The subnet address is not a valid subnet address")
 #define ERROR_213 ERROR_CONFIG, (-213), ("Invalid port number")
 #define ERROR_214 ERROR_CONFIG, (-214), ("Only TCP rule can use the \"established\" flag")
-
-#define ERROR_215 (-215), ("Describes traffic not going through the router")
-#define ERROR_216 (-216), ("Describes traffic not going through the router")
-#define ERROR_217 (-217), ("Describes traffic not going through the network")
-
+#define ERROR_215 ERROR_CONFIG, (-215), ("Describes traffic not going through the router")
+#define ERROR_216 ERROR_CONFIG, (-216), ("Describes traffic not going through the router")
+#define ERROR_217 ERROR_CONFIG, (-217), ("Describes traffic not going through the network")
 #define ERROR_218 ERROR_CONFIG, (-218), ("Do not create sub-interface for an interface with the DHCP client enabled")
 #define ERROR_219 ERROR_CONFIG, (-219), ("Do not enable DHCP client on an interface with sub-interfaces")
 #define ERROR_220 ERROR_CONFIG, (-220), ("Do not configure an IPv4 address on an interface with sub-interfaces")
@@ -60,17 +57,10 @@
 #define ERROR_225     ERROR_CONFIG, (-225)
 #define ERROR_225_FMT "\"%s\" command outside of an \"%s\" section"
 
-#define ERROR_226     ERROR_CONFIG, (-226)
-#define ERROR_226_MSG "Invalid IPv4 address"
-
-#define ERROR_227     ERROR_CONFIG, (-227)
-#define ERROR_227_MSG "Invalid IPv4 address"
-
-#define ERROR_228     ERROR_CONFIG, (-228)
-#define ERROR_228_MSG "Invalid next router IPv4 address"
-
-#define ERROR_229     ERROR_CONFIG, (-229)
-#define ERROR_229_MSG "IP routing is not enabled and the router use more than one interface"
+#define ERROR_226     ERROR_CONFIG, (-226), ("Invalid IPv4 address")
+#define ERROR_227     ERROR_CONFIG, (-227), ("Invalid IPv4 address")
+#define ERROR_228     ERROR_CONFIG, (-228), ("Invalid next router IPv4 address")
+#define ERROR_229     ERROR_CONFIG, (-229), ("IP routing is not enabled and the router use more than one interface")
 
 // ===== FILE ERROR =========================================================
 
