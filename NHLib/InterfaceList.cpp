@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -229,9 +229,6 @@ namespace NH
             delete[] lShapes;
         }
     }
-
-    // NOT TESTED NH.InterfaceList.Verify.Error
-    //            Two interface connected to the same subnet
 
     unsigned int InterfaceList::Verify_Internal() const
     {

@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Parser.h
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-10 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -64,9 +64,6 @@ void Parser::ValidateCount(const char * aCommand, unsigned int aCount, unsigned 
         Utl_ThrowError(ERROR_402, lMessage);
     }
 }
-
-// NOT TESTED NH.Router.Error
-//            Unexpected command element or enumeration value
 
 unsigned int Parser::Walk(const char **aElements, unsigned int aCount, const Node * aNodes)
 {
@@ -259,9 +256,6 @@ void Display_Line(const char * aLine)
 
     printf("%s", aLine);
 }
-
-// NOT TESTED NH.Router.Error
-//            Command too long or contining to many elements
 
 unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_byte, const char ** aElements, unsigned int aMax)
 {

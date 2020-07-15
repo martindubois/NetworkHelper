@@ -340,6 +340,8 @@ void Router_AddInterface(KmsLib::ToolBase * aToolBase, const char * aArg)
             sInterface = sRouter->mInterfaces.FindOrCreate(lName);
             assert(NULL != sInterface);
 
+            sInterface->SetEnable();
+
             if (NULL != sSubNet)
             {
                 sInterface->SetSubNet(sSubNet);

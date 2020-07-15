@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -30,9 +30,6 @@ namespace NH
 
     // Public
     /////////////////////////////////////////////////////////////////////////
-
-    // NOT TESTED NH.Route.Error
-    //            The next router is on the destination network.
 
     Route::Route(const SubNet * aSubNet, const char * aAddr) : mSubNet(aSubNet)
     {

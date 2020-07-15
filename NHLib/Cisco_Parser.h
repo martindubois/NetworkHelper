@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.h
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -52,8 +52,9 @@ namespace Cisco
         bool Cmd_Ip_Route              (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Routing            (const char ** aElements, unsigned int aCount);
         bool Cmd_Network               (const char ** aElements, unsigned int aCount);
-        bool Cmd_No                    (const char ** aElements, unsigned int aCount);
+        bool Cmd_No_Shutdown           (const char ** aElements, unsigned int aCount);
         bool Cmd_Permit                (const char ** aElements, unsigned int aCount);
+        bool Cmd_Shutdown              (const char ** aElements, unsigned int aCount);
 
         // ===== Sections ===================================================
         void Section_AccessList(const char * aCommand, const char * aSection);

@@ -70,7 +70,11 @@ namespace NH
         /// \param aAddr The address
         void SetAddress(const char * aAddr);
 
-        void SetDHCP           ();
+        void SetDHCP();
+
+        /// \param aEnable
+        void SetEnable(bool aEnable = true);
+
         void SetHasSubInterface();
 
         /// \param aName The name
@@ -114,12 +118,17 @@ namespace NH
 
         void Init();
 
+        void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
+
         void Prepare_Link_SubNet(HI::Shape * aShape, HI::Diagram * aDiagram, const ShapeMap & aSubNetMap);
         void Prepare_Title      (HI::Shape * aShape);
+
+        unsigned int Verify_Flags() const;
 
         struct
         {
             unsigned mDHCP            : 1;
+            unsigned mEnable          : 1;
             unsigned mHasSubInterface : 1;
             unsigned mNAT_Inside      : 1;
             unsigned mNAT_Outside     : 1;

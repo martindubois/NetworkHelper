@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -66,24 +66,29 @@ static const Parser::Node ENUM_DIRECTION[] =
 /////////////////////////////////////////////////////////////////////////////
 
 #define CMD_ACCESS_LIST             ( 1)
-#define CMD_DENY                    ( 2)
-#define CMD_ENCAPSULATION_DOT1Q     ( 3)
-#define CMD_HOSTNAME                ( 4)
-#define CMD_INTERFACE               ( 5)
-#define CMD_INTERFACE_TUNNEL        ( 6)
-#define CMD_IP_ACCESS_GROUP         ( 7)
-#define CMD_IP_ACCESS_LIST_EXTENDED ( 8)
-#define CMD_IP_ADDRESS              ( 9)
-#define CMD_IP_ADDRESS_DHCP         (10)
-#define CMD_IP_NAT_INSIDE           (11)
-#define CMD_IP_NAT_OUTSIDE          (12)
-#define CMD_IP_NAT_POOL             (13)
-#define CMD_IP_ROUTE                (14)
-#define CMD_IP_ROUTING              (15)
-#define CMD_NETWORK                 (16)
-#define CMD_PERMIT                  (17)
-#define CMD_TUNNEL_DESTINATION      (18)
-#define CMD_TUNNEL_SOURCE           (19)
+#define CMD_DEFAULT_ROUTER          ( 2)
+#define CMD_DENY                    ( 3)
+#define CMD_DNS_SERVER              ( 4)
+#define CMD_ENCAPSULATION_DOT1Q     ( 5)
+#define CMD_HOSTNAME                ( 6)
+#define CMD_INTERFACE               ( 7)
+#define CMD_INTERFACE_TUNNEL        ( 8)
+#define CMD_IP_ACCESS_GROUP         ( 9)
+#define CMD_IP_ACCESS_LIST_EXTENDED (10)
+#define CMD_IP_ADDRESS              (11)
+#define CMD_IP_ADDRESS_DHCP         (12)
+#define CMD_IP_DHCP_POOL            (13)
+#define CMD_IP_NAT_INSIDE           (14)
+#define CMD_IP_NAT_OUTSIDE          (15)
+#define CMD_IP_NAT_POOL             (16)
+#define CMD_IP_ROUTE                (17)
+#define CMD_IP_ROUTING              (18)
+#define CMD_NETWORK                 (19)
+#define CMD_NO_SHUTDOWN             (20)
+#define CMD_PERMIT                  (21)
+#define CMD_SHUTDOWN                (22)
+#define CMD_TUNNEL_DESTINATION      (23)
+#define CMD_TUNNEL_SOURCE           (24)
 
 static const Parser::Node CMDS_ACCESS[] =
 {
@@ -121,6 +126,13 @@ static const Parser::Node CMDS_IP_ADDRESS[] =
     { Parser::CODE_NO_MATCH, NULL, NULL }
 };
 
+static const Parser::Node CMDS_IP_DHCP[] =
+{
+    { CMD_IP_DHCP_POOL, "pool", NULL },
+
+    { Parser::CODE_NO_MATCH, NULL, NULL }
+};
+
 static const Parser::Node CMDS_IP_NAT[] =
 {
     { CMD_IP_NAT_INSIDE , "inside" , NULL },
@@ -135,9 +147,17 @@ static const Parser::Node CMDS_IP[] =
     { CMD_IP_ACCESS_GROUP, "access-group", NULL                },
     { Parser::CODE_IGNORE, "access-list" , CMDS_IP_ACCESS_LIST },
     { CMD_IP_ADDRESS     , "address"     , CMDS_IP_ADDRESS     },
+    { Parser::CODE_IGNORE, "dhcp"        , CMDS_IP_DHCP        },
     { Parser::CODE_IGNORE, "nat"         , CMDS_IP_NAT         },
     { CMD_IP_ROUTE       , "route"       , NULL                },
     { CMD_IP_ROUTING     , "routing"     , NULL                },
+
+    { Parser::CODE_IGNORE, NULL, NULL }
+};
+
+static const Parser::Node CMDS_NO[] =
+{
+    { CMD_NO_SHUTDOWN, "shutdown", NULL },
 
     { Parser::CODE_IGNORE, NULL, NULL }
 };
@@ -153,13 +173,17 @@ static const Parser::Node CMDS_TUNNEL[] =
 static const Parser::Node COMMANDS[] =
 {
     { CMD_ACCESS_LIST    , "access-list"  , NULL               },
+    { CMD_DEFAULT_ROUTER , "default-router", NULL              },
     { CMD_DENY           , "deny"         , NULL               },
+    { CMD_DNS_SERVER     , "dns-server"   , NULL               },
     { Parser::CODE_IGNORE, "encapsulation", CMDS_ENCAPSULATION },
     { CMD_HOSTNAME       , "hostname"     , NULL               },
     { CMD_INTERFACE      , "interface"    , CMDS_INTERFACE     },
     { Parser::CODE_IGNORE, "ip"           , CMDS_IP            },
     { CMD_NETWORK        , "network"      , NULL               },
+    { Parser::CODE_IGNORE, "no"           , CMDS_NO            },
     { CMD_PERMIT         , "permit"       , NULL               },
+    { CMD_SHUTDOWN       , "shutdown"     , NULL               },
     { Parser::CODE_IGNORE, "tunnel"       , CMDS_TUNNEL        },
 
     { Parser::CODE_IGNORE, NULL, NULL }
@@ -231,9 +255,14 @@ namespace Cisco
         case CMD_IP_ROUTE               : return Cmd_Ip_Route              (aElements, aCount);
         case CMD_IP_ROUTING             : return Cmd_Ip_Routing            (aElements, aCount);
         case CMD_NETWORK                : return Cmd_Network               (aElements, aCount);
+        case CMD_NO_SHUTDOWN            : return Cmd_No_Shutdown           (aElements, aCount);
         case CMD_PERMIT                 : return Cmd_Permit                (aElements, aCount);
+        case CMD_SHUTDOWN               : return Cmd_Shutdown              (aElements, aCount);
 
         case CMD_ACCESS_LIST       :
+        case CMD_DEFAULT_ROUTER    :
+        case CMD_DNS_SERVER        :
+        case CMD_IP_DHCP_POOL      :
         case CMD_IP_NAT_POOL       :
         case CMD_TUNNEL_DESTINATION:
         case CMD_TUNNEL_SOURCE     :
@@ -247,9 +276,6 @@ namespace Cisco
 
     // Private
     /////////////////////////////////////////////////////////////////////////
-
-    // NOT TESTED Cisco.Router.Error
-    //            Invalid final element for deny or permit command
 
     bool Parser::Access(const char ** aElements, unsigned int aCount, NH::Access::Type aType, const char * aCommand)
     {
@@ -369,7 +395,9 @@ namespace Cisco
 
     bool Parser::Cmd_Deny(const char ** aElements, unsigned int aCount)
     {
-        return Access(aElements, aCount, NH::Access::TYPE_DENY, "deny");
+        static const char * COMMAND = "deny";
+
+        return Access(aElements, aCount, NH::Access::TYPE_DENY, COMMAND);
     }
 
     bool Parser::Cmd_Encapsulation_Dot1Q(const char ** aElements, unsigned int aCount)
@@ -392,10 +420,12 @@ namespace Cisco
 
     bool Parser::Cmd_Hostname(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "hostname";
+
         assert(NULL != aElements);
         assert(   1 <= aCount   );
 
-        ValidateCount("hostname", aCount, 2, 2);
+        ValidateCount(COMMAND, aCount, 2, 2);
         assert(NULL != aElements[1]);
 
         GetRouter()->SetName(aElements[1]);
@@ -405,10 +435,12 @@ namespace Cisco
 
     bool Parser::Cmd_Interface(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "interface";
+
         assert(NULL != aElements);
         assert(   1 <= aCount   );
 
-        ValidateCount("interface", aCount, 2, 2);
+        ValidateCount(COMMAND, aCount, 2, 2);
         assert(NULL != aElements[1]);
 
         mInterface = GetRouter()->mInterfaces.FindOrCreate(aElements[1]);
@@ -419,10 +451,12 @@ namespace Cisco
 
     bool Parser::Cmd_Interface_Tunnel(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "interface tunel";
+
         assert(NULL != aElements);
         assert(   2 <= aCount   );
 
-        ValidateCount("interface tunnel", aCount, 3, 3);
+        ValidateCount(COMMAND, aCount, 3, 3);
         assert(NULL != aElements[2]);
 
         char lName[64];
@@ -467,10 +501,12 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_AccessList_Extended(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "ip access-list extended";
+
         assert(NULL != aElements);
         assert(   3 <= aCount   );
 
-        ValidateCount("ip access-list extended", aCount, 4);
+        ValidateCount(COMMAND, aCount, 4);
         assert(NULL != aElements[3]);
 
         mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3]);
@@ -532,15 +568,16 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Nat_Inside(const char ** aElements, unsigned int aCount)
     {
-        assert(NULL != aElements);
-        assert(   3 <= aCount   );
+        static const char * COMMAND = "ip nat inside";
+
+        assert(3 <= aCount);
 
         if (3 < aCount)
         {
             return false;
         }
 
-        Section_Interface("ip nat inside");
+        Section_Interface(COMMAND);
         assert(NULL != mInterface);
 
         mInterface->SetNAT_Inside();
@@ -567,10 +604,12 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Route(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "ip route";
+
         assert(NULL != aElements);
         assert(   2 <= aCount   );
 
-        ValidateCount("ip route", aCount, 5, 5);
+        ValidateCount(COMMAND, aCount, 5, 5);
         assert(NULL != aElements[2]);
         assert(NULL != aElements[3]);
         assert(NULL != aElements[4]);
@@ -588,9 +627,11 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Routing(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "ip routing";
+
         assert(2 <= aCount);
 
-        ValidateCount("ip routing", aCount, 2, 2);
+        ValidateCount(COMMAND, aCount, 2, 2);
 
         GetRouter()->SetIpRouting();
 
@@ -599,10 +640,12 @@ namespace Cisco
 
     bool Parser::Cmd_Network(const char ** aElements, unsigned int aCount)
     {
+        static const char * COMMAND = "network";
+
         assert(NULL != aElements);
         assert(   1 <= aCount   );
 
-        ValidateCount("network", aCount, 3, 3);
+        ValidateCount(COMMAND, aCount, 3, 3);
         assert(NULL != aElements[1]);
         assert(NULL != aElements[2]);
 
@@ -619,9 +662,43 @@ namespace Cisco
         return true;
     }
 
+    bool Parser::Cmd_No_Shutdown(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "no shutdown";
+
+        assert(2 <= aCount);
+
+        ValidateCount(COMMAND, 2, 2);
+
+        Section_Interface(COMMAND);
+        assert(NULL != mInterface);
+
+        mInterface->SetEnable();
+
+        return true;
+    }
+
     bool Parser::Cmd_Permit(const char ** aElements, unsigned int aCount)
     {
-        return Access(aElements, aCount, NH::Access::TYPE_PERMIT, "permit");
+        static const char * COMMAND = "permit";
+
+        return Access(aElements, aCount, NH::Access::TYPE_PERMIT, COMMAND);
+    }
+
+    bool Parser::Cmd_Shutdown(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "shutdown";
+
+        assert(1 <= aCount);
+
+        ValidateCount(COMMAND, 1, 1);
+
+        Section_Interface(COMMAND);
+        assert(NULL != mInterface);
+
+        mInterface->SetEnable(false);
+
+        return true;
     }
 
     // ===== Sections =======================================================

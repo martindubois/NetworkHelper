@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/SubNetList.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -98,8 +98,6 @@ namespace NH
         return FindOrCreate(lAddr, lMask);
     }
 
-    // NOT TESTED NH.SubNetList.Verify
-
     void SubNetList::Verify() const
     {
         Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", Verify_Internal());
@@ -117,8 +115,6 @@ namespace NH
             (*lIt)->Prepare(aDiagram, aShapeMap);
         }
     }
-
-    // NOT TESTED NH.SubNetList.Verify.Error
 
     unsigned int SubNetList::Verify_Internal() const
     {

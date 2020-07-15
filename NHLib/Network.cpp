@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Network.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// CODE COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 // TODO NH.Network.AddKnownDevices
 
@@ -60,9 +60,6 @@ namespace NH
     {
     }
 
-    // NOT TESTED NH.Network.AddDevice.Error
-    //            Add the same Device twice.
-
     // aDevice [-K-;R--]
     void Network::AddDevice(Device * aDevice)
     {
@@ -108,6 +105,7 @@ namespace NH
                     assert(NULL != lInterface);
 
                     lInterface->SetAddress(lAddr);
+                    lInterface->SetEnable ();
 
                     const SubNet * lSubNet = mSubNets.Find(lAddr);
                     if (NULL != lSubNet)
@@ -120,9 +118,6 @@ namespace NH
             }
         }
     }
-
-    // NOT TESTED NH.Network.AddRouter.Error
-    //            Add the same Router twice.
 
     // aRouter [-K-;R--]
     void Network::AddRouter(Router * aRouter)
@@ -220,7 +215,7 @@ namespace NH
 
         lResult += mSubNets.Verify_Internal();
 
-        Utl_ThrowErrorIfNeeded(__LINE__, ELEMENT, "", lResult);
+        Utl_ThrowErrorIfNeeded(ERROR_005, ELEMENT, "", lResult);
     }
 
     // Private

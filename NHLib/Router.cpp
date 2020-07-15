@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -107,9 +107,6 @@ namespace NH
     // NOT TESTED NH.Router.RetrieveInfo
     //            Retrieve Router information through Telenet connection
 
-    // NOT TESTED NH.Router.RetrieveInfo.Error
-    //            Report an error when the InfoType is not valid
-
     void Router::RetrieveInfo(InfoType aType, const char * aData, unsigned int aFlags)
     {
         assert(NULL != aData);
@@ -202,9 +199,6 @@ namespace NH
     //      Does NAT pool access list match the nat inside interface?
     //      Does NAT pool address really public?
 
-    // NOT TESTED Router.Verify.Error
-    //            IP routing is not enabled and routes are configured
-
     unsigned int Router::Verify_Internal() const
     {
         unsigned int lResult = 0;
@@ -234,9 +228,6 @@ namespace NH
 
     // Privates
     /////////////////////////////////////////////////////////////////////////
-
-    // NOT TESTED NH.Router.Verify.Error
-    //            Useless route and unreachable next router
 
     unsigned int Router::Verify_Routes() const
     {

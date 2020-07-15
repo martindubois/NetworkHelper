@@ -49,10 +49,12 @@ KMS_TEST_BEGIN(Network_MyNetwork)
     NH::Interface * lI_ASUS_WAN = lR_ASUS.mInterfaces.FindOrCreate("WAN");
     NH::Interface * lI_ASUS_1   = lR_ASUS.mInterfaces.FindOrCreate("1");
 
+    lI_ASUS_WAN->SetEnable();
     lI_ASUS_WAN->SetDHCP  ();
     lI_ASUS_WAN->SetSubNet(lSN_Bell);
 
     lI_ASUS_1->SetAddress("192.168.0.1");
+    lI_ASUS_1->SetEnable ();
     lI_ASUS_1->SetSubNet (lSN_ASUS);
 
     lSN_ASUS->SetDHCP(&lR_ASUS, lI_ASUS_1);
@@ -63,9 +65,11 @@ KMS_TEST_BEGIN(Network_MyNetwork)
     NH::Interface * lI_Bell_WAN = lR_Bell.mInterfaces.FindOrCreate("WAN");
     NH::Interface * lI_Bell_1   = lR_Bell.mInterfaces.FindOrCreate("1");
 
-    lI_Bell_WAN->SetDHCP();
+    lI_Bell_WAN->SetDHCP  ();
+    lI_Bell_WAN->SetEnable();
 
     lI_Bell_1->SetAddress("192.168.2.1");
+    lI_Bell_1->SetEnable ();
     lI_Bell_1->SetSubNet (lSN_Bell);
 
     lSN_Bell->SetDHCP(&lR_Bell, lI_Bell_1);

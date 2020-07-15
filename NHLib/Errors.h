@@ -17,6 +17,7 @@
 #define ERROR_002 (-2)
 #define ERROR_003 (-3)
 #define ERROR_004 (-4)
+#define ERROR_005 (-5)
 #define ERROR_006 (-6)
 
 // ===== CALLER ERROR =======================================================
@@ -31,9 +32,7 @@
 #define ERROR_202 ERROR_CONFIG, (-202), ("A VLAN must be set on sub-interface")
 #define ERROR_203 ERROR_CONFIG, (-203), ("A same interface cannot be NAT outside and NAT inside")
 #define ERROR_204 ERROR_CONFIG, (-204), ("A same interface cannot be NAT inside and NAT outside")
-
-#define ERROR_205     ERROR_CONFIG, (-205)
-#define ERROR_205_MSG "Act as DHCP server but DHCP request are not allowed in"
+#define ERROR_205 ERROR_CONFIG, (-205), ("Act as DHCP server but DHCP request are not allowed in")
 
 #define ERROR_206 (-206), ("describes traffic going into the interace and the access list is used as \"out\"")
 #define ERROR_207 (-207), ("describe traffic going out from the interace and the access list is used as \"in\"")
@@ -90,3 +89,9 @@
 #define ERROR_403 ERROR_PARSE, (-403), ("Invalid VLAN number")
 #define ERROR_404 ERROR_PARSE, (-404), ("Invalid IPv4 address format")
 #define ERROR_405 ERROR_PARSE, (-405), ("Invalid IPv4 inverted net mask format")
+
+// ===== WARNING ============================================================
+
+#define ERROR_WARNING ("WARNING")
+
+#define ERROR_501 ERROR_WARNING, (-501), ("Disabled but configured using IPv4 static address")

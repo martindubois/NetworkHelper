@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -83,9 +83,6 @@ namespace NH
         }
     }
 
-    // NOT TESTED NH.AccessEnd.Error
-    //            Not initialized
-
     AccessEnd::Filter AccessEnd::GetFilter() const
     {
         return mFilter;
@@ -119,9 +116,6 @@ namespace NH
     {
         return FILTER_INVALID != mFilter;
     }
-
-    // NOT TESTED NH.AccessEnd.Error
-    //            Already initialized
 
     void AccessEnd::SetAny()
     {
@@ -165,9 +159,6 @@ namespace NH
 
         SetHost(IPv4_TextToAddress(aHost, false));
     }
-
-    // NOT TESTED NH.AccessEnd.Error
-    //            Port alread initialized
 
     void AccessEnd::SetPort(Operator aOp)
     {
@@ -319,8 +310,6 @@ namespace NH
 
         return false;
     }
-
-    // NOT TESTED NH.AccessEnd.Verify
 
     void AccessEnd::Verify() const
     {

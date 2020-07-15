@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-13 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-13 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -144,9 +144,6 @@ namespace NH
     // TODO NH.Interface.SetDHCP.Error
     //      DHCP already set
 
-    // NOT TESTED NH.Interface.SetDHCP.Error
-    //            Same interface as DHCP client and server
-
     void Interface::SetDHCP()
     {
         if (!mFlags.mDHCP)
@@ -170,19 +167,21 @@ namespace NH
         }
     }
 
-    // NOT TESTED NH.Interface.SetHasSubInterface.Error
-    //            Sub-sub-interface, Sub-interface connected to a subnet
+    void Interface::SetEnable(bool aEnable)
+    {
+        mFlags.mEnable = aEnable;
+    }
 
     void Interface::SetHasSubInterface()
     {
         if (!mFlags.mHasSubInterface)
         {
             if (mFlags.mDHCP   ) { Utl_ThrowError(ERROR_218); }
-            if (mFlags.mSub    ) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a sub-interface"                      ); }
-            if (mFlags.mVirtual) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a virtual interface"                  ); }
+            if (mFlags.mSub    ) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a sub-interface"    ); }
+            if (mFlags.mVirtual) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for a virtual interface"); }
 
             if (   0 != mAddr  ) { Utl_ThrowError(ERROR_222); }
-            if (NULL != mSubNet) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for an interface connected to a subnet"         ); }
+            if (NULL != mSubNet) { Utl_ThrowError(ERROR_CONFIG, __LINE__, "Do not create sub-interface for an interface connected to a subnet"); }
 
             mFlags.mHasSubInterface = true;
         }
@@ -238,9 +237,6 @@ namespace NH
 
     // TODO NH.Interface.SetSubNet.Error
     //      SubNet already set
-
-    // NOT TESTED NH.Interface.SetSubNet.Error
-    //            DHCP client and server on the same interface
 
     void Interface::SetSubNet(const SubNet * aSubNet)
     {
@@ -337,26 +333,30 @@ namespace NH
         return lResult;
     }
 
-    // NOT TESTED NH.Interface.Verify.Error
-    //            Not configured interface
-
     // NOT TESTED NH.Interface.Verify
     //            Interface configured using DHCP with an access list.
 
     unsigned int Interface::Verify_Internal() const
     {
-        char         lMessage[128];
         unsigned int lResult = 0;
-        int          lRet;
 
-        if ((0 == mAddr) && (!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
+        lResult += Verify_Flags();
+
+        if (0 == mAddr)
         {
-            lRet = sprintf_s(lMessage, ELEMENT " %s - No IPv4 address set and DHCP client not enabled", mName.c_str());
-            assert(0 < lRet);
-            assert(sizeof(lMessage) > lRet);
-
-            Utl_DisplayError(ERROR_CONFIG, __LINE__, lMessage);
-            lResult++;
+            if ((!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
+            {
+                DisplayError(ERROR_CONFIG, __LINE__, "No IPv4 address set and DHCP client not enabled");
+                lResult++;
+            }
+        }
+        else
+        {
+            if (!mFlags.mEnable)
+            {
+                DisplayError(ERROR_501);
+                lResult++;
+            }
         }
 
         for (unsigned int i = 0; i < DIRECTION_QTY; i++)
@@ -380,11 +380,7 @@ namespace NH
 
             if (!mAccessLists[DIRECTION_IN]->IsAllowed(Access::PROTOCOL_UDP, *mSubNet, 68, 0, 67))
             {
-                lRet = sprintf_s(lMessage, ELEMENT " %s - " ERROR_205_MSG, mName.c_str());
-                assert(0 < lRet);
-                assert(sizeof(lMessage) > lRet);
-
-                Utl_DisplayError(ERROR_205, lMessage);
+                DisplayError(ERROR_205);
                 lResult++;
             }
         }
@@ -426,6 +422,19 @@ namespace NH
 
         memset(&mFlags      , 0, sizeof(mFlags      ));
         memset(&mAccessLists, 0, sizeof(mAccessLists));
+    }
+
+    void Interface::DisplayError(const char * aErrorType, int aCode, const char * aMessage) const
+    {
+        assert(NULL != aMessage);
+
+        char lMessage[128];
+
+        int lRet = sprintf_s(lMessage, ELEMENT " %s - %s", mName.c_str(), aMessage);
+        assert(               0 < lRet);
+        assert(sizeof(lMessage) > lRet);
+
+        Utl_DisplayError(aErrorType, aCode, lMessage);
     }
 
     void Interface::Prepare_Link_SubNet(HI::Shape * aShape, HI::Diagram * aDiagram, const ShapeMap & aSubNetMap)
@@ -510,6 +519,52 @@ namespace NH
         }
 
         aShape->SetTitle(lTitle.c_str());
+    }
+
+    unsigned int Interface::Verify_Flags() const
+    {
+        unsigned int lResult = 0;
+
+        if (!mFlags.mEnable)
+        {
+            if (mFlags.mDHCP)
+            {
+                DisplayError(ERROR_WARNING, __LINE__, "Disabled but configured using DHCP");
+                lResult++;
+            }
+
+            if (mFlags.mHasSubInterface)
+            {
+                DisplayError(ERROR_WARNING, __LINE__, "Disabled but has sub-interface");
+                lResult++;
+            }
+
+            if (mFlags.mNAT_Inside)
+            {
+                DisplayError(ERROR_WARNING, __LINE__, "Disabled but configured as NAT inside");
+                lResult++;
+            }
+
+            if (mFlags.mNAT_Outside)
+            {
+                DisplayError(ERROR_WARNING, __LINE__, "Disabled but configured as NAT outside");
+                lResult++;
+            }
+
+            if (mFlags.mSub)
+            {
+                DisplayError(ERROR_WARNING, __LINE__, "Disabled sub-interface");
+                lResult++;
+            }
+
+            if (mFlags.mVirtual)
+            {
+                DisplayError(ERROR_WARNING, __LINE__, "Disabled virtual interface");
+                lResult++;
+            }
+        }
+
+        return lResult;
     }
 
 }
