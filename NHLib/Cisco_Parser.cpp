@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -252,6 +252,7 @@ namespace Cisco
         case CMD_IP_ADDRESS_DHCP        : return Cmd_Ip_Address_Dhcp       (aElements, aCount);
         case CMD_IP_NAT_INSIDE          : return Cmd_Ip_Nat_Inside         (aElements, aCount);
         case CMD_IP_NAT_OUTSIDE         : return Cmd_Ip_Nat_Outside        (aElements, aCount);
+        case CMD_IP_NAT_POOL            : return Cmd_Ip_Nat_Pool           (aElements, aCount);
         case CMD_IP_ROUTE               : return Cmd_Ip_Route              (aElements, aCount);
         case CMD_IP_ROUTING             : return Cmd_Ip_Routing            (aElements, aCount);
         case CMD_NETWORK                : return Cmd_Network               (aElements, aCount);
@@ -263,7 +264,6 @@ namespace Cisco
         case CMD_DEFAULT_ROUTER    :
         case CMD_DNS_SERVER        :
         case CMD_IP_DHCP_POOL      :
-        case CMD_IP_NAT_POOL       :
         case CMD_TUNNEL_DESTINATION:
         case CMD_TUNNEL_SOURCE     :
             break;
@@ -598,6 +598,25 @@ namespace Cisco
         assert(NULL != mInterface);
 
         mInterface->SetNAT_Outside();
+
+        return true;
+    }
+
+    bool Parser::Cmd_Ip_Nat_Pool(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "ip nat pool";
+
+        assert(NULL != aElements);
+        assert(   3 <= aCount   );
+
+        ValidateCount(COMMAND, aCount, 8, 8);
+
+        if (0 != _stricmp("netmask", aElements[6]))
+        {
+            Utl_ThrowError(ERROR_PARSE, __LINE__, "Invalid \"ip nat pool\" command");
+        }
+
+        GetRouter()->mNATs.Add(aElements[3], aElements[4], aElements[5], aElements[7]);
 
         return true;
     }

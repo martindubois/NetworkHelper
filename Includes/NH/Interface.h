@@ -27,6 +27,7 @@ namespace NH
 {
 
     class AccessList;
+    class NATList;
     class SubNet;
 
     /// \brief NH::Interface
@@ -101,7 +102,7 @@ namespace NH
         void        PrepareLink (HI::Diagram * aDiagram, HI::Shape * aShape, const HI::Shape * aParent);
         HI::Shape * PrepareShape(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap);
 
-        unsigned int Verify_Internal() const;
+        unsigned int Verify_Internal(const NATList * aNATs) const;
 
     protected:
 
@@ -119,6 +120,8 @@ namespace NH
         void Prepare_Title      (HI::Shape * aShape);
 
         unsigned int Verify_Flags() const;
+        unsigned int Verify_WithAddress   (const NATList * aNATs) const;
+        unsigned int Verify_WithoutAddress(const NATList * aNATs) const;
 
         struct
         {

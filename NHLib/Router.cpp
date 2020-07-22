@@ -4,13 +4,14 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
 // ===== Includes ===========================================================
+#include <NH/NAT.h>
 #include <NH/Route.h>
 #include <NH/SubNet.h>
 
@@ -197,7 +198,7 @@ namespace NH
         unsigned int lResult = 0;
 
         lResult += mAccessLists.Verify_Internal();
-        lResult += mInterfaces .Verify_Internal();
+        lResult += mInterfaces .Verify_Internal(&mNATs);
 
         lResult += Verify_Routes();
 

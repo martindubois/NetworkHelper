@@ -42,6 +42,8 @@
     <ClCompile Include="IP.cpp" />
     <ClCompile Include="IPv4.cpp" />
     <ClCompile Include="NamedObject.cpp" />
+    <ClCompile Include="NAT.cpp" />
+    <ClCompile Include="NATList.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Parser.cpp" />

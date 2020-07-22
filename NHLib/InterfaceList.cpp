@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -170,7 +170,7 @@ namespace NH
 
     void InterfaceList::Verify() const
     {
-        ThrowErrorIfNeeded(ERROR_003, Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_003, Verify_Internal(NULL));
     }
 
     // Internal
@@ -225,7 +225,8 @@ namespace NH
         }
     }
 
-    unsigned int InterfaceList::Verify_Internal() const
+    // aNATs [--O;R--]
+    unsigned int InterfaceList::Verify_Internal(const NATList * aNATs) const
     {
         unsigned int lResult = 0;
 
@@ -234,7 +235,7 @@ namespace NH
             const Interface * lI0 = lIt0->second;
             assert(NULL != lI0);
 
-            lResult += lI0->Verify_Internal();
+            lResult += lI0->Verify_Internal(aNATs);
 
             InterfaceMap::const_iterator lIt1 = lIt0;
 

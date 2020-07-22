@@ -23,6 +23,7 @@
 #include <NH/AccessListMap.h>
 #include <NH/InterfaceList.h>
 #include <NH/NamedObject.h>
+#include <NH/NATList.h>
 #include <NH/Route.h>
 
 // ===== NHLib ==============================================================
@@ -31,6 +32,7 @@ class ShapeMap;
 namespace NH
 {
 
+    class NAT       ;
     class SubNetList;
 
     /// \brief NH::Rooter
@@ -91,6 +93,7 @@ namespace NH
 
         AccessListMap mAccessLists;
         InterfaceList mInterfaces ;
+        NATList       mNATs       ;
 
     // Internal
 

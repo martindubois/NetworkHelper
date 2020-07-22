@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -16,6 +16,7 @@
 
 // ===== Includes ===========================================================
 #include <NH/AccessList.h>
+#include <NH/NATList.h>
 #include <NH/SubNet.h>
 
 #include <NH/Interface.h>
@@ -294,7 +295,7 @@ namespace NH
 
     void Interface::Verify() const
     {
-        ThrowErrorIfNeeded(ERROR_004, Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_004, Verify_Internal(NULL));
     }
 
     // ===== NamedObject ====================================================
@@ -348,10 +349,8 @@ namespace NH
         return lResult;
     }
 
-    // NOT TESTED NH.Interface.Verify
-    //            Interface configured using DHCP with an access list.
-
-    unsigned int Interface::Verify_Internal() const
+    // aNATs [--O;R--]
+    unsigned int Interface::Verify_Internal(const NATList * aNATs) const
     {
         unsigned int lResult = 0;
 
@@ -359,34 +358,11 @@ namespace NH
 
         if (0 == mAddr)
         {
-            if ((!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
-            {
-                DisplayError(ERROR_CONFIG, __LINE__, "No IPv4 address set and DHCP client not enabled");
-                lResult++;
-            }
+            Verify_WithoutAddress(aNATs);
         }
         else
         {
-            if (!mFlags.mEnable)
-            {
-                DisplayError(ERROR_501);
-                lResult++;
-            }
-        }
-
-        for (unsigned int i = 0; i < DIRECTION_QTY; i++)
-        {
-            if (NULL != mAccessLists[i])
-            {
-                if (0 != mAddr)
-                {
-                    lResult += mAccessLists[i]->Verify_Internal(mAddr, static_cast<NH::Direction>(i));
-                }
-                else if (NULL != mSubNet)
-                {
-                    lResult += mAccessLists[i]->Verify_Internal(*mSubNet, static_cast<NH::Direction>(i));
-                }
-            }
+            Verify_WithAddress(aNATs);
         }
 
         if (IsDHCPServer() && (NULL != mAccessLists[DIRECTION_IN]))
@@ -563,6 +539,77 @@ namespace NH
             {
                 DisplayError(ERROR_WARNING, __LINE__, "Disabled virtual interface");
                 lResult++;
+            }
+        }
+
+        return lResult;
+    }
+
+    // aNATs [--O;R--]
+    unsigned int Interface::Verify_WithAddress(const NATList * aNATs) const
+    {
+        unsigned int lResult = 0;
+
+        if (!mFlags.mEnable)
+        {
+            DisplayError(ERROR_501);
+            lResult++;
+        }
+
+        if (mFlags.mNAT_Outside && (NULL != aNATs))
+        {
+            const NAT * lNAT = aNATs->Find(mAddr);
+            if (NULL == lNAT)
+            {
+                DisplayError(ERROR_CONFIG, __LINE__, "Configured as NAT outside but do not match any NAT pool");
+                lResult++;
+            }
+        }
+
+        for (unsigned int i = 0; i < DIRECTION_QTY; i++)
+        {
+            if (NULL != mAccessLists[i])
+            {
+                lResult += mAccessLists[i]->Verify_Internal(mAddr, static_cast<NH::Direction>(i));
+            }
+        }
+
+        return lResult;
+    }
+
+    // NOT TESTED NH.Interface.Verify
+    //            Interface configured using DHCP with an access list.
+    //            Interface used as NAT outside but without static address.
+
+    // aNATs [--O;R--]
+    unsigned int Interface::Verify_WithoutAddress(const NATList * aNATs) const
+    {
+        unsigned int lResult = 0;
+
+        if ((!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
+        {
+            DisplayError(ERROR_CONFIG, __LINE__, "No IPv4 address set and DHCP client not enabled");
+            lResult++;
+        }
+
+        if (mFlags.mNAT_Outside && (NULL != mSubNet) && (NULL != aNATs))
+        {
+            const NAT * lNAT = aNATs->Find(*mSubNet);
+            if (NULL != lNAT)
+            {
+                DisplayError(ERROR_CONFIG, __LINE__, "Configured as NAT outside but do not match any NAT pool");
+                lResult++;
+            }
+        }
+
+        if (NULL != mSubNet)
+        {
+            for (unsigned int i = 0; i < DIRECTION_QTY; i++)
+            {
+                if (NULL != mAccessLists[i])
+                {
+                    lResult += mAccessLists[i]->Verify_Internal(*mSubNet, static_cast<NH::Direction>(i));
+                }
             }
         }
 

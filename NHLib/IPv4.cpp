@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/IPv4.cpp
 
-// CODE REVIEW 2020-07-10 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -110,6 +110,11 @@ IPv4_AddressType IPv4_GetAddressType(uint32_t aAddr)
     }
 
     return IPv4_PUBLIC;
+}
+
+bool IPv4_IsAddressOnSubNet(uint32_t aAddr, uint32_t aSubNet, uint32_t aMask)
+{
+    return ((aAddr & aMask) == (aSubNet & aMask)) && (0 != (aAddr & aMask));
 }
 
 uint32_t IPv4_TextToAddress(const char * aIn, bool aValidate)
