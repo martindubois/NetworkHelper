@@ -144,6 +144,8 @@ namespace NH
 
         void Verify() const;
 
+        void VerifyPrivate() const;
+
     // Internal
 
         unsigned int Verify_Internal() const;

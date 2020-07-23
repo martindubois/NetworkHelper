@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessList.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -41,6 +41,16 @@ namespace NH
 
             delete (*lIt);
         }
+    }
+
+    unsigned int AccessList::GetListType() const
+    {
+        return mListType;
+    }
+
+    void AccessList::SetListType(unsigned int aListType)
+    {
+        mListType = aListType;
     }
 
     Access * AccessList::Add(Access::Type aType)

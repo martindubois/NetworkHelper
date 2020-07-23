@@ -4,13 +4,14 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
 // ===== Includes ===========================================================
+#include <NH/NAT.h>
 #include <NH/Router.h>
 #include <NH/SubNet.h>
 #include <NH/SubNetList.h>
@@ -21,6 +22,14 @@
 #include "Utilities.h"
 
 #include "Cisco_Parser.h"
+
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define ACCESS_LIST_IP  (0)
+#define ACCESS_LIST_NAT (1)
+
+#define ACCESS_LIST_QTY (2)
 
 // Enumerations
 /////////////////////////////////////////////////////////////////////////////
@@ -79,16 +88,17 @@ static const Parser::Node ENUM_DIRECTION[] =
 #define CMD_IP_ADDRESS_DHCP         (12)
 #define CMD_IP_DHCP_POOL            (13)
 #define CMD_IP_NAT_INSIDE           (14)
-#define CMD_IP_NAT_OUTSIDE          (15)
-#define CMD_IP_NAT_POOL             (16)
-#define CMD_IP_ROUTE                (17)
-#define CMD_IP_ROUTING              (18)
-#define CMD_NETWORK                 (19)
-#define CMD_NO_SHUTDOWN             (20)
-#define CMD_PERMIT                  (21)
-#define CMD_SHUTDOWN                (22)
-#define CMD_TUNNEL_DESTINATION      (23)
-#define CMD_TUNNEL_SOURCE           (24)
+#define CMD_IP_NAT_INSIDE_SOURCE_LIST (15)
+#define CMD_IP_NAT_OUTSIDE          (16)
+#define CMD_IP_NAT_POOL             (17)
+#define CMD_IP_ROUTE                (18)
+#define CMD_IP_ROUTING              (19)
+#define CMD_NETWORK                 (20)
+#define CMD_NO_SHUTDOWN             (21)
+#define CMD_PERMIT                  (22)
+#define CMD_SHUTDOWN                (23)
+#define CMD_TUNNEL_DESTINATION      (24)
+#define CMD_TUNNEL_SOURCE           (25)
 
 static const Parser::Node CMDS_ACCESS[] =
 {
@@ -133,9 +143,23 @@ static const Parser::Node CMDS_IP_DHCP[] =
     { Parser::CODE_NO_MATCH, NULL, NULL }
 };
 
+static const Parser::Node CMDS_IP_NAT_INSIDE_SOURCE[] =
+{
+    { CMD_IP_NAT_INSIDE_SOURCE_LIST, "list", NULL },
+
+    { Parser::CODE_ERROR, NULL, NULL }
+};
+
+static const Parser::Node CMDS_IP_NAT_INSIDE[] =
+{
+    { Parser::CODE_ERROR, "source", CMDS_IP_NAT_INSIDE_SOURCE },
+
+    { Parser::CODE_NO_MATCH, NULL, NULL }
+};
+
 static const Parser::Node CMDS_IP_NAT[] =
 {
-    { CMD_IP_NAT_INSIDE , "inside" , NULL },
+    { CMD_IP_NAT_INSIDE , "inside" , CMDS_IP_NAT_INSIDE },
     { CMD_IP_NAT_OUTSIDE, "outside", NULL },
     { CMD_IP_NAT_POOL   , "pool"   , NULL },
 
@@ -241,6 +265,7 @@ namespace Cisco
     {
         switch (aCode)
         {
+        case CMD_ACCESS_LIST            : return Cmd_AccessList            (aElements, aCount);
         case CMD_DENY                   : return Cmd_Deny                  (aElements, aCount);
         case CMD_ENCAPSULATION_DOT1Q    : return Cmd_Encapsulation_Dot1Q   (aElements, aCount);
         case CMD_HOSTNAME               : return Cmd_Hostname              (aElements, aCount);
@@ -251,6 +276,7 @@ namespace Cisco
         case CMD_IP_ADDRESS             : return Cmd_Ip_Address            (aElements, aCount);
         case CMD_IP_ADDRESS_DHCP        : return Cmd_Ip_Address_Dhcp       (aElements, aCount);
         case CMD_IP_NAT_INSIDE          : return Cmd_Ip_Nat_Inside         (aElements, aCount);
+        case CMD_IP_NAT_INSIDE_SOURCE_LIST: return Cmd_Ip_Nat_Inside_Source_List(aElements, aCount);
         case CMD_IP_NAT_OUTSIDE         : return Cmd_Ip_Nat_Outside        (aElements, aCount);
         case CMD_IP_NAT_POOL            : return Cmd_Ip_Nat_Pool           (aElements, aCount);
         case CMD_IP_ROUTE               : return Cmd_Ip_Route              (aElements, aCount);
@@ -260,7 +286,6 @@ namespace Cisco
         case CMD_PERMIT                 : return Cmd_Permit                (aElements, aCount);
         case CMD_SHUTDOWN               : return Cmd_Shutdown              (aElements, aCount);
 
-        case CMD_ACCESS_LIST       :
         case CMD_DEFAULT_ROUTER    :
         case CMD_DNS_SERVER        :
         case CMD_IP_DHCP_POOL      :
@@ -286,46 +311,21 @@ namespace Cisco
         ValidateCount(aCommand, aCount, 2);
         assert(NULL != aElements[1]);
 
-        Section_AccessList(aCommand, "ip access-list");
+        Section_AccessList(aCommand, "access-list or ip access-list");
         assert(NULL != mAccessList);
 
-        NH::Access * lAccess = mAccessList->Add(NH::Access::TYPE_DENY);
+        NH::Access * lAccess = mAccessList->Add(aType);
         assert(NULL != lAccess);
 
-        try
+        switch (mAccessList->GetListType())
         {
-            NH::Access::Protocol lProtocol = static_cast<NH::Access::Protocol>(Walk(aElements + 1, 1, ENUM_ACCESS_PROTOCOL));
+        case ACCESS_LIST_IP : return Access_Ip (aElements, aCount, lAccess, aCommand);
+        case ACCESS_LIST_NAT: return Access_Nat(aElements, aCount, lAccess, aCommand);
 
-            lAccess->SetProtocol(lProtocol);
-
-            unsigned int lIndex = 2;
-
-            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &lAccess->mSource     , aCommand);
-            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &lAccess->mDestination, aCommand);
-
-            if (aCount > lIndex)
-            {
-                assert(NULL != aElements[lIndex]);
-
-                if (0 == _stricmp("established", aElements[lIndex]))
-                {
-                    lAccess->SetEstablished();
-                }
-                else
-                {
-                    Utl_ThrowError(ERROR_PARSE, __LINE__, "Unexexpected command element");
-                }
-            }
-
-            lAccess->Verify();
-        }
-        catch (...)
-        {
-            mAccessList->Undo();
-            throw;
+        default: assert(false);
         }
 
-        return true;
+        return false;
     }
 
     unsigned int Parser::Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd * aEnd, const char * aCommand)
@@ -388,7 +388,134 @@ namespace Cisco
         return lIndex;
     }
 
+    bool Parser::Access_Ip(const char ** aElements, unsigned int aCount, NH::Access * aAccess, const char * aCommand)
+    {
+        assert(NULL != aElements);
+        assert(NULL != aAccess);
+
+        try
+        {
+            NH::Access::Protocol lProtocol = static_cast<NH::Access::Protocol>(Walk(aElements + 1, 1, ENUM_ACCESS_PROTOCOL));
+
+            aAccess->SetProtocol(lProtocol);
+
+            unsigned int lIndex = 2;
+
+            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &aAccess->mSource     , aCommand);
+            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &aAccess->mDestination, aCommand);
+
+            if (aCount > lIndex)
+            {
+                assert(NULL != aElements[lIndex]);
+
+                if (0 == _stricmp("established", aElements[lIndex]))
+                {
+                    aAccess->SetEstablished();
+                }
+                else
+                {
+                    Utl_ThrowError(ERROR_PARSE, __LINE__, "Unexexpected command element");
+                }
+            }
+
+            aAccess->Verify();
+        }
+        catch (...)
+        {
+            mAccessList->Undo();
+            throw;
+        }
+
+        return true;
+    }
+
+    bool Parser::Access_Nat(const char ** aElements, unsigned int aCount, NH::Access * aAccess, const char * aCommand)
+    {
+        assert(NULL != aElements);
+        assert(NULL != aAccess);
+
+        try
+        {
+            aAccess->mDestination.SetAny();
+
+            Access_Nat_Source(aElements, aCount, &aAccess->mSource, aCommand);
+
+            aAccess->Verify();
+        }
+        catch (...)
+        {
+            mAccessList->Undo();
+            throw;
+        }
+
+        return true;
+    }
+
+    void Parser::Access_Nat_Source(const char ** aElements, unsigned int aCount, NH::AccessEnd * aSource, const char * aCommand)
+    {
+        assert(NULL != aElements);
+        assert(   1 <= aCount);
+        assert(NULL != aSource);
+
+        ValidateCount(aCommand, aCount, 2, 3);
+        assert(NULL != aElements[1]);
+
+        switch (Walk(aElements + 1, 1, ENUM_ACCESS_END_FILTER))
+        {
+        case NH::AccessEnd::FILTER_ANY:
+            aSource->SetAny();
+            break;
+
+        case NH::AccessEnd::FILTER_HOST:
+            ValidateCount(aCommand, aCount, 3, 3);
+
+            aSource->SetHost(aElements[2]);
+            break;
+
+        case Parser::CODE_NO_MATCH:
+            ValidateCount(aCommand, aCount, 3, 3);
+
+            uint32_t lAddr;
+            uint32_t lMask;
+
+            lAddr = IPv4_TextToAddress       (aElements[1]);
+            lMask = IPv4_TextToAddress_Invert(aElements[2]);
+
+            aSource->SetSubNet(GetRouter()->GetSubNetList()->FindOrCreate(lAddr, lMask));
+            break;
+
+        default: assert(false);
+        }
+
+        aSource->VerifyPrivate();
+    }
+
     // ===== Commands =======================================================
+
+    bool Parser::Cmd_AccessList(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "access-list";
+
+        assert(NULL != aElements);
+        assert(   1 <= aCount   );
+
+        ValidateCount(COMMAND, aCount, 2);
+
+        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_NAT);
+
+        if (3 <= aCount)
+        {
+            switch (Walk(aElements + 2, 1, CMDS_ACCESS))
+            {
+            case CMD_DENY  : return Cmd_Deny  (aElements + 2, aCount - 2);
+            case CMD_PERMIT: return Cmd_Permit(aElements + 2, aCount - 2);
+
+            default: assert(false);
+            }
+        }
+
+        return true;
+    }
 
     // NOT TESTED Cisco.Router
     //            deny command
@@ -488,16 +615,13 @@ namespace Cisco
 
         NH::Direction lDirection = static_cast<NH::Direction>(Walk(aElements + 3, 1, ENUM_DIRECTION));
 
-        NH::AccessList * lAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[2]);
+        NH::AccessList * lAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[2], ACCESS_LIST_IP);
         assert(NULL != lAccessList);
 
         mInterface->SetAccessList(lDirection, lAccessList);
 
         return true;
     }
-
-    // NOT TESTED Cisco.Router
-    //            deny or permit at the end of an access-list command
 
     bool Parser::Cmd_Ip_AccessList_Extended(const char ** aElements, unsigned int aCount)
     {
@@ -509,7 +633,7 @@ namespace Cisco
         ValidateCount(COMMAND, aCount, 4);
         assert(NULL != aElements[3]);
 
-        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3]);
+        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP);
         assert(NULL != mAccessList);
 
         if (5 <= aCount)
@@ -585,6 +709,39 @@ namespace Cisco
         return true;
     }
 
+    bool Parser::Cmd_Ip_Nat_Inside_Source_List(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "ip nat inside source list";
+
+        assert(5 <= aCount);
+
+        ValidateCount(COMMAND, aCount, 8, 9);
+        assert(NULL != aElements[6]);
+
+        if (0 != _stricmp("pool", aElements[6]))
+        {
+            Utl_ThrowError(ERROR_PARSE, __LINE__, "Invalid \"ip nat inside source list\" command");
+        }
+
+        if (9 <= aCount)
+        {
+            assert(NULL != aElements[8]);
+
+            if (0 != _stricmp("overload", aElements[8]))
+            {
+                Utl_ThrowError(ERROR_PARSE, __LINE__, "Invalid \"ip nat inside source list\" command");
+            }
+        }
+
+        NH::Router * lRouter = GetRouter();
+        assert(NULL != lRouter);
+
+        lRouter->mAccessLists.FindOrCreate(aElements[5], ACCESS_LIST_NAT);
+        lRouter->mNATs       .FindOrCreate(aElements[7]);
+
+        return true;
+    }
+
     bool Parser::Cmd_Ip_Nat_Outside(const char ** aElements, unsigned int aCount)
     {
         static const char * COMMAND = "ip nat outside";
@@ -616,7 +773,10 @@ namespace Cisco
             Utl_ThrowError(ERROR_PARSE, __LINE__, "Invalid \"ip nat pool\" command");
         }
 
-        GetRouter()->mNATs.Add(aElements[3], aElements[4], aElements[5], aElements[7]);
+        NH::NAT * lNAT = GetRouter()->mNATs.FindOrCreate(aElements[3]);
+        assert(NULL != lNAT);
+
+        lNAT->Set(aElements[4], aElements[5], aElements[7]);
 
         return true;
     }

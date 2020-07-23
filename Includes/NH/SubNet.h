@@ -62,6 +62,10 @@ namespace NH
         /// \param aMask IPV4 subnet mask
         bool Is(uint32_t aAddr, uint32_t aMask) const;
 
+        /// \retval false
+        /// \retval true
+        bool IsPrivate() const;
+
         /// \param aRouter
         /// \param aInterface
         /// \exception std::exception

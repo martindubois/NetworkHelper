@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessListMap.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -16,6 +16,7 @@
 #include <NH/AccessListMap.h>
 
 // ===== NHLib ==============================================================
+#include "Errors.h"
 #include "Utilities.h"
 
 namespace NH
@@ -38,7 +39,7 @@ namespace NH
         }
     }
 
-    AccessList * AccessListMap::FindOrCreate(const char * aName)
+    AccessList * AccessListMap::FindOrCreate(const char * aName, unsigned int aListType)
     {
         assert(NULL != aName);
 
@@ -49,11 +50,19 @@ namespace NH
         {
             lResult = new AccessList(aName);
 
+            lResult->SetName    (aName    );
+            lResult->SetListType(aListType);
+
             mAccessLists.insert(InternalMap::value_type(aName, lResult));
         }
         else
         {
             lResult = lIt->second;
+
+            if (lResult->GetListType() != aListType)
+            {
+                ThrowError(ERROR_CONFIG, __LINE__, "List of different type with the same name");
+            }
         }
 
         assert(NULL != lResult);

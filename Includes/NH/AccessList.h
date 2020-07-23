@@ -32,6 +32,12 @@ namespace NH
 
         ~AccessList();
 
+        /// \return This method returns the list type set using SetListType.
+        unsigned int GetListType() const;
+
+        /// \param aListType
+        void SetListType(unsigned int aListType);
+
         /// \param aType
         Access * Add(Access::Type aType);
 
@@ -66,6 +72,8 @@ namespace NH
         typedef std::list<Access *> InternalList;
 
         InternalList mAccess;
+
+        unsigned int mListType;
 
     };
 

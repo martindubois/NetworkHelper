@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -312,6 +312,35 @@ namespace NH
     void AccessEnd::Verify() const
     {
         ThrowErrorIfNeeded(__LINE__, Verify_Internal());
+    }
+
+    // NOT TESTED NH.AccessEnd.VerifyPrivate
+    //            FILTER_ANY and FILTER_HOST
+
+    void AccessEnd::VerifyPrivate() const
+    {
+        switch (mFilter)
+        {
+        case FILTER_ANY: break;
+
+        case FILTER_HOST:
+            if (IPv4_PRIVATE != IPv4_GetAddressType(mHost))
+            {
+                ThrowError(ERROR_CONFIG, __LINE__, "The access rule source is not a private address");
+            }
+            break;
+
+        case FILTER_SUBNET:
+            assert(NULL != mSubNet);
+
+            if (!mSubNet->IsPrivate())
+            {
+                ThrowError(ERROR_CONFIG, __LINE__, "The access rule source subnet is not private");
+            }
+            break;
+
+        default: assert(false);
+        }
     }
 
     // Internal

@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/SubNet.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -91,6 +91,11 @@ namespace NH
     bool SubNet::Is(uint32_t aAddr, uint32_t aMask) const
     {
         return (mAddr == aAddr) && (mMask == aMask);
+    }
+
+    bool SubNet::IsPrivate() const
+    {
+        return IPv4_PRIVATE == IPv4_GetAddressType(mAddr);
     }
 
     // TODO NH.SubNet.SetDHCP

@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/NATList.cpp
 
-// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -25,43 +25,19 @@ namespace NH
 
     NATList::~NATList()
     {
-        for (InternalList::iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
+        for (InternalMap::iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
         {
-            assert(NULL != (*lIt));
+            assert(NULL != lIt->second);
 
-            delete (*lIt);
+            delete lIt->second;
         }
-    }
-
-    void NATList::Add(const char * aName, uint32_t aFirst, uint32_t aLast, uint32_t aNetMask)
-    {
-        NAT * lNAT = new NAT();
-        assert(NULL != lNAT);
-
-        lNAT->SetName(aName);
-
-        lNAT->Set(aFirst, aLast, aNetMask);
-
-        mNATs.push_back(lNAT);
-    }
-
-    void NATList::Add(const char * aName, const char * aFirst, const char * aLast, const char * aNetMask)
-    {
-        NAT * lNAT = new NAT();
-        assert(NULL != lNAT);
-
-        lNAT->SetName(aName);
-
-        lNAT->Set(aFirst, aLast, aNetMask);
-
-        mNATs.push_back(lNAT);
     }
 
     const NAT * NATList::Find(uint32_t aAddr) const
     {
-        for (InternalList::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
+        for (InternalMap::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
         {
-            const NAT * lNAT = *lIt;
+            const NAT * lNAT = lIt->second;
             assert(NULL != lNAT);
 
             if (lNAT->Match(aAddr))
@@ -75,9 +51,9 @@ namespace NH
 
     const NAT * NATList::Find(const SubNet & aSubNet) const
     {
-        for (InternalList::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
+        for (InternalMap::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
         {
-            const NAT * lNAT = *lIt;
+            const NAT * lNAT = lIt->second;
             assert(NULL != lNAT);
 
             if (lNAT->Match(aSubNet))
@@ -87,6 +63,31 @@ namespace NH
         }
 
         return NULL;
+    }
+
+    NAT * NATList::FindOrCreate(const char * aName)
+    {
+        assert(NULL != aName);
+
+        NAT * lResult;
+
+        InternalMap::iterator lIt = mNATs.find(aName);
+        if (mNATs.end() == lIt)
+        {
+            lResult = new NAT();
+            assert(NULL != lResult);
+
+            lResult->SetName(aName);
+
+            mNATs.insert(InternalMap::value_type(aName, lResult));
+        }
+        else
+        {
+            lResult = lIt->second;
+            assert(NULL != lResult);
+        }
+
+        return lResult;
     }
 
 }

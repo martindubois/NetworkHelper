@@ -10,7 +10,7 @@
 #pragma once
 
 // ===== C++ ================================================================
-#include <list>
+#include <map>
 
 namespace NH
 {
@@ -28,20 +28,6 @@ namespace NH
 
         ~NATList();
 
-        /// \param aName
-        /// \param aFirst
-        /// \param aLast
-        /// \param aNetMask
-        /// \exception std::exception
-        void Add(const char * aName, uint32_t aFirst, uint32_t aLast, uint32_t aNetMask);
-
-        /// \param aName
-        /// \param aFirst
-        /// \param aLast
-        /// \param aNetMask
-        /// \exception std::exception
-        void Add(const char * aName, const char * aFirst, const char * aLast, const char * aNetMask);
-
         /// \param aAddr
         /// \return This method returns a pointer to an internal instance or NULL.
         const NAT * Find(uint32_t aAddr) const;
@@ -50,15 +36,19 @@ namespace NH
         /// \return This method returns a pointer to an internal instance or NULL.
         const NAT * Find(const SubNet & aSubNet) const;
 
+        /// \param aName
+        /// \return This method returns a pointer to an interna instance.
+        NAT * FindOrCreate(const char * aName);
+
     private:
 
         NATList(const NATList &);
 
         const NATList & operator = (const NATList &);
 
-        typedef std::list<NAT *> InternalList;
+        typedef std::map<std::string, NAT *> InternalMap;
 
-        InternalList mNATs;
+        InternalMap mNATs;
 
     };
 
