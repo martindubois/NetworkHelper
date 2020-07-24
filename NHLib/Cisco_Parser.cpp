@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -26,10 +26,10 @@
 // Constants
 /////////////////////////////////////////////////////////////////////////////
 
-#define ACCESS_LIST_IP  (0)
-#define ACCESS_LIST_NAT (1)
-
-#define ACCESS_LIST_QTY (2)
+#define ACCESS_LIST_IP_EXTENDED (0x00000001)
+#define ACCESS_LIST_IP_STANDARD (0x00000002)
+#define ACCESS_LIST_IP          (ACCESS_LIST_IP_EXTENDED|ACCESS_LIST_IP_STANDARD)
+#define ACCESS_LIST_NAT         (0x00000004)
 
 // Enumerations
 /////////////////////////////////////////////////////////////////////////////
@@ -319,8 +319,8 @@ namespace Cisco
 
         switch (mAccessList->GetListType())
         {
-        case ACCESS_LIST_IP : return Access_Ip (aElements, aCount, lAccess, aCommand);
-        case ACCESS_LIST_NAT: return Access_Nat(aElements, aCount, lAccess, aCommand);
+        case ACCESS_LIST_IP_EXTENDED: return Access_Ip (aElements, aCount, lAccess, aCommand);
+        case ACCESS_LIST_NAT        : return Access_Nat(aElements, aCount, lAccess, aCommand);
 
         default: assert(false);
         }
@@ -501,7 +501,7 @@ namespace Cisco
 
         ValidateCount(COMMAND, aCount, 2);
 
-        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_NAT);
+        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[1], ACCESS_LIST_NAT);
 
         if (3 <= aCount)
         {
@@ -633,7 +633,7 @@ namespace Cisco
         ValidateCount(COMMAND, aCount, 4);
         assert(NULL != aElements[3]);
 
-        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP);
+        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP_EXTENDED);
         assert(NULL != mAccessList);
 
         if (5 <= aCount)

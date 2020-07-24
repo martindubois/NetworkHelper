@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessListMap.cpp
 
-// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -49,6 +49,7 @@ namespace NH
         if (mAccessLists.end() == lIt)
         {
             lResult = new AccessList(aName);
+            assert(NULL != lResult);
 
             lResult->SetName    (aName    );
             lResult->SetListType(aListType);
@@ -58,14 +59,16 @@ namespace NH
         else
         {
             lResult = lIt->second;
+            assert(NULL != lResult);
 
-            if (lResult->GetListType() != aListType)
+            unsigned int lListType = lResult->GetListType() & aListType;
+            if (0 == lListType)
             {
                 ThrowError(ERROR_CONFIG, __LINE__, "List of different type with the same name");
             }
-        }
 
-        assert(NULL != lResult);
+            lResult->SetListType(lListType);
+        }
 
         return lResult;
     }

@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessList.cpp
 
-// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -108,43 +108,51 @@ namespace NH
     {
         unsigned int lResult = 0;
 
-        for (InternalList::const_iterator lIt0 = mAccess.begin(); lIt0 != mAccess.end(); lIt0++)
+        if (mAccess.empty())
         {
-            Access * lA0 = (*lIt0);
-            assert(NULL != lA0);
-
-            lResult += lA0->Verify_Internal();
-
-            AccessEnd::Filter lSF0 = lA0->mSource.GetFilter();
-            if (AccessEnd::FILTER_ANY != lSF0)
+            NamedObject::DisplayError(ERROR_CONFIG, __LINE__, "No access rule in the access list");
+            lResult++;
+        }
+        else
+        {
+            for (InternalList::const_iterator lIt0 = mAccess.begin(); lIt0 != mAccess.end(); lIt0++)
             {
-                InternalList::const_iterator lIt1 = lIt0;
+                Access * lA0 = (*lIt0);
+                assert(NULL != lA0);
 
-                for (lIt1++; lIt1 != mAccess.end(); lIt1++)
+                lResult += lA0->Verify_Internal();
+
+                AccessEnd::Filter lSF0 = lA0->mSource.GetFilter();
+                if (AccessEnd::FILTER_ANY != lSF0)
                 {
-                    Access * lA1 = (*lIt1);
-                    assert(NULL != lA1);
+                    InternalList::const_iterator lIt1 = lIt0;
 
-                    AccessEnd::Filter lDF1 = lA1->mDestination.GetFilter();
-
-                    switch (lSF0)
+                    for (lIt1++; lIt1 != mAccess.end(); lIt1++)
                     {
-                    case AccessEnd::FILTER_HOST:
-                        if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(lA0->mSource.GetHost()))
-                        {
-                            DisplayError(ERROR_CONFIG, __LINE__, "describe opposed traffics", *lA0, *lA1);
-                            lResult++;
-                        }
-                        break;
-                    case AccessEnd::FILTER_SUBNET:
-                        if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(*lA0->mSource.GetSubNet()))
-                        {
-                            DisplayError(ERROR_208, *lA0, *lA1);
-                            lResult++;
-                        }
-                        break;
+                        Access * lA1 = (*lIt1);
+                        assert(NULL != lA1);
 
-                    default: assert(false);
+                        AccessEnd::Filter lDF1 = lA1->mDestination.GetFilter();
+
+                        switch (lSF0)
+                        {
+                        case AccessEnd::FILTER_HOST:
+                            if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(lA0->mSource.GetHost()))
+                            {
+                                DisplayError(ERROR_CONFIG, __LINE__, "describe opposed traffics", *lA0, *lA1);
+                                lResult++;
+                            }
+                            break;
+                        case AccessEnd::FILTER_SUBNET:
+                            if ((AccessEnd::FILTER_ANY != lDF1) && lA1->mDestination.Match(*lA0->mSource.GetSubNet()))
+                            {
+                                DisplayError(ERROR_208, *lA0, *lA1);
+                                lResult++;
+                            }
+                            break;
+
+                        default: assert(false);
+                        }
                     }
                 }
             }
