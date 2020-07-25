@@ -61,6 +61,11 @@ namespace NH
         /// \retval true
         bool IsDHCPServer() const;
 
+        /// \param aAccessList
+        /// \retval false
+        /// \retval true
+        bool Match(const AccessList & aAccessList) const;
+
         /// \param aDirection  See Direction
         /// \param aAccessList
         void SetAccessList(Direction aDirection, const AccessList * aAccessList);

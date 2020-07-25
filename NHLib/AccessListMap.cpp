@@ -77,13 +77,15 @@ namespace NH
 
     void AccessListMap::Verify() const
     {
-        ThrowErrorIfNeeded(__LINE__, Verify_Internal());
+        ThrowErrorIfNeeded(__LINE__, Verify_Internal(NULL, NULL));
     }
 
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
-    unsigned int AccessListMap::Verify_Internal() const
+    /// aInterfaces [--O;R--]
+    /// aNATs       [--O;R--]
+    unsigned int AccessListMap::Verify_Internal(const InterfaceList * aInterfaces, const NATList * aNATs) const
     {
         unsigned int lResult = 0;
 
@@ -91,7 +93,7 @@ namespace NH
         {
             assert(NULL != lIt->second);
 
-            lResult += lIt->second->Verify_Internal();
+            lResult += lIt->second->Verify_Internal(aInterfaces, aNATs);
         }
 
         return lResult;

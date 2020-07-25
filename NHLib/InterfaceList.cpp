@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -59,6 +59,23 @@ namespace NH
         }
 
         return false;
+    }
+
+    // aAccessList [---;---]
+    const Interface * InterfaceList::Find(const AccessList & aAccessList) const
+    {
+        for (InterfaceMap::const_iterator lIt = mInterfaces.begin(); lIt != mInterfaces.end(); lIt++)
+        {
+            const Interface * lInterface = lIt->second;
+            assert(NULL != lInterface);
+
+            if (lInterface->Match(aAccessList))
+            {
+                return lInterface;
+            }
+        }
+
+        return NULL;
     }
 
     // NOT TESTED NH.InterfaceList.Find

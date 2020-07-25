@@ -4,7 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/NAT.cpp
 
-// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -23,13 +25,19 @@ namespace NH
     // Public
     ////////////////////////////////////////////////////////////////////////
 
-    NAT::NAT() : NamedObject("NAT pool"), mFirst(0), mLast(0), mNetMask(0)
+    NAT::NAT() : NamedObject("NAT pool"), mAccessList(NULL), mFirst(0), mLast(0), mNetMask(0)
     {
     }
 
     bool NAT::Match(uint32_t aAddr) const
     {
         return IPv4_IsAddressOnSubNet(aAddr, mFirst & mNetMask, mNetMask);
+    }
+
+    // aAccessList [---;---]
+    bool NAT::Match(const AccessList & aAccessList) const
+    {
+        return mAccessList == &aAccessList;
     }
 
     bool NAT::Match(const SubNet & aSubNet) const
@@ -60,6 +68,28 @@ namespace NH
     void NAT::Set(const char * aFirst, const char * aLast, const char * aNetMask)
     {
         Set(IPv4_TextToAddress(aFirst), IPv4_TextToAddress(aLast), IPv4_TextToAddress(aNetMask));
+    }
+
+    // aAccessList [-K-;R--]
+    void NAT::SetAccessList(const AccessList * aAccessList)
+    {
+        mAccessList = aAccessList;
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    unsigned int NAT::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
+        if (NULL == mAccessList)
+        {
+            DisplayError(ERROR_CONFIG, __LINE__, "No access list");
+            lResult++;
+        }
+
+        return lResult;
     }
 
 }

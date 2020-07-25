@@ -12,6 +12,8 @@
 
 // ===== Includes ===========================================================
 #include <NH/Access.h>
+#include <NH/InterfaceList.h>
+#include <NH/NATList.h>
 
 #include <NH/AccessList.h>
 
@@ -98,19 +100,28 @@ namespace NH
 
     void AccessList::Verify() const
     {
-        ThrowErrorIfNeeded(ERROR_006, Verify_Internal());
+        ThrowErrorIfNeeded(ERROR_006, Verify_Internal(NULL, NULL));
     }
 
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
-    unsigned int AccessList::Verify_Internal() const
+    // aInterfaces [--O;R--]
+    // aNATs       [--O;R--]
+    unsigned int AccessList::Verify_Internal(const InterfaceList * aInterfaces, const NATList * aNATs) const
     {
         unsigned int lResult = 0;
 
+        if (   (NULL != aInterfaces) && (NULL == aInterfaces->Find(*this))
+            && (NULL != aNATs      ) && (NULL == aNATs      ->Find(*this)))
+        {
+            NamedObject::DisplayError(ERROR_233);
+            lResult++;
+        }
+
         if (mAccess.empty())
         {
-            NamedObject::DisplayError(ERROR_CONFIG, __LINE__, "No access rule in the access list");
+            NamedObject::DisplayError(ERROR_232);
             lResult++;
         }
         else

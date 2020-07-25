@@ -15,6 +15,7 @@
 namespace NH
 {
 
+    class AccessList;
     class NAT;
     class SubNet;
 
@@ -32,6 +33,10 @@ namespace NH
         /// \return This method returns a pointer to an internal instance or NULL.
         const NAT * Find(uint32_t aAddr) const;
 
+        /// \param aAccessList
+        /// \return This method return a pointer to an internal NAT instance or NULL.
+        const NAT * Find(const AccessList & aAccessList) const;
+
         /// \param aSubNet 
         /// \return This method returns a pointer to an internal instance or NULL.
         const NAT * Find(const SubNet & aSubNet) const;
@@ -39,6 +44,10 @@ namespace NH
         /// \param aName
         /// \return This method returns a pointer to an interna instance.
         NAT * FindOrCreate(const char * aName);
+
+    // Internal
+
+        unsigned int Verify_Internal() const;
 
     private:
 

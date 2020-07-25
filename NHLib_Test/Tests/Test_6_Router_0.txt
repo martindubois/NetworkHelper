@@ -110,7 +110,13 @@ exit
 ! ===== NAT =================================================================
 
 // TEST INFO NAT.Error
-//           -203, -204, -402
+//           -203, -204, -230, -402
+
+! >>>>> CONFIG ERROR  -230  Access end - The access rule source subnet is not private
+access-list 1 permit 204.105.94.0 0.0.0.255
+
+! >>>>> CONFIG ERROR  -231  Access end - The access rule source is not a private address
+access-list 1 permit 204.105.94.1
 
 ! >>>>> PARSE ERROR  -402  The command "ip nat outside" must have 3 elements or less
 ip nat outside invalid
@@ -196,4 +202,4 @@ interface test4.1
 exit
 
 ! ===== Expected error message after parsing the file =======================
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 36 lines with error
+! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 38 lines with error

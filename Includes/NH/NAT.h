@@ -15,6 +15,7 @@
 namespace NH
 {
 
+    class AccessList;
     class SubNet;
 
     /// \brief NH::NAT
@@ -29,6 +30,11 @@ namespace NH
         /// \retval false
         /// \retval true
         bool Match(uint32_t aAddr) const;
+
+        /// \param aAccessList
+        /// \retval false
+        /// \retval true
+        bool Match(const AccessList & aAccessList) const;
 
         /// \param aSubNet
         /// \retval false
@@ -47,7 +53,16 @@ namespace NH
         /// \exception std::exception
         void Set(const char * aFirst, const char * aLast, const char * aNetMask);
 
+        /// \param aAccessList
+        void SetAccessList(const AccessList * aAccessList);
+
+    // Internal
+
+        unsigned int Verify_Internal() const;
+
     private:
+
+        const AccessList * mAccessList;
 
         uint32_t mFirst  ;
         uint32_t mLast   ;

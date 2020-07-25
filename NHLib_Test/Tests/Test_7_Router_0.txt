@@ -7,16 +7,16 @@
 ! This file test error detected when verifying the router configuration by calling NH::Router::Verify.
 
 ! TEST INFO AccessList.Error
-!           A same access-list describes opposed traffics
+!           -206, -207, -208, -232, -233
+
+ip access-list extended 102
+exit
 
 ip access-list extended 103
 	permit tcp 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
 	permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.10 eq 80
 	permit udp host 192.168.20.1 192.168.10.0 0.0.0.255 neq 21
 exit
-
-! TEST INFO AccessList.Error
-!           The access-list is used in the bad direction
 
 ip access-list extended 104	permit tcp host 192.168.10.10 eq 80 192.168.0.0 0.0.0.255 established
 
@@ -50,15 +50,18 @@ ip dhcp pool alice
 exit
 
 ! ===== Expected error at verification ======================================
+! CONFIG ERROR  -233  Access list 102 - Not used
+! CONFIG ERROR  -232  Access list 102 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 103 - Not used
 ! CONFIG ERROR  -208  Access list 103 - TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and TCP 192.168.20.0/255.255.255.0 ==> 192.168.10.10 == 80 describe opposed traffics
 ! CONFIG ERROR  -208  Access list 103 - TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and UDP 192.168.20.1 ==> 192.168.10.0/255.255.255.0 != 21 describe opposed traffics
 ! WARNING  -501  Interface f0/0 - Disabled but configured using IPv4 static address
-! CONFIG ERROR  -207  Access list 104 - TCP 192.168.10.10 == 80 ==> 192.168.0.0/255.255.255.0  describe traffic going out from the interace and the access list is used as "in"
+! CONFIG ERROR  -207  Access list 104 - TCP 192.168.10.10 == 80 ==> 192.168.0.0/255.255.255.0 describes traffic going out from the interface and the access list is used as "in"
 ! WARNING  -501  Interface f0/1 - Disabled but configured using IPv4 static address
-! CONFIG ERROR  -206  Access list 105, UDP 192.168.10.0/255.255.255.0 ==> 192.168.0.0/255.255.255.0  describe traffic going into the interace and the access list is used as "out"
+! CONFIG ERROR  -206  Access list 105 - UDP 192.168.10.0/255.255.255.0 ==> 192.168.0.0/255.255.255.0 describes traffic going into the interface and the access list is used as "out"
 ! WARNING  -501  Interface f0/2 - Disabled but configured using IPv4 static address
 ! CONFIG ERROR  -205  Interface f0/2 - Act as DHCP server but DHCP request are not allowed in
 ! CONFIG ERROR  -229  Router Test_7_Router_0 - IP routing is not enabled and the router use more than one interface
 
 ! ===== Expected error at the end of processing =============================
-! ERROR    -5  Network - 9 errors
+! ERROR    -5  Network - 12 errors

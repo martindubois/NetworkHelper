@@ -25,6 +25,7 @@ class ShapeMap;
 namespace NH
 {
 
+    class AccessList;
     class Interface;
     class NATList  ;
     class SubNet   ;
@@ -43,6 +44,10 @@ namespace NH
         /// \retval false Cannot reach
         /// \retval true  Can reach
         bool CanReach(uint32_t aAddr) const;
+
+        /// \param aAccessList
+        /// \return This method return a pointer to an Interface instance or NULL.
+        const Interface * Find(const AccessList & aAccessList) const;
 
         /// \param aSubNet The SubNet attached to the Interface
         /// \return A pointer to an internal instance

@@ -4,7 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/NATList.cpp
 
-// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -33,6 +35,10 @@ namespace NH
         }
     }
 
+    // NOT TESTED NH.NatList.Find
+    //            Do not find.
+    //            Serch using SubNet.
+
     const NAT * NATList::Find(uint32_t aAddr) const
     {
         for (InternalMap::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
@@ -41,6 +47,23 @@ namespace NH
             assert(NULL != lNAT);
 
             if (lNAT->Match(aAddr))
+            {
+                return lNAT;
+            }
+        }
+
+        return NULL;
+    }
+
+    // aAccessList [---;---]
+    const NAT * NATList::Find(const AccessList & aAccessList) const
+    {
+        for (InternalMap::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
+        {
+            const NAT * lNAT = lIt->second;
+            assert(NULL != lNAT);
+
+            if (lNAT->Match(aAccessList))
             {
                 return lNAT;
             }
@@ -85,6 +108,23 @@ namespace NH
         {
             lResult = lIt->second;
             assert(NULL != lResult);
+        }
+
+        return lResult;
+    }
+
+    // Internal
+    /////////////////////////////////////////////////////////////////////////
+
+    unsigned int NATList::Verify_Internal() const
+    {
+        unsigned int lResult = 0;
+
+        for (InternalMap::const_iterator lIt = mNATs.begin(); lIt != mNATs.end(); lIt++)
+        {
+            assert(NULL != lIt->second);
+
+            lResult += lIt->second->Verify_Internal();
         }
 
         return lResult;

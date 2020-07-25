@@ -460,19 +460,13 @@ namespace Cisco
         ValidateCount(aCommand, aCount, 2, 3);
         assert(NULL != aElements[1]);
 
-        switch (Walk(aElements + 1, 1, ENUM_ACCESS_END_FILTER))
+        switch (aCount)
         {
-        case NH::AccessEnd::FILTER_ANY:
-            aSource->SetAny();
+        case 2:
+            aSource->SetHost(aElements[1]);
             break;
 
-        case NH::AccessEnd::FILTER_HOST:
-            ValidateCount(aCommand, aCount, 3, 3);
-
-            aSource->SetHost(aElements[2]);
-            break;
-
-        case Parser::CODE_NO_MATCH:
+        case 3:
             ValidateCount(aCommand, aCount, 3, 3);
 
             uint32_t lAddr;
@@ -736,8 +730,13 @@ namespace Cisco
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
 
-        lRouter->mAccessLists.FindOrCreate(aElements[5], ACCESS_LIST_NAT);
-        lRouter->mNATs       .FindOrCreate(aElements[7]);
+        NH::AccessList * lAccessList = lRouter->mAccessLists.FindOrCreate(aElements[5], ACCESS_LIST_NAT);
+        assert(NULL != lAccessList);
+
+        NH::NAT * lNAT = lRouter->mNATs.FindOrCreate(aElements[7]);
+        assert(NULL != lNAT);
+
+        lNAT->SetAccessList(lAccessList);
 
         return true;
     }

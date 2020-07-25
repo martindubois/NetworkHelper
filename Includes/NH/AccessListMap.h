@@ -19,6 +19,8 @@ namespace NH
 {
 
     class AccessList;
+    class InterfaceList;
+    class NATList;
 
     /// \brief NH::AccessListMap
     class AccessListMap : public Object
@@ -39,7 +41,7 @@ namespace NH
 
     // Internal
 
-        unsigned int Verify_Internal() const;
+        unsigned int Verify_Internal(const InterfaceList * aInterfaces, const NATList * aNATs) const;
 
     private:
 

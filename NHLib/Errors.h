@@ -34,8 +34,8 @@
 #define ERROR_203 ERROR_CONFIG, (-203), ("A same interface cannot be NAT outside and NAT inside")
 #define ERROR_204 ERROR_CONFIG, (-204), ("A same interface cannot be NAT inside and NAT outside")
 #define ERROR_205 ERROR_CONFIG, (-205), ("Act as DHCP server but DHCP request are not allowed in")
-#define ERROR_206 ERROR_CONFIG, (-206), ("describes traffic going into the interace and the access list is used as \"out\"")
-#define ERROR_207 ERROR_CONFIG, (-207), ("describe traffic going out from the interace and the access list is used as \"in\"")
+#define ERROR_206 ERROR_CONFIG, (-206), ("describes traffic going into the interface and the access list is used as \"out\"")
+#define ERROR_207 ERROR_CONFIG, (-207), ("describe traffic going out from the interface and the access list is used as \"in\"")
 #define ERROR_208 ERROR_CONFIG, (-208), ("describe opposed traffics")
 #define ERROR_209 ERROR_CONFIG, (-209), ("An access list is already set for this direction")
 #define ERROR_210 ERROR_CONFIG, (-210), ("Invalid IPv4 address")
@@ -57,10 +57,14 @@
 #define ERROR_225     ERROR_CONFIG, (-225)
 #define ERROR_225_FMT "\"%s\" command outside of an \"%s\" section"
 
-#define ERROR_226     ERROR_CONFIG, (-226), ("Invalid IPv4 address")
-#define ERROR_227     ERROR_CONFIG, (-227), ("Invalid IPv4 address")
-#define ERROR_228     ERROR_CONFIG, (-228), ("Invalid next router IPv4 address")
-#define ERROR_229     ERROR_CONFIG, (-229), ("IP routing is not enabled and the router use more than one interface")
+#define ERROR_226 ERROR_CONFIG, (-226), ("Invalid IPv4 address")
+#define ERROR_227 ERROR_CONFIG, (-227), ("Invalid IPv4 address")
+#define ERROR_228 ERROR_CONFIG, (-228), ("Invalid next router IPv4 address")
+#define ERROR_229 ERROR_CONFIG, (-229), ("IP routing is not enabled, and the router use more than one interface")
+#define ERROR_230 ERROR_CONFIG, (-230), ("The access rule source subnet is not private")
+#define ERROR_231 ERROR_CONFIG, (-231), ("The access rule source is not a private address")
+#define ERROR_232 ERROR_CONFIG, (-232), ("No access rule in the access list")
+#define ERROR_233 ERROR_CONFIG, (-233), ("Not used")
 
 // ===== FILE ERROR =========================================================
 

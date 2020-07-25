@@ -21,6 +21,9 @@
 namespace NH
 {
 
+    class InterfaceList;
+    class NATList;
+
     /// \brief NH::AccessList
     class AccessList : public NamedObject
     {
@@ -56,7 +59,7 @@ namespace NH
 
     // Internal
 
-        unsigned int Verify_Internal() const;
+        unsigned int Verify_Internal(const InterfaceList * aInterfaces, const NATList * aNATs) const;
         unsigned int Verify_Internal(uint32_t       aAddr  , Direction aDirection) const;
         unsigned int Verify_Internal(const SubNet & aSubNet, Direction aDirection) const;
 

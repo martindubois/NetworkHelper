@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-23 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-23 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -326,7 +326,7 @@ namespace NH
         case FILTER_HOST:
             if (IPv4_PRIVATE != IPv4_GetAddressType(mHost))
             {
-                ThrowError(ERROR_CONFIG, __LINE__, "The access rule source is not a private address");
+                ThrowError(ERROR_231);
             }
             break;
 
@@ -335,7 +335,7 @@ namespace NH
 
             if (!mSubNet->IsPrivate())
             {
-                ThrowError(ERROR_CONFIG, __LINE__, "The access rule source subnet is not private");
+                ThrowError(ERROR_230);
             }
             break;
 

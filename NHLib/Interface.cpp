@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-21 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-21 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -91,6 +91,20 @@ namespace NH
     bool Interface::IsDHCPServer() const
     {
         return (NULL != mSubNet) && mSubNet->GetDHCP(this);
+    }
+
+    // aAccessList [---;---]
+    bool Interface::Match(const AccessList & aAccessList) const
+    {
+        for (unsigned int i = 0; i < DIRECTION_QTY; i++)
+        {
+            if (mAccessLists[i] == &aAccessList)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     void Interface::SetAccessList(Direction aDirection, const AccessList * aAccessList)
@@ -358,11 +372,11 @@ namespace NH
 
         if (0 == mAddr)
         {
-            Verify_WithoutAddress(aNATs);
+            lResult += Verify_WithoutAddress(aNATs);
         }
         else
         {
-            Verify_WithAddress(aNATs);
+            lResult += Verify_WithAddress(aNATs);
         }
 
         if (IsDHCPServer() && (NULL != mAccessLists[DIRECTION_IN]))
