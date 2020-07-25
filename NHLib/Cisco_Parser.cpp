@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-25 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -265,32 +265,32 @@ namespace Cisco
     {
         switch (aCode)
         {
-        case CMD_ACCESS_LIST            : return Cmd_AccessList            (aElements, aCount);
-        case CMD_DENY                   : return Cmd_Deny                  (aElements, aCount);
-        case CMD_ENCAPSULATION_DOT1Q    : return Cmd_Encapsulation_Dot1Q   (aElements, aCount);
-        case CMD_HOSTNAME               : return Cmd_Hostname              (aElements, aCount);
-        case CMD_INTERFACE              : return Cmd_Interface             (aElements, aCount);
-        case CMD_INTERFACE_TUNNEL       : return Cmd_Interface_Tunnel      (aElements, aCount);
-        case CMD_IP_ACCESS_GROUP        : return Cmd_Ip_AccessGroup        (aElements, aCount);
-        case CMD_IP_ACCESS_LIST_EXTENDED: return Cmd_Ip_AccessList_Extended(aElements, aCount);
-        case CMD_IP_ADDRESS             : return Cmd_Ip_Address            (aElements, aCount);
-        case CMD_IP_ADDRESS_DHCP        : return Cmd_Ip_Address_Dhcp       (aElements, aCount);
-        case CMD_IP_NAT_INSIDE          : return Cmd_Ip_Nat_Inside         (aElements, aCount);
+        case CMD_ACCESS_LIST              : return Cmd_AccessList               (aElements, aCount);
+        case CMD_DEFAULT_ROUTER           : return Cmd_DefaultRouter            (aElements, aCount);
+        case CMD_DENY                     : return Cmd_Deny                     (aElements, aCount);
+        case CMD_DNS_SERVER               : return Cmd_DnsServer                (aElements, aCount);
+        case CMD_ENCAPSULATION_DOT1Q      : return Cmd_Encapsulation_Dot1Q      (aElements, aCount);
+        case CMD_HOSTNAME                 : return Cmd_Hostname                 (aElements, aCount);
+        case CMD_INTERFACE                : return Cmd_Interface                (aElements, aCount);
+        case CMD_INTERFACE_TUNNEL         : return Cmd_Interface_Tunnel         (aElements, aCount);
+        case CMD_IP_ACCESS_GROUP          : return Cmd_Ip_AccessGroup           (aElements, aCount);
+        case CMD_IP_ACCESS_LIST_EXTENDED  : return Cmd_Ip_AccessList_Extended   (aElements, aCount);
+        case CMD_IP_ADDRESS               : return Cmd_Ip_Address               (aElements, aCount);
+        case CMD_IP_ADDRESS_DHCP          : return Cmd_Ip_Address_Dhcp          (aElements, aCount);
+        case CMD_IP_NAT_INSIDE            : return Cmd_Ip_Nat_Inside            (aElements, aCount);
         case CMD_IP_NAT_INSIDE_SOURCE_LIST: return Cmd_Ip_Nat_Inside_Source_List(aElements, aCount);
-        case CMD_IP_NAT_OUTSIDE         : return Cmd_Ip_Nat_Outside        (aElements, aCount);
-        case CMD_IP_NAT_POOL            : return Cmd_Ip_Nat_Pool           (aElements, aCount);
-        case CMD_IP_ROUTE               : return Cmd_Ip_Route              (aElements, aCount);
-        case CMD_IP_ROUTING             : return Cmd_Ip_Routing            (aElements, aCount);
-        case CMD_NETWORK                : return Cmd_Network               (aElements, aCount);
-        case CMD_NO_SHUTDOWN            : return Cmd_No_Shutdown           (aElements, aCount);
-        case CMD_PERMIT                 : return Cmd_Permit                (aElements, aCount);
-        case CMD_SHUTDOWN               : return Cmd_Shutdown              (aElements, aCount);
+        case CMD_IP_NAT_OUTSIDE           : return Cmd_Ip_Nat_Outside           (aElements, aCount);
+        case CMD_IP_NAT_POOL              : return Cmd_Ip_Nat_Pool              (aElements, aCount);
+        case CMD_IP_ROUTE                 : return Cmd_Ip_Route                 (aElements, aCount);
+        case CMD_IP_ROUTING               : return Cmd_Ip_Routing               (aElements, aCount);
+        case CMD_NETWORK                  : return Cmd_Network                  (aElements, aCount);
+        case CMD_NO_SHUTDOWN              : return Cmd_No_Shutdown              (aElements, aCount);
+        case CMD_PERMIT                   : return Cmd_Permit                   (aElements, aCount);
+        case CMD_SHUTDOWN                 : return Cmd_Shutdown                 (aElements, aCount);
+        case CMD_TUNNEL_DESTINATION       : return Cmd_Tunnel_Destination       (aElements, aCount);
+        case CMD_TUNNEL_SOURCE            : return Cmd_Tunnel_Source            (aElements, aCount);
 
-        case CMD_DEFAULT_ROUTER    :
-        case CMD_DNS_SERVER        :
-        case CMD_IP_DHCP_POOL      :
-        case CMD_TUNNEL_DESTINATION:
-        case CMD_TUNNEL_SOURCE     :
+        case CMD_IP_DHCP_POOL:
             break;
 
         default: assert(false);
@@ -511,6 +511,28 @@ namespace Cisco
         return true;
     }
 
+    bool Parser::Cmd_DefaultRouter(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "default-router";
+
+        assert(1 <= aCount);
+
+        ValidateCount(COMMAND, aCount, 2, 2);
+
+        uint32_t lAddr = IPv4_TextToAddress(aElements[1]);
+
+        switch (IPv4_GetAddressType(lAddr))
+        {
+        case IPv4_PRIVATE:
+        case IPv4_PUBLIC :
+            break;
+
+        default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The default router address is not valid");
+        }
+
+        return true;
+    }
+
     // NOT TESTED Cisco.Router
     //            deny command
 
@@ -519,6 +541,28 @@ namespace Cisco
         static const char * COMMAND = "deny";
 
         return Access(aElements, aCount, NH::Access::TYPE_DENY, COMMAND);
+    }
+
+    bool Parser::Cmd_DnsServer(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "dns-server";
+
+        assert(1 <= aCount);
+
+        ValidateCount(COMMAND, aCount, 2, 2);
+
+        uint32_t lAddr = IPv4_TextToAddress(aElements[1]);
+
+        switch (IPv4_GetAddressType(lAddr))
+        {
+        case IPv4_PRIVATE:
+        case IPv4_PUBLIC :
+            break;
+
+        default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The DNS server address is not valid");
+        }
+
+        return true;
     }
 
     bool Parser::Cmd_Encapsulation_Dot1Q(const char ** aElements, unsigned int aCount)
@@ -875,6 +919,44 @@ namespace Cisco
         assert(NULL != mInterface);
 
         mInterface->SetEnable(false);
+
+        return true;
+    }
+
+    bool Parser::Cmd_Tunnel_Destination(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "tunnel destination";
+
+        assert(2 <= aCount);
+
+        ValidateCount(COMMAND, 3, 3);
+
+        Section_Interface(COMMAND);
+
+        uint32_t lAddr = IPv4_TextToAddress(aElements[2]);
+
+        switch (IPv4_GetAddressType(lAddr))
+        {
+        case IPv4_PRIVATE: Utl_ThrowError(ERROR_WARNING, __LINE__, "The tunnel destination is a private address");
+        case IPv4_PUBLIC : break;
+
+        default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The tunnel destination is not a valid IPv4 address");
+        }
+
+        return true;
+    }
+
+    bool Parser::Cmd_Tunnel_Source(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "tunnel source";
+
+        assert(2 <= aCount);
+
+        ValidateCount(COMMAND, 3, 3);
+
+        Section_Interface(COMMAND);
+
+        GetRouter()->mInterfaces.FindOrCreate(aElements[2]);
 
         return true;
     }
