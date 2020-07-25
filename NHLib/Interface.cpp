@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-25 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -22,6 +22,7 @@
 #include <NH/Interface.h>
 
 // ===== NHLib ==============================================================
+#include "CheckList.h"
 #include "Errors.h"
 #include "IPv4.h"
 #include "ShapeMap.h"
@@ -38,7 +39,7 @@ namespace NH
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Interface::Interface(const char * aName) : NamedObject("Interface")
+    Interface::Interface(const char * aName) : NamedObject("Interface"), mCheckList(new CheckList)
     {
         Init();
 
@@ -47,6 +48,7 @@ namespace NH
 
     Interface::~Interface()
     {
+        delete mCheckList;
     }
 
     uint32_t Interface::GetAddress() const
@@ -91,6 +93,11 @@ namespace NH
     bool Interface::IsDHCPServer() const
     {
         return (NULL != mSubNet) && mSubNet->GetDHCP(this);
+    }
+
+    bool Interface::IsEnabled() const
+    {
+        return mFlags.mEnable;
     }
 
     // aAccessList [---;---]
@@ -367,6 +374,8 @@ namespace NH
     unsigned int Interface::Verify_Internal(const NATList * aNATs) const
     {
         unsigned int lResult = 0;
+
+        lResult += mCheckList->Verify(*this);
 
         lResult += Verify_Flags();
 

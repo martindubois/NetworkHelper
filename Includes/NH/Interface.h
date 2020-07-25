@@ -21,6 +21,7 @@
 #include <NH/Types.h>
 
 // ===== NHLib ==============================================================
+class CheckList;
 class ShapeMap;
 
 namespace NH
@@ -60,6 +61,10 @@ namespace NH
         /// \retval false
         /// \retval true
         bool IsDHCPServer() const;
+
+        /// \retval false
+        /// \retval true
+        bool IsEnabled() const;
 
         /// \param aAccessList
         /// \retval false
@@ -108,6 +113,8 @@ namespace NH
         HI::Shape * PrepareShape(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap);
 
         unsigned int Verify_Internal(const NATList * aNATs) const;
+
+        CheckList * mCheckList;
 
     protected:
 

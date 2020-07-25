@@ -21,11 +21,14 @@ namespace NH
         /// \return This method returns the value passed to the constructor.
         const char * GetObjectType() const;
 
+    // Internal
+
+        virtual void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
+
     protected:
 
         Object(const char * aObjectType);
 
-        virtual void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
         virtual void ThrowError  (const char * aErrorType, int aCode, const char * aMessage) const;
 
         virtual void ThrowErrorIfNeeded(int aCode, unsigned int aErrorCount) const;

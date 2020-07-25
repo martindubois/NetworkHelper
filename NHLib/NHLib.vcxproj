@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Check.h" />
+    <ClInclude Include="CheckList.h" />
+    <ClInclude Include="Check_Enabled.h" />
     <ClInclude Include="Cisco_Parser.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Component.h" />
@@ -34,6 +37,9 @@
     <ClCompile Include="AccessEnd.cpp" />
     <ClCompile Include="AccessList.cpp" />
     <ClCompile Include="AccessListMap.cpp" />
+    <ClCompile Include="Check.cpp" />
+    <ClCompile Include="CheckList.cpp" />
+    <ClCompile Include="Check_Enabled.cpp" />
     <ClCompile Include="Cisco_Parser.cpp" />
     <ClCompile Include="Cisco_Router.cpp" />
     <ClCompile Include="Device.cpp" />

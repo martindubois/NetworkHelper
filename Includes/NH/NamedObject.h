@@ -34,12 +34,16 @@ namespace NH
         /// \param aName
         virtual void SetName(const char * aName);
 
+    // Internal
+
+        // ===== Object =====================================================
+        virtual void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
+
     protected:
 
         NamedObject(const char * aTypeName);
 
         // ===== Object =====================================================
-        virtual void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;
         virtual void ThrowError  (const char * aErrorType, int aCode, const char * aMessage) const;
 
         virtual void ThrowErrorIfNeeded(int aCode, unsigned int aErrorCount) const;

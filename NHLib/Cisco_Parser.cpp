@@ -17,6 +17,8 @@
 #include <NH/SubNetList.h>
 
 // ===== NHLib ==============================================================
+#include "Check_Enabled.h"
+#include "CheckList.h"
 #include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
@@ -339,7 +341,6 @@ namespace Cisco
         unsigned int lIndex = aIndex;
 
         ValidateCount(aCommand, aCount, lIndex + 1);
-        assert(NULL != aElements[lIndex]);
 
         switch (Walk(aElements + lIndex, 1, ENUM_ACCESS_END_FILTER))
         {
@@ -351,15 +352,12 @@ namespace Cisco
             lIndex++;
 
             ValidateCount(aCommand, aCount, lIndex + 1);
-            assert(NULL != aElements[lIndex]);
 
             aEnd->SetHost(aElements[lIndex]);
             break;
 
         case Parser::CODE_NO_MATCH:
             ValidateCount(aCommand, aCount, lIndex + 2);
-            assert(NULL != aElements[lIndex    ]);
-            assert(NULL != aElements[lIndex + 1]);
 
             uint32_t lAddr;
             uint32_t lMask;
@@ -573,7 +571,6 @@ namespace Cisco
         assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 3, 3);
-        assert(NULL != aElements[2]);
 
         Section_Interface(COMMAND);
         assert(NULL != mInterface);
@@ -591,7 +588,6 @@ namespace Cisco
         assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 2, 2);
-        assert(NULL != aElements[1]);
 
         GetRouter()->SetName(aElements[1]);
 
@@ -606,7 +602,6 @@ namespace Cisco
         assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 2, 2);
-        assert(NULL != aElements[1]);
 
         mInterface = GetRouter()->mInterfaces.FindOrCreate(aElements[1]);
         assert(NULL != mInterface);
@@ -645,8 +640,6 @@ namespace Cisco
         assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 4, 4);
-        assert(NULL != aElements[2]);
-        assert(NULL != aElements[3]);
 
         Section_Interface(COMMAND);
         assert(NULL != mInterface);
@@ -669,7 +662,6 @@ namespace Cisco
         assert(   3 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 4);
-        assert(NULL != aElements[3]);
 
         mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP_EXTENDED);
         assert(NULL != mAccessList);
@@ -696,8 +688,6 @@ namespace Cisco
         assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 4, 4);
-        assert(NULL != aElements[2]);
-        assert(NULL != aElements[3]);
 
         Section_Interface(COMMAND);
         assert(NULL != mInterface);
@@ -832,9 +822,6 @@ namespace Cisco
         assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 5, 5);
-        assert(NULL != aElements[2]);
-        assert(NULL != aElements[3]);
-        assert(NULL != aElements[4]);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -868,8 +855,6 @@ namespace Cisco
         assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 3, 3);
-        assert(NULL != aElements[1]);
-        assert(NULL != aElements[2]);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -956,7 +941,10 @@ namespace Cisco
 
         Section_Interface(COMMAND);
 
-        GetRouter()->mInterfaces.FindOrCreate(aElements[2]);
+        NH::Interface * lInterface = GetRouter()->mInterfaces.FindOrCreate(aElements[2]);
+        assert(NULL != lInterface);
+
+        lInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is a tunnel source"));
 
         return true;
     }

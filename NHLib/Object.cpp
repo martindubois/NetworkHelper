@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Object.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-25 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -33,14 +33,8 @@ namespace NH
         return mObjectType;
     }
 
-    // Protected
+    // Internal
     ////////////////////////////////////////////////////////////////////////
-
-    // aObjectType [-K-;R--]
-    Object::Object(const char * aObjectType) : mObjectType(aObjectType)
-    {
-        assert(NULL != aObjectType);
-    }
 
     // NOT TESTED NH.Object.DisplayError
 
@@ -57,6 +51,15 @@ namespace NH
         assert(sizeof(lMessage) > lRet);
 
         Utl_DisplayError(aErrorType, aCode, lMessage);
+    }
+
+    // Protected
+    ////////////////////////////////////////////////////////////////////////
+
+    // aObjectType [-K-;R--]
+    Object::Object(const char * aObjectType) : mObjectType(aObjectType)
+    {
+        assert(NULL != aObjectType);
     }
 
     void Object::ThrowError(const char * aErrorType, int aCode, const char * aMessage) const
