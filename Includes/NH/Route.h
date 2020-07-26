@@ -27,21 +27,21 @@ namespace NH
     public:
 
         /// \param aSubNet
-        /// \param aAddr
-        Route(const SubNet * aSubNet, uint32_t aAddr);
+        /// \param aNextRouter
+        Route(const SubNet * aSubNet, uint32_t aNextRouter);
 
         /// \param aSubNet
-        /// \param aAddr
-        Route(const SubNet * aSubNet, const char * aAddr);
+        /// \param aNextRouter
+        Route(const SubNet * aSubNet, const char * aNextRouter);
 
         ~Route();
 
         /// \return This method return the address of the router to use to reach the SubNet.
-        uint32_t GetAddress() const;
+        uint32_t GetNextRouter() const;
 
         /// \param aOut
         /// \param aOutSize_byte
-        void GetAddress(char * aOut, unsigned int aOutSize_byte) const;
+        void GetNextRouter(char * aOut, unsigned int aOutSize_byte) const;
 
         /// \param aOut
         /// \param aOutSize_byte
@@ -50,9 +50,16 @@ namespace NH
         /// \return This method return the destination SubNet
         const SubNet * GetSubNet() const;
 
+        /// \param aSubNet
+        /// \retval false
+        /// \retval true
+        bool Match(const SubNet & aSubNet) const;
+
     private:
 
-        uint32_t mAddr;
+        void Init(const SubNet * aSubNet, uint32_t aNextRouter);
+
+        uint32_t mNextRouter;
 
         const SubNet * mSubNet;
 

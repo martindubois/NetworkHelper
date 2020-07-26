@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -18,6 +18,7 @@
 #include <NH/Router.h>
 
 // ===== NHLib ==============================================================
+#include "CheckList.h"
 #include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
@@ -40,8 +41,10 @@ namespace NH
 
     const unsigned int Router::FLAG_NO_ECHO = 0x00000001;
 
-    Router::Router() : NamedObject("Router"), mSubNets(NULL)
+    Router::Router() : NamedObject("Router"), mCheckList(new CheckList), mSubNets(NULL)
     {
+        assert(NULL != mCheckList);
+
         mFlags.mIpRouting = false;
 
         SetName(NAME_DEFAULT);
@@ -49,12 +52,13 @@ namespace NH
 
     Router::~Router()
     {
+        assert(NULL != mCheckList);
+
+        delete mCheckList;
     }
 
-    void Router::AddRoute(const SubNet * aSubNet, const char * aAddr)
-    {
-        mRoutes.push_back(Route(aSubNet, aAddr));
-    }
+    void Router::AddRoute(const SubNet * aSubNet, uint32_t     aAddr) { mRoutes.push_back(Route(aSubNet, aAddr)); }
+    void Router::AddRoute(const SubNet * aSubNet, const char * aAddr) { mRoutes.push_back(Route(aSubNet, aAddr)); }
 
     bool Router::CanReach(uint32_t aAddr) const
     {
@@ -66,6 +70,25 @@ namespace NH
         for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
         {
             if (lIt->GetSubNet()->VerifyAddress(aAddr))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// aSubNet [---;---]
+    bool Router::CanReach(const SubNet & aSubNet) const
+    {
+        if (NULL != mInterfaces.Find(&aSubNet))
+        {
+            return true;
+        }
+
+        for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
+        {
+            if (lIt->Match(aSubNet))
             {
                 return true;
             }
@@ -197,6 +220,8 @@ namespace NH
     {
         unsigned int lResult = 0;
 
+        lResult += mCheckList->Verify(*this);
+
         lResult += mAccessLists.Verify_Internal(&mInterfaces, &mNATs);
         lResult += mInterfaces .Verify_Internal(              &mNATs);
         lResult += mNATs       .Verify_Internal();
@@ -249,11 +274,11 @@ namespace NH
                 lResult++;
             }
 
-            if (!CanReach(lIt->GetAddress()))
+            if (!CanReach(lIt->GetNextRouter()))
             {
                 char lAddr[32];
 
-                lIt->GetAddress(lAddr, sizeof(lAddr));
+                lIt->GetNextRouter(lAddr, sizeof(lAddr));
 
                 lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
 

@@ -4,12 +4,16 @@
 // Product    NetworkHelper
 // File       NHLib/Check.h
 
-// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
+// ===== C++ ================================================================
+#include <string>
+
 // ===== Includes ===========================================================
 #include <NH/Interface.h>
+#include <NH/Router.h>
 
 // Class
 /////////////////////////////////////////////////////////////////////////////
@@ -19,16 +23,22 @@ class Check
 
 public:
 
-    Check(const char * aType, int aCode, const char * aMessage);
-
     virtual ~Check();
 
     virtual unsigned int Verify(const NH::Interface & aElement) const;
+    virtual unsigned int Verify(const NH::Router    & aElement) const;
+
+protected:
+
+    Check(const char * aType, int aCode);
+    Check(const char * aType, int aCode, const char * aMessage);
+
+    void SetMessage(const char * aMessage);
 
 private:
 
     int          mCode   ;
-    const char * mMessage;
+    std::string  mMessage;
     const char * mType   ;
 
 };

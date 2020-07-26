@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/CheckList.h
 
-// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -13,6 +13,7 @@
 
 // ===== Includes ===========================================================
 #include <NH/Interface.h>
+#include <NH/Router.h>
 
 // ===== NHLib ==============================================================
 class Check;
@@ -32,6 +33,7 @@ public:
     void Add(Check * aCheck);
 
     unsigned int Verify(const NH::Interface & aElement) const;
+    unsigned int Verify(const NH::Router    & aElement) const;
 
 private:
 

@@ -66,6 +66,10 @@ namespace NH
         /// \retval true
         bool IsPrivate() const;
 
+        /// \retval false
+        /// \retval true
+        bool IsPublic() const;
+
         /// \param aRouter
         /// \param aInterface
         /// \exception std::exception

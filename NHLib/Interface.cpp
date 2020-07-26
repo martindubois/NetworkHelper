@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-25 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -41,6 +41,8 @@ namespace NH
 
     Interface::Interface(const char * aName) : NamedObject("Interface"), mCheckList(new CheckList)
     {
+        assert(NULL != mCheckList);
+
         Init();
 
         SetName(aName);
@@ -48,6 +50,8 @@ namespace NH
 
     Interface::~Interface()
     {
+        assert(NULL != mCheckList);
+
         delete mCheckList;
     }
 
@@ -98,6 +102,21 @@ namespace NH
     bool Interface::IsEnabled() const
     {
         return mFlags.mEnable;
+    }
+
+    bool Interface::IsPublic() const
+    {
+        if (0 != mAddr)
+        {
+            return IPv4_PUBLIC == IPv4_GetAddressType(mAddr);
+        }
+
+        if (NULL != mSubNet)
+        {
+            return mSubNet->IsPublic();
+        }
+
+        return false;
     }
 
     // aAccessList [---;---]
@@ -572,12 +591,6 @@ namespace NH
     unsigned int Interface::Verify_WithAddress(const NATList * aNATs) const
     {
         unsigned int lResult = 0;
-
-        if (!mFlags.mEnable)
-        {
-            DisplayError(ERROR_501);
-            lResult++;
-        }
 
         if (mFlags.mNAT_Outside && (NULL != aNATs))
         {

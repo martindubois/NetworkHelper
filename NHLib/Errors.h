@@ -65,6 +65,10 @@
 #define ERROR_231 ERROR_CONFIG, (-231), ("The access rule source is not a private address")
 #define ERROR_232 ERROR_CONFIG, (-232), ("No access rule in the access list")
 #define ERROR_233 ERROR_CONFIG, (-233), ("Not used")
+#define ERROR_234 ERROR_CONFIG, (-234), ("Cannot reach a subnet indicated in an access list")
+#define ERROR_235 ERROR_CONFIG, (-235), ("Cannot reach a host indicated in an access list")
+#define ERROR_236 ERROR_CONFIG, (-236), ("Must be enabled because an access-list is associated to it")
+#define ERROR_237 ERROR_CONFIG, (-237), ("Must be enabled because it act as DHCP server")
 
 // ===== FILE ERROR =========================================================
 
@@ -88,4 +92,4 @@
 
 #define ERROR_WARNING ("WARNING")
 
-#define ERROR_501 ERROR_WARNING, (-501), ("Disabled but configured using IPv4 static address")
+#define ERROR_501 ERROR_WARNING, (-501), ("Should be enabled because it is configured to use a static IPv4 address")

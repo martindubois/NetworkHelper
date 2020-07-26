@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Network.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
 
-// CODE COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng.
 
 // TODO NH.Network.AddKnownDevices
 
@@ -85,14 +85,14 @@ namespace NH
 
             for (Router::RouteList::const_iterator lRoute = lRoutes->begin(); lRoute != lRoutes->end(); lRoute++)
             {
-                uint32_t lAddr = lRoute->GetAddress();
+                uint32_t lAddr = lRoute->GetNextRouter();
 
                 const Router * lExisting = FindRouter(lAddr);
                 if (NULL == lExisting)
                 {
                     char lName[32];
 
-                    lRoute->GetAddress(lName, sizeof(lName));
+                    lRoute->GetNextRouter(lName, sizeof(lName));
 
                     Router * lNew = new Router();
                     assert(NULL != lNew);

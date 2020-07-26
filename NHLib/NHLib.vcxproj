@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Check.h" />
     <ClInclude Include="CheckList.h" />
-    <ClInclude Include="Check_Enabled.h" />
+    <ClInclude Include="Checks.h" />
     <ClInclude Include="Cisco_Parser.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="Component.h" />
@@ -40,6 +40,8 @@
     <ClCompile Include="Check.cpp" />
     <ClCompile Include="CheckList.cpp" />
     <ClCompile Include="Check_Enabled.cpp" />
+    <ClCompile Include="Check_Public.cpp" />
+    <ClCompile Include="Check_Reach.cpp" />
     <ClCompile Include="Cisco_Parser.cpp" />
     <ClCompile Include="Cisco_Router.cpp" />
     <ClCompile Include="Device.cpp" />

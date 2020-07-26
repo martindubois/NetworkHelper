@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -26,40 +26,32 @@ namespace NH
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Route::Route(const SubNet * aSubNet, const char * aAddr) : Object("Route"), mSubNet(aSubNet)
+    // aSubNet [-K-;---]
+    Route::Route(const SubNet * aSubNet, uint32_t aNextRouter) : Object("Route")
+    {
+        Init(aSubNet, aNextRouter);
+    }
+
+    // aSubNet [-K-;---]
+    Route::Route(const SubNet * aSubNet, const char * aNextRouter) : Object("Route")
     {
         assert(NULL != aSubNet);
 
-        mAddr = IPv4_TextToAddress(aAddr);
-
-        switch (IPv4_GetAddressType(mAddr))
-        {
-        case IPv4_PRIVATE:
-        case IPv4_PUBLIC:
-            break;
-
-        default:
-            ThrowError(ERROR_228);
-        }
-
-        if (aSubNet->VerifyAddress(mAddr))
-        {
-            ThrowError(ERROR_CONFIG, __LINE__, "The next router cannot be on the destination subnet");
-        }
+        Init(aSubNet, IPv4_TextToAddress(aNextRouter));
     }
 
     Route::~Route()
     {
     }
 
-    uint32_t Route::GetAddress() const
+    uint32_t Route::GetNextRouter() const
     {
-        return mAddr;
+        return mNextRouter;
     }
 
-    void Route::GetAddress(char * aOut, unsigned int aOutSize_byte) const
+    void Route::GetNextRouter(char * aOut, unsigned int aOutSize_byte) const
     {
-        IPv4_AddressToText(aOut, aOutSize_byte, mAddr);
+        IPv4_AddressToText(aOut, aOutSize_byte, mNextRouter);
     }
 
     void Route::GetDescription(char * aOut, unsigned int aOutSize_byte) const
@@ -70,7 +62,7 @@ namespace NH
         char lAddr  [32];
         char lSubNet[64];
 
-        GetAddress(lAddr, sizeof(lAddr));
+        GetNextRouter(lAddr, sizeof(lAddr));
 
         mSubNet->GetFullName(lSubNet, sizeof(lSubNet));
 
@@ -82,6 +74,41 @@ namespace NH
     const SubNet * Route::GetSubNet() const
     {
         return mSubNet;
+    }
+
+    // aSubNet [---;---]
+    bool Route::Match(const SubNet & aSubNet) const
+    {
+        assert(NULL != &aSubNet);
+
+        return mSubNet == &aSubNet;
+    }
+
+    // Private
+    /////////////////////////////////////////////////////////////////////////
+
+    // aSubNet [-K-;R--]
+    void Route::Init(const SubNet * aSubNet, uint32_t aNextRouter)
+    {
+        assert(NULL != aSubNet);
+
+        switch (IPv4_GetAddressType(aNextRouter))
+        {
+        case IPv4_PRIVATE:
+        case IPv4_PUBLIC:
+            break;
+
+        default:
+            ThrowError(ERROR_228);
+        }
+
+        if (aSubNet->VerifyAddress(aNextRouter))
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "The next router cannot be on the destination subnet");
+        }
+
+        mNextRouter = aNextRouter;
+        mSubNet     = aSubNet;
     }
 
 }

@@ -45,10 +45,10 @@
     <ClInclude Include="CheckList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Check_Enabled.h">
+    <ClInclude Include="Check.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Check.h">
+    <ClInclude Include="Checks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -129,6 +129,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Check.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Check_Public.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Check_Reach.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

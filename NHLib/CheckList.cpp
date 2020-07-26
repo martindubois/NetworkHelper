@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/CheckList.cpp
 
-// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-25 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng.
 
 // ===== C ==================================================================
 #include <assert.h>
@@ -42,6 +42,20 @@ void CheckList::Add(Check * aCheck)
 }
 
 unsigned int CheckList::Verify(const NH::Interface & aElement) const
+{
+    unsigned int lResult = 0;
+
+    for (InternalList::const_iterator lIt = mChecks.begin(); lIt != mChecks.end(); lIt++)
+    {
+        assert(NULL != (*lIt));
+
+        lResult += (*lIt)->Verify(aElement);
+    }
+
+    return lResult;
+}
+
+unsigned int CheckList::Verify(const NH::Router & aElement) const
 {
     unsigned int lResult = 0;
 

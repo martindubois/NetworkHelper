@@ -27,6 +27,7 @@
 #include <NH/Route.h>
 
 // ===== NHLib ==============================================================
+class CheckList;
 class ShapeMap;
 
 namespace NH
@@ -75,6 +76,11 @@ namespace NH
         /// \retval true  Can reach
         bool CanReach(uint32_t aAddr) const;
 
+        /// \param aSubNet
+        /// \retval false Cannot reach
+        /// \retval true  Can reach
+        bool CanReach(const SubNet & aSubNet) const;
+
         /// \return This method returns the SubNetList associated to the network the router is in.
         SubNetList * GetSubNetList();
 
@@ -104,6 +110,8 @@ namespace NH
         void Prepare(HI::Diagram * aDiagram, HI::CSS_Color aColor, const ShapeMap & aSubNetMap);
 
         unsigned int Verify_Internal() const;
+
+        CheckList * mCheckList;
 
     private:
 
