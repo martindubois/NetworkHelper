@@ -137,5 +137,8 @@
     <ClCompile Include="Check_Reach.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Check_Private.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

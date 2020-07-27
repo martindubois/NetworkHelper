@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-27 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -23,6 +23,7 @@
 
 // ===== NHLib ==============================================================
 #include "CheckList.h"
+#include "Checks.h"
 #include "Errors.h"
 #include "IPv4.h"
 #include "ShapeMap.h"
@@ -104,6 +105,27 @@ namespace NH
         return mFlags.mEnable;
     }
 
+    // NOT TESTED NH.Interface.IsPrivate
+    //            Test without static address
+
+    bool Interface::IsPrivate() const
+    {
+        if (0 != mAddr)
+        {
+            return IPv4_PRIVATE == IPv4_GetAddressType(mAddr);
+        }
+
+        if (NULL != mSubNet)
+        {
+            return mSubNet->IsPrivate();
+        }
+
+        return false;
+    }
+
+    // NOT TESTED NH.Interface.IsPublic
+    //            Test without static address
+
     bool Interface::IsPublic() const
     {
         if (0 != mAddr)
@@ -144,6 +166,8 @@ namespace NH
         }
 
         mAccessLists[aDirection] = aAccessList;
+
+        mCheckList->Add(new Check_Enabled(ERROR_236));
     }
 
     // TODO NH.Interface.SetAddress
@@ -181,6 +205,11 @@ namespace NH
         }
 
         mAddr = aAddr;
+
+        mCheckList->Add(new Check_Enabled(ERROR_501));
+
+        // TODO Cisco.ip.address
+        //      Add a Check_NoDHCP
     }
 
     void Interface::SetAddress(const char * aAddr)
@@ -193,25 +222,27 @@ namespace NH
 
     void Interface::SetDHCP()
     {
-        if (!mFlags.mDHCP)
+        if (mFlags.mHasSubInterface)
         {
-            if (mFlags.mHasSubInterface)
-            {
-                ThrowError(ERROR_219);
-            }
-
-            if (0 != mAddr)
-            {
-                ThrowError(ERROR_223);
-            }
-
-            if (IsDHCPServer())
-            {
-                ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
-            }
-
-            mFlags.mDHCP = true;
+            ThrowError(ERROR_219);
         }
+
+        if (0 != mAddr)
+        {
+            ThrowError(ERROR_223);
+        }
+
+        if (IsDHCPServer())
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
+        }
+
+        mFlags.mDHCP = true;
+
+        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because its address is configured using DHCP"));
+
+        // TODO Cisco.ip.address.dhcp
+        //      Add a Check_NoStaticAddress
     }
 
     void Interface::SetEnable(bool aEnable)
@@ -239,15 +270,15 @@ namespace NH
 
     void Interface::SetNAT_Inside()
     {
-        if (!mFlags.mNAT_Inside)
+        if (mFlags.mNAT_Outside)
         {
-            if (mFlags.mNAT_Outside)
-            {
-                ThrowError(ERROR_203);
-            }
-
-            mFlags.mNAT_Inside = true;
+            ThrowError(ERROR_203);
         }
+
+        mFlags.mNAT_Inside = true;
+
+        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT inside"));
+        mCheckList->Add(new Check_Private(ERROR_CONFIG, __LINE__, "Must be configured using private address because it is configured as NAT inside"));
     }
 
     // TODO NH.Interface.SetNAT_Inside.Error
@@ -255,15 +286,15 @@ namespace NH
 
     void Interface::SetNAT_Outside()
     {
-        if (!mFlags.mNAT_Outside)
+        if (mFlags.mNAT_Inside)
         {
-            if (mFlags.mNAT_Inside)
-            {
-                ThrowError(ERROR_204);
-            }
-
-            mFlags.mNAT_Outside = true;
+            ThrowError(ERROR_204);
         }
+
+        mFlags.mNAT_Outside = true;
+
+        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT outside"));
+        mCheckList->Add(new Check_Public(ERROR_WARNING, __LINE__, "Should be configured with a public address because it is configured as NAT outside"));
     }
 
     // TODO NH.Interface.SetSubNet.Error
@@ -314,24 +345,35 @@ namespace NH
             ThrowError(ERROR_201);
         }
 
-        if (mVLAN != lVLAN)
+        if ( mFlags.mHasSubInterface)
         {
-            if ( mFlags.mHasSubInterface)
-            {
-                ThrowError(ERROR_221);
-            }
-
-            if (!mFlags.mSub)
-            {
-                ThrowError(ERROR_202);
-            }
-
-            mVLAN = lVLAN;
+            ThrowError(ERROR_221);
         }
+
+        if (!mFlags.mSub)
+        {
+            ThrowError(ERROR_202);
+        }
+
+        mVLAN = lVLAN;
+
+        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is connected to a VLAN"));
     }
 
-    void Interface::SetVirtual() { mFlags.mVirtual = true; }
-    void Interface::SetWifi   () { mFlags.mWifi    = true; }
+    void Interface::SetVirtual()
+    {
+        mFlags.mVirtual = true;
+    
+        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is a virtual interface"));
+        mCheckList->Add(new Check_Private(ERROR_CONFIG, __LINE__, "Must be configured with a private address because it is a tunnel"));
+    }
+
+    void Interface::SetWifi()
+    {
+        mFlags.mWifi = true;
+    }
+
+    // NOT TESTED NH.Interface.Verify
 
     void Interface::Verify() const
     {

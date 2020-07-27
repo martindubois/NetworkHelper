@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-27 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -19,6 +19,7 @@
 
 // ===== NHLib ==============================================================
 #include "CheckList.h"
+#include "Checks.h"
 #include "Errors.h"
 #include "IPv4.h"
 #include "Utilities.h"
@@ -57,8 +58,17 @@ namespace NH
         delete mCheckList;
     }
 
-    void Router::AddRoute(const SubNet * aSubNet, uint32_t     aAddr) { mRoutes.push_back(Route(aSubNet, aAddr)); }
-    void Router::AddRoute(const SubNet * aSubNet, const char * aAddr) { mRoutes.push_back(Route(aSubNet, aAddr)); }
+    void Router::AddRoute(const SubNet * aSubNet, uint32_t aNextRouter)
+    {
+        mRoutes.push_back(Route(aSubNet, aNextRouter));
+
+        mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a next router", aNextRouter));
+    }
+
+    void Router::AddRoute(const SubNet * aSubNet, const char * aNextRouter)
+    {
+        AddRoute(aSubNet, IPv4_TextToAddress(aNextRouter));
+    }
 
     bool Router::CanReach(uint32_t aAddr) const
     {

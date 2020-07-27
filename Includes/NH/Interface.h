@@ -68,6 +68,10 @@ namespace NH
 
         /// \retval false
         /// \retval true
+        bool IsPrivate() const;
+
+        /// \retval false
+        /// \retval true
         bool IsPublic() const;
 
         /// \param aAccessList

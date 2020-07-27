@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-25 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-27 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -624,11 +624,8 @@ namespace Cisco
 
         mInterface->SetVLAN(aElements[2]);
 
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is connected to a VLAN"));
-
         // TODO Cisco.encapsulation.dot1q
         //      Add a Check_Enabled to verify the base insterface
-        //      mInterface->mCheckList->Add(new Check_SubInterface(ERROR_CONFIG, __LINE__, "Must be a sub-interface because a VLAN is associated to it"));
 
         return true;
     }
@@ -683,11 +680,6 @@ namespace Cisco
 
         mInterface->SetVirtual();
 
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is a virtual interface"));
-
-        // TODO Cisco.interface.tunnel
-        //      mInterface->mCheckList->Add(new Check_Private(ERROR_CONFIG, __LINE__, "Must be configured with a private address because it is a tunnel"));
-
         return true;
     }
 
@@ -709,8 +701,6 @@ namespace Cisco
         assert(NULL != lAccessList);
 
         mInterface->SetAccessList(lDirection, lAccessList);
-
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_236));
 
         return true;
     }
@@ -759,11 +749,6 @@ namespace Cisco
         mInterface->SetAddress(lAddr);
         mInterface->SetSubNet (GetRouter()->GetSubNetList()->FindOrCreate(lAddr & lMask, lMask));
 
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_501));
-
-        // TODO Cisco.ip.address
-        //      Add a Check_NoDHCP
-
         return true;
     }
 
@@ -780,11 +765,6 @@ namespace Cisco
         assert(NULL != mInterface);
 
         mInterface->SetDHCP();
-
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because its address is configured using DHCP"));
-
-        // TODO Cisco.ip.address.dhcp
-        //      Add a Check_NoStaticAddress
 
         return true;
     }
@@ -804,9 +784,6 @@ namespace Cisco
         assert(NULL != mInterface);
 
         mInterface->SetNAT_Inside();
-
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT inside"));
-        // mInterface->mCheckList->Add(new Check_Private(ERROR_CONFIG, __LINE__, "Must be configured using private address because it is configured as NAT inside"));
 
         return true;
     }
@@ -863,9 +840,6 @@ namespace Cisco
 
         mInterface->SetNAT_Outside();
 
-        mInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT outside"));
-        mInterface->mCheckList->Add(new Check_Public(ERROR_WARNING, __LINE__, "Should be configured with a public address because it is configured as NAT outside"));
-
         return true;
     }
 
@@ -906,11 +880,7 @@ namespace Cisco
         NH::SubNet * lSubNet = lRouter->GetSubNetList()->FindOrCreate(aElements[2], aElements[3]);
         assert(NULL != lSubNet);
 
-        uint32_t lNextRouter = IPv4_TextToAddress(aElements[4]);
-
-        lRouter->AddRoute(lSubNet, lNextRouter);
-
-        lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a next router", lNextRouter));
+        lRouter->AddRoute(lSubNet, aElements[4]);
 
         return true;
     }

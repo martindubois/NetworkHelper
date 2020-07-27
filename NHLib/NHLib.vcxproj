@@ -40,6 +40,7 @@
     <ClCompile Include="Check.cpp" />
     <ClCompile Include="CheckList.cpp" />
     <ClCompile Include="Check_Enabled.cpp" />
+    <ClCompile Include="Check_Private.cpp" />
     <ClCompile Include="Check_Public.cpp" />
     <ClCompile Include="Check_Reach.cpp" />
     <ClCompile Include="Cisco_Parser.cpp" />
