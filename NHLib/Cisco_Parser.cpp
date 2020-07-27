@@ -563,8 +563,13 @@ namespace Cisco
         default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The default router address is not valid");
         }
 
-        // GetRouter()->mCheckList->Add(new Check_Address(ERROR_WARNING, __LINE__, "The router is not the default router it advertises", lAddr));
-        GetRouter()->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a default router", lAddr));
+        NH::Router * lRouter = GetRouter();
+        assert(NULL != lRouter);
+        assert(NULL != lRouter->mCheckList);
+
+        // TODO Cisco.default-router
+        //      lRouter->mCheckList->Add(new Check_Address(ERROR_WARNING, __LINE__, "The router is not the default router it advertises", lAddr));
+        lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a default router", lAddr));
 
         // TODO Cisco.default-router
         //      Verify if the default router match the network
@@ -601,6 +606,10 @@ namespace Cisco
         default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The DNS server address is not valid");
         }
 
+        NH::Router * lRouter = GetRouter();
+        assert(NULL != lRouter);
+        assert(NULL != lRouter->mCheckList);
+
         GetRouter()->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a configured DNS server", lAddr));
 
         // TODO Cisco.dns-server
@@ -624,8 +633,16 @@ namespace Cisco
 
         mInterface->SetVLAN(aElements[2]);
 
-        // TODO Cisco.encapsulation.dot1q
-        //      Add a Check_Enabled to verify the base insterface
+        char lBaseName[64];
+
+        bool lRetB = mInterface->GetBaseName(lBaseName, sizeof(lBaseName));
+        assert(lRetB);
+
+        NH::Interface * lBase = GetRouter()->mInterfaces.FindOrCreate(lBaseName);
+        assert(NULL != lBase);
+        assert(NULL != lBase->mCheckList);
+
+        lBase->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it as sub-interface"));
 
         return true;
     }
@@ -917,11 +934,16 @@ namespace Cisco
 
         lSubNet->SetDHCP(lRouter, lInterface);
 
-        lInterface->mCheckList->Add(new Check_Enabled(ERROR_237));
+        if (NULL != lInterface)
+        {
+            assert(NULL != lInterface->mCheckList);
 
-        // TODO Cisco.network
-        //      lInterface->mCheckList->Add(new Check_NoDHCP(ERROR_CONFIG, __LINE__, "A same interface cannot be DHCP client and server"));
-        //      Add a Check_StaticAddress
+            lInterface->mCheckList->Add(new Check_Enabled(ERROR_237));
+
+            // TODO Cisco.network
+            //      lInterface->mCheckList->Add(new Check_NoDHCP(ERROR_CONFIG, __LINE__, "A same interface cannot be DHCP client and server"));
+            //      Add a Check_StaticAddress
+        }
 
         return true;
     }
@@ -985,7 +1007,11 @@ namespace Cisco
         default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The tunnel destination is not a valid IPv4 address");
         }
 
-        GetRouter()->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a tunnel destination", lAddr));
+        NH::Router * lRouter = GetRouter();
+        assert(NULL != lRouter);
+        assert(NULL != lRouter->mCheckList);
+
+        lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a tunnel destination", lAddr));
 
         return true;
     }
@@ -1002,6 +1028,7 @@ namespace Cisco
 
         NH::Interface * lInterface = GetRouter()->mInterfaces.FindOrCreate(aElements[2]);
         assert(NULL != lInterface);
+        assert(NULL != lInterface->mCheckList);
 
         lInterface->mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is a tunnel source"));
         lInterface->mCheckList->Add(new Check_Public(ERROR_WARNING, __LINE__, "Should be connected to a public subnet because it is a tunnel source"));

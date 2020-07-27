@@ -160,6 +160,8 @@ namespace NH
         assert(DIRECTION_QTY >  aDirection );
         assert(NULL          != aAccessList);
 
+        assert(NULL != mCheckList);
+
         if (NULL != mAccessLists[aDirection])
         {
             ThrowError(ERROR_209);
@@ -179,6 +181,8 @@ namespace NH
 
     void Interface::SetAddress(uint32_t aAddr)
     {
+        assert(NULL != mCheckList);
+
         switch (IPv4_GetAddressType(aAddr))
         {
         case IPv4_PRIVATE:
@@ -222,6 +226,8 @@ namespace NH
 
     void Interface::SetDHCP()
     {
+        assert(NULL != mCheckList);
+
         if (mFlags.mHasSubInterface)
         {
             ThrowError(ERROR_219);
@@ -270,6 +276,8 @@ namespace NH
 
     void Interface::SetNAT_Inside()
     {
+        assert(NULL != mCheckList);
+
         if (mFlags.mNAT_Outside)
         {
             ThrowError(ERROR_203);
@@ -286,6 +294,8 @@ namespace NH
 
     void Interface::SetNAT_Outside()
     {
+        assert(NULL != mCheckList);
+
         if (mFlags.mNAT_Inside)
         {
             ThrowError(ERROR_204);
@@ -332,6 +342,8 @@ namespace NH
     {
         assert(NULL != aVLAN);
 
+        assert(NULL != mCheckList);
+
         unsigned int lVLAN;
 
         int lRet = sscanf_s(aVLAN, "%u", &lVLAN);
@@ -362,6 +374,8 @@ namespace NH
 
     void Interface::SetVirtual()
     {
+        assert(NULL != mCheckList);
+
         mFlags.mVirtual = true;
     
         mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is a virtual interface"));
@@ -434,6 +448,8 @@ namespace NH
     // aNATs [--O;R--]
     unsigned int Interface::Verify_Internal(const NATList * aNATs) const
     {
+        assert(NULL != mCheckList);
+
         unsigned int lResult = 0;
 
         lResult += mCheckList->Verify(*this);

@@ -60,6 +60,8 @@ namespace NH
 
     void Router::AddRoute(const SubNet * aSubNet, uint32_t aNextRouter)
     {
+        assert(NULL != mCheckList);
+
         mRoutes.push_back(Route(aSubNet, aNextRouter));
 
         mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a next router", aNextRouter));
@@ -228,6 +230,8 @@ namespace NH
 
     unsigned int Router::Verify_Internal() const
     {
+        assert(NULL != mCheckList);
+
         unsigned int lResult = 0;
 
         lResult += mCheckList->Verify(*this);
