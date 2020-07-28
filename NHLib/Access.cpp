@@ -152,7 +152,7 @@ namespace NH
             case AccessEnd::FILTER_ANY: break;
 
             case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { lResult++; DisplayError(ERROR_215); } break;
-            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { lResult++; DisplayError(ERROR_CONFIG, __LINE__, "Describes traffic not going through the router"); } break;
+            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { lResult++; DisplayError(ERROR_238); } break;
 
             default: assert(false);
             }
@@ -180,7 +180,7 @@ namespace NH
 
         sprintf_s(lMessage, "%s %s - %s", GetObjectType(), lDesc, aMessage);
 
-        Utl_DisplayError(ERROR_ERROR, aCode, lMessage);
+        Utl_DisplayError(aErrorType, aCode, lMessage);
     }
 
 }

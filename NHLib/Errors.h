@@ -69,6 +69,7 @@
 #define ERROR_235 ERROR_CONFIG, (-235), ("Cannot reach a host indicated in an access list")
 #define ERROR_236 ERROR_CONFIG, (-236), ("Must be enabled because an access-list is associated to it")
 #define ERROR_237 ERROR_CONFIG, (-237), ("Must be enabled because it act as DHCP server")
+#define ERROR_238 ERROR_CONFIG, (-238), ("Describes traffic not going through the router")
 
 // ===== FILE ERROR =========================================================
 

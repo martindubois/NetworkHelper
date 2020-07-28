@@ -17,8 +17,9 @@
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
-static bool Test (unsigned int aTestIndex, unsigned int aRouterIndex);
-static bool Tests(unsigned int aTestIndex, unsigned int aRouterQty);
+static void Test (unsigned int aTestIndex, unsigned int aRouterIndex);
+static void Test (const char * aFileName);
+static void Tests(unsigned int aTestIndex, unsigned int aRouterQty);
 
 // Tests
 /////////////////////////////////////////////////////////////////////////////
@@ -51,12 +52,12 @@ KMS_TEST_BEGIN(Router_Base)
         printf("%s\n", eE.what());
     }
 
-    KMS_TEST_ASSERT(Tests(0, 1));
-    KMS_TEST_ASSERT(Tests(1, 1));
-    KMS_TEST_ASSERT(Tests(2, 2));
-    KMS_TEST_ASSERT(Tests(3, 3));
-    KMS_TEST_ASSERT(Tests(4, 4));
-    KMS_TEST_ASSERT(Tests(5, 6));
+    Tests(0, 1);
+    Tests(1, 1);
+    Tests(2, 2);
+    Tests(3, 3);
+    Tests(4, 4);
+    Tests(5, 6);
 
     try
     {
@@ -80,25 +81,46 @@ KMS_TEST_BEGIN(Router_Base)
         printf("%s\n", eE.what());
     }
 
-    KMS_TEST_END
+    try
+    {
+        Test("Test_ip_access-list");
+        KMS_TEST_ASSERT(false);
+    }
+    catch (std::exception eE)
+    {
+        KMS_TEST_ERROR_INFO;
+        printf("%s\n", eE.what());
+    }
+
+KMS_TEST_END
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
 
-bool Test(unsigned int aTestIndex, unsigned int aRouterIndex)
+void Test(unsigned int aTestIndex, unsigned int aRouterIndex)
+{
+    char lFileName[64];
+
+    int lRet = sprintf_s(lFileName, "Test_%u_Router_%u", aTestIndex, aRouterIndex);
+    assert(lRet > 0);
+    assert(lRet < sizeof(lFileName));
+
+    Test(lFileName);
+}
+
+void Test(const char * aFileName)
 {
     Cisco::Router lCR;
-    char          lFile[64];
+    char          lFileName[256];
     NH::Network   lNN;
-    int           lRet;
 
     lCR.SetSubNetList(&lNN.mSubNets);
 
-    lRet = sprintf_s(lFile, "NHLib_Test/Tests/Test_%u_Router_%u.txt", aTestIndex, aRouterIndex);
-    assert(            0 < lRet);
-    assert(sizeof(lFile) > lRet);
+    int lRet = sprintf_s(lFileName, "NHLib_Test/Tests/%s.txt", aFileName);
+    assert(lRet > 0);
+    assert(lRet < sizeof(lFileName));
 
-    lCR.RetrieveInfo(NH::Router::INFO_CONFIG_FILE, lFile);
+    lCR.RetrieveInfo(NH::Router::INFO_CONFIG_FILE, lFileName);
 
     lNN.AddRouter(&lCR);
 
@@ -106,32 +128,15 @@ bool Test(unsigned int aTestIndex, unsigned int aRouterIndex)
 
     lNN.Verify();
 
-    char lTitle[64];
-
-    lRet = sprintf_s(lFile , "Test_%u_Router_%u", aTestIndex, aRouterIndex);
-    assert(            0 < lRet);
-    assert(sizeof(lFile) > lRet);
-
-    lRet = sprintf_s(lTitle, "Test %u - Router %u", aTestIndex, aRouterIndex);
-    assert(            0 < lRet);
-    assert(sizeof(lFile) > lRet);
-
-    lNN.Generate_HTML(HI::FOLDER_CURRENT, lFile, lTitle);
-
-    return true;
+    lNN.Generate_HTML(HI::FOLDER_CURRENT, aFileName, aFileName);
 }
 
-bool Tests(unsigned int aTestIndex, unsigned int aRouterQty)
+void Tests(unsigned int aTestIndex, unsigned int aRouterQty)
 {
     assert(0 < aRouterQty);
 
     for (unsigned int i = 0; i < aRouterQty; i ++)
     {
-        if (!Test(aTestIndex, i))
-        {
-            return false;
-        }
+        Test(aTestIndex, i);
     }
-
-    return true;
 }

@@ -9,39 +9,6 @@
 ! >>>>> CONFIG ERROR  -225  "ip address" command outside of an "interface" section
 ip address 192.168.0.1 255.255.255.0
 
-! ===== Access ==============================================================
-
-! TEST INFO Access.Error
-!           -213, -214, -215, -216, -217, -226, -405
-
-! ERROR  -217  Access rule IP 192.168.0.10 ==> 192.168.0.10 - Describes traffic not going through the network
-! >>>>> ERROR    -7  Access rule - 1 errors
-ip access-list extended 101	permit ip host 192.168.0.10 host 192.168.0.10
-
-ip access-list extended 102
-
-	! ERROR  -216  Access rule IP 192.168.0.0/255.255.255.0 ==> 192.168.0.10 - Describes traffic not going through the router
-	! >>>>> ERROR    -7  Access rule - 1 errors
-	permit ip 192.168.0.0 0.0.0.255 host 192.168.0.10
-
-	! ERROR  -215  Access rule IP 192.168.0.10 ==> 192.168.0.0/255.255.255.0 - Describes traffic not going through the router
-	! >>>>> ERROR    -7  Access rule - 1 errors
-	permit ip host 192.168.0.10 192.168.0.0 0.0.0.255
-
-exit
-
-! >>>>> CONFIG ERROR  -214  Access rule - Only the TCP rule can use the "establish" flag
-ip access-list extended 103 permit UDP host 192.168.0.10 eq 80 192.168.10.0 0.0.0.255 established
-
-! >>>>> CONFIG ERROR  -213  Invalid port number
-ip access-list extended 104 permit UDP any any eq 65537
-
-! >>>>> PARSE ERROR  -405  Invalid IPv4 inverted net mask format
-ip access-list extended 105 permit IP 192.168.0.0 Invalid any
-
-! >>>>> CONFIG ERROR  -226  Access end - Invalid IP address
-ip access-list extended 106 permit IP any host 240.0.0.1
-
 ! ===== DHCP ================================================================
 
 ! TEST INFO DHCP.Error
