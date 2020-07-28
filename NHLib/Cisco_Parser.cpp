@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-27 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -428,7 +428,7 @@ namespace Cisco
                 }
                 else
                 {
-                    Utl_ThrowError(ERROR_PARSE, __LINE__, "Unexexpected command element");
+                    Utl_ThrowError(ERROR_406);
                 }
             }
 

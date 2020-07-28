@@ -70,6 +70,7 @@
 #define ERROR_236 ERROR_CONFIG, (-236), ("Must be enabled because an access-list is associated to it")
 #define ERROR_237 ERROR_CONFIG, (-237), ("Must be enabled because it act as DHCP server")
 #define ERROR_238 ERROR_CONFIG, (-238), ("Describes traffic not going through the router")
+#define ERROR_239 ERROR_CONFIG, (-239), ("Invalid port range")
 
 // ===== FILE ERROR =========================================================
 
@@ -88,6 +89,7 @@
 #define ERROR_403 ERROR_PARSE, (-403), ("Invalid VLAN number")
 #define ERROR_404 ERROR_PARSE, (-404), ("Invalid IPv4 address format")
 #define ERROR_405 ERROR_PARSE, (-405), ("Invalid IPv4 inverted net mask format")
+#define ERROR_406 ERROR_PARSE, (-406), ("Unexpected command element")
 
 // ===== WARNING ============================================================
 

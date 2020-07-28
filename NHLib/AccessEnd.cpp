@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -213,7 +213,7 @@ namespace NH
         case OPERATOR_RANGE:
             if (aPortA > aPortB)
             {
-                ThrowError(ERROR_CONFIG, __LINE__, "Invalid port range");
+                ThrowError(ERROR_239);
             }
             mPort_A  = aPortA;
             mPort_B  = aPortB;
