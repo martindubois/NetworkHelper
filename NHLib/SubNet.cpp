@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/SubNet.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -101,9 +101,6 @@ namespace NH
         return ((mAddr & mMask) == (aAddr & mMask));
     }
 
-    // TODO NH.SubNet.SetDHCP
-    //      DHCP set twice
-
     // aRouter    [-K-;---]
     // aInterface [-KO;---]
     void SubNet::SetDHCP(const Router * aRouter, const Interface * aInterface)
@@ -117,9 +114,9 @@ namespace NH
 
         if (NULL != aInterface)
         {
-            if ((NULL != mDHCP_Interface) && (mDHCP_Interface != aInterface))
+            if (NULL != mDHCP_Interface)
             {
-                ThrowError(ERROR_CONFIG, __LINE__, "Two DHCP server for the same SubNet");
+                ThrowError(ERROR_241);
             }
 
             mDHCP_Interface = aInterface;
@@ -155,6 +152,25 @@ namespace NH
         lShape->SetTitle(lStr);
 
         aSubNetMap->Add(this, lShape);
+    }
+
+    // Protected
+    /////////////////////////////////////////////////////////////////////////
+
+    // ===== Object =========================================================
+
+    void SubNet::ThrowError(const char * aErrorType, int aCode, const char * aMessage) const
+    {
+        assert(NULL != aMessage);
+
+        char lFullName[128];
+        char lMessage [256];
+
+        GetFullName(lFullName, sizeof(lFullName));
+
+        sprintf_s(lMessage, "%s %s - %s", GetObjectType(), lFullName, aMessage);
+
+        Utl_DisplayError(aErrorType, aCode, lMessage);
     }
 
 }

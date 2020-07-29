@@ -88,6 +88,11 @@ namespace NH
 
         void Prepare(HI::Diagram * aDiagram, ShapeMap * aSubNetMap);
 
+    protected:
+
+        // ===== Object =====================================================
+        virtual void ThrowError(const char * aErrorType, int aCode, const char * aMessage) const;
+
     private:
 
         uint32_t mAddr;

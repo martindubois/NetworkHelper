@@ -72,6 +72,7 @@
 #define ERROR_238 ERROR_CONFIG, (-238), ("Describes traffic not going through the router")
 #define ERROR_239 ERROR_CONFIG, (-239), ("Invalid port range")
 #define ERROR_240 ERROR_CONFIG, (-240), ("No default router")
+#define ERROR_241 ERROR_CONFIG, (-241), ("Two DHCP server for the same subNet")
 
 // ===== FILE ERROR =========================================================
 

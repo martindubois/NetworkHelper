@@ -25,7 +25,7 @@ static void Tests(unsigned int aTestIndex, unsigned int aRouterQty);
 /////////////////////////////////////////////////////////////////////////////
 
 KMS_TEST_BEGIN(Router_Base)
-
+{
     Cisco::Router lCR;
 
     // ===== RetieveInfo ====================================================
@@ -92,6 +92,17 @@ KMS_TEST_BEGIN(Router_Base)
         printf("%s\n", eE.what());
     }
 
+    try
+    {
+        Test("Test_ip_dhcp_pool");
+        KMS_TEST_ASSERT(false);
+    }
+    catch (std::exception eE)
+    {
+        KMS_TEST_ERROR_INFO;
+        printf("%s\n", eE.what());
+    }
+}
 KMS_TEST_END
 
 // Static functions

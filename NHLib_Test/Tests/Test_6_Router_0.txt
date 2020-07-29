@@ -9,26 +9,6 @@
 ! >>>>> CONFIG ERROR  -225  "ip address" command outside of an "interface" section
 ip address 192.168.0.1 255.255.255.0
 
-! ===== DHCP ================================================================
-
-! TEST INFO DHCP.Error
-!           -211, -212, -401
-
-! >>>>> PARSE ERROR  -401  The command "network" must have at least 3 elements
-network
-
-ip dhcp pool Alice
-
-	! >>>>> CONFIG ERROR  -212  The subnet address is not a valid subnet address
-	network 192.168.0.1 255.255.255.0
-
-ip dhcp pool Bob
-
-	! >>>>> CONFIG ERROR  -211  The subnet address is not valid
-	network 0.0.0.1 255.255.255.0
-
-exit
-
 ! ===== Interface ===========================================================
 
 ! TEST INFO Interface.Error
@@ -169,4 +149,4 @@ interface test4.1
 exit
 
 ! ===== Expected error message after parsing the file =======================
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 31 lines with error
+! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 28 lines with error

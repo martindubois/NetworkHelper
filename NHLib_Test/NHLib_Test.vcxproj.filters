@@ -94,5 +94,8 @@
     <Text Include="Tests\Test_ip_access-list.txt">
       <Filter>Tests</Filter>
     </Text>
+    <Text Include="Tests\Test_ip_dhcp_pool.txt">
+      <Filter>Tests</Filter>
+    </Text>
   </ItemGroup>
 </Project>

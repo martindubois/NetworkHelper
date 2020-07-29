@@ -1,0 +1,41 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_ip_dhcp_pool.txt
+
+! This file test error detection when parsing "default-router", "dns-server", "ip dhcp pool" and "network" command in configuration file.
+
+interface Interface0
+	ip address 192.168.0.1 255.255.255.0
+exit
+
+! TEST INFO DHCP.Error
+!           -211, -212, -401
+
+! >>>>> PARSE ERROR  -401  The command "network" must have at least 3 elements
+network
+
+ip dhcp pool Alice
+
+	! >>>>> CONFIG ERROR  -212  The subnet address is not a valid subnet address
+	network 192.168.0.1 255.255.255.0
+
+ip dhcp pool Bob
+
+	! >>>>> CONFIG ERROR  -211  The subnet address is not valid
+	network 0.0.0.1 255.255.255.0
+
+ip dhcp pool Charle
+
+	network 192.168.0.0 255.255.255.0
+
+ip dhcp pool Denis
+
+	! >>>>> CONFIG ERROR  -241  Subnet 192.168.0.0/255.255.255.0 - Two DHCP server for the same subnet
+	network 192.168.0.0 255.255.255.0
+
+exit
+
+! ===== Expected error message after parsing the file =======================
+! ERROR    -1  File NHLib_Test/Tests/Test_ip_dhcp_pool_0.txt - 4 lines with error
