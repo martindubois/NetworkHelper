@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -267,11 +267,11 @@ namespace NH
                 {
                     char lMessage[128];
 
-                    int lRet = sprintf_s(lMessage, "Interface %s and %s are connected to the same subnet", lI0->GetName(), lI1->GetName());
+                    int lRet = sprintf_s(lMessage, ERROR_246_FMT, lI0->GetName(), lI1->GetName());
                     assert(               0 < lRet);
                     assert(sizeof(lMessage) > lRet);
 
-                    DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                    DisplayError(ERROR_246, lMessage);
                     lResult++;
                 }
             }

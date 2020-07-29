@@ -76,6 +76,12 @@
 #define ERROR_242 ERROR_CONFIG, (-242), ("IP routing is not enabled and at least one route is configured")
 #define ERROR_243 ERROR_CONFIG, (-243), ("Cannot reach a next router")
 #define ERROR_244 ERROR_CONFIG, (-244), ("No subnet")
+#define ERROR_245 ERROR_CONFIG, (-245), ("Must be enabled because its address is configured using DHCP")
+
+#define ERROR_246     ERROR_CONFIG, (-246)
+#define ERROR_246_FMT "Interface %s and %s are connected to the same subnet"
+
+#define ERROR_247 ERROR_CONFIG, (-247), ("No IPv4 address set and DHCP client not enabled")
 
 // ===== FILE ERROR =========================================================
 
@@ -102,3 +108,6 @@
 
 #define ERROR_501 ERROR_WARNING, (-501), ("Should be enabled because it is configured to use a static IPv4 address")
 #define ERROR_502 ERROR_WARNING, (-502), ("No DNS server")
+#define ERROR_503 ERROR_WARNING, (-503), ("Disabled virtual interface")
+#define ERROR_504 ERROR_WARNING, (-504), ("Disabled sub-interface")
+#define ERROR_505 ERROR_WARNING, (-505), ("Disabled but has sub-interface")

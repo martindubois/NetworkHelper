@@ -11,39 +11,11 @@ ip address 192.168.0.1 255.255.255.0
 
 ! ===== Interface ===========================================================
 
-! TEST INFO Interface.Error
-!           -209 -210, -225, -401, -402, -404
-
-! >>>>> PARSE ERROR  -401  The command "encapsulation dot1q" must have at least 3 elements
-encapsulation dot1q
-
-! >>>>> CONFIG ERROR  -225  "encapsulation dot1q" command outside of an "interface" section
-encapsulation dot1q 10
-
-! >>>>> PARSE ERROR  -401  The command "interface" must have at least 2 elements
-interface
+! TEST INFO Cisco.interface_tunnel
+!           Parsing errors -209 and -401.
 
 ! >>>>> PARSE ERROR  -401  The command "interface tunnel" must have at least 3 elements
 interface tunnel
-
-! >>>>> PARSE ERROR  -401  The command "ip address" must have at least 4 elements
-ip address
-
-! >>>>> PARSE ERROR  -402  The command "ip address dhcp" must have 3 elements or less
-ip address dhcp invalid
-
-interface f0/1
-
-	! >>>>> PARSE ERROR  -404  Invalid IPv4 address format
-	ip address Invalid 255.255.255.0
-
-	! >>>>> CONFIG ERROR  -227  Interface f0/1 - Invalid IPv4 address
-	ip address 0.0.0.1 255.255.255.0
-
-interface f0/2
-
-	! >>>>> CONFIG ERROR  -210  Invalid IPv4 address
-	ip address 0.0.0.0 255.255.255.0
 
 interface f0/3
 
@@ -56,8 +28,8 @@ exit
 
 ! ===== NAT =================================================================
 
-// TEST INFO NAT.Error
-//           -203, -204, -230, -402
+// TEST INFO Cisco.ip_nat_pool
+//           Parsing errors -203, -204, -230 and -402
 
 ! >>>>> CONFIG ERROR  -230  Access end - The access rule source subnet is not private
 access-list 1 permit 204.105.94.0 0.0.0.255
@@ -84,58 +56,5 @@ interface f0/5
 
 exit
 
-! ===== Sub-Interface =======================================================
-
-! TEST INFO Sub-Interface.Error
-!           -201, -202, -218, -219, -220, -221, -222, -223, -224, -403 
-
-interface test1
-
-	! >>>>> PARSE ERROR  -403  Interface test1 - Invalid VLAN number
-	encapsulation dot1q invalid
-
-	! >>>>> CONFIG ERROR  -201  Interface test1 - A VLAN number must be below 4096
-	encapsulation dot1q 4096
-
-	! >>>>> CONFIG ERROR  -202  Interface test1 - A VLAN must be set on sub-interface
-	encapsulation dot1q 10
-
-	ip address dhcp
-
-	! >>>>> CONFIG ERROR  -224  Interface test1 - Do not configure an IPv4 address on an interace with DHCP client enabled
-	ip address 1.2.3.4 255.255.255.0
-
-interface test2
-
-	ip address 1.2.3.4 255.255.255.0
-
-	! >>>>> CONFIG ERROR  -223  Interface test2 - Do not enable DHCP client on an interface with a valid IPv4 address
-	ip address dhcp
-
-! >>>>> CONFIG ERROR  -222  Interface test2 - Do not create sub-interface for an interface with an IPv4 address configured
-interface test2.1
-
-interface test3.1
-
-interface test3
-
-	! >>>>> CONFIG ERROR  -221  Interface test3 - Do not set a VLAN for an interface with sub-interfaces
-	encapsulation dot1q 10
-
-	! >>>>> CONFIG ERROR  -220  Interface test3 - Do not configure an IPv4 address on an interface with sub-interfaces
-	ip address 1.2.3.4 255.255.255.0
-
-	! >>>>> CONFIG ERROR  -219  Interface test3 - Do not enable DHCP client on an interface with sub-interfaces
-	ip address dhcp
-
-interface test4
-
-	ip address dhcp
-
-! >>>>> CONFIG ERROR  -218  Interface test4 - Do not create sub-interface for an interface with DHCP client enabled
-interface test4.1
-
-exit
-
 ! ===== Expected error message after parsing the file =======================
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 26 lines with error
+! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 8 lines with error

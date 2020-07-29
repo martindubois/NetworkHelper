@@ -19,6 +19,7 @@
 
 static const char * ERRORS[]
 {
+    "Test_interface",
     "Test_ip_route",
     "Test_ip_dhcp_pool",
 

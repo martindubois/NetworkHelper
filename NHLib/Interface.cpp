@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-27 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -245,7 +245,7 @@ namespace NH
 
         mFlags.mDHCP = true;
 
-        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because its address is configured using DHCP"));
+        mCheckList->Add(new Check_Enabled(ERROR_245));
 
         // TODO Cisco.ip.address.dhcp
         //      Add a Check_NoStaticAddress
@@ -605,15 +605,9 @@ namespace NH
 
         if (!mFlags.mEnable)
         {
-            if (mFlags.mDHCP)
-            {
-                DisplayError(ERROR_WARNING, __LINE__, "Disabled but configured using DHCP");
-                lResult++;
-            }
-
             if (mFlags.mHasSubInterface)
             {
-                DisplayError(ERROR_WARNING, __LINE__, "Disabled but has sub-interface");
+                DisplayError(ERROR_505);
                 lResult++;
             }
 
@@ -631,13 +625,13 @@ namespace NH
 
             if (mFlags.mSub)
             {
-                DisplayError(ERROR_WARNING, __LINE__, "Disabled sub-interface");
+                DisplayError(ERROR_504);
                 lResult++;
             }
 
             if (mFlags.mVirtual)
             {
-                DisplayError(ERROR_WARNING, __LINE__, "Disabled virtual interface");
+                DisplayError(ERROR_503);
                 lResult++;
             }
         }
@@ -682,7 +676,7 @@ namespace NH
 
         if ((!mFlags.mDHCP) && (!mFlags.mHasSubInterface))
         {
-            DisplayError(ERROR_CONFIG, __LINE__, "No IPv4 address set and DHCP client not enabled");
+            DisplayError(ERROR_247);
             lResult++;
         }
 

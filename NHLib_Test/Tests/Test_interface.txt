@@ -1,0 +1,123 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_interface.txt
+
+! This file test error detection for "encapsulation dot1q", "interface", "ip address" "no shutdown" and "shutdown" commands in configuration file.
+
+ip routing
+
+! ===== Parsing and verification errors =====================================
+
+! TEST INFO Cisco.interface
+!           Parsing errors -201, -202, -210, -218, -219, -220, -221, -222, -223, -224, -225, -227, -401, -402 and -403.
+!           Verification errors -246, -247, -501, -503, -504 and -505.
+
+! >>>>> PARSE ERROR  -401  The command "encapsulation dot1q" must have at least 3 elements
+encapsulation dot1q
+
+! >>>>> CONFIG ERROR  -225  "encapsulation dot1q" command outside of an "interface" section
+encapsulation dot1q 10
+
+! >>>>> PARSE ERROR  -401  The command "interface" must have at least 2 elements
+interface
+
+! >>>>> PARSE ERROR  -401  The command "ip address" must have at least 4 elements
+ip address
+
+! >>>>> PARSE ERROR  -402  The command "ip address dhcp" must have 3 elements or less
+ip address dhcp invalid
+
+interface f0/1
+
+	! >>>>> PARSE ERROR  -404  Invalid IPv4 address format
+	ip address Invalid 255.255.255.0
+
+	! >>>>> CONFIG ERROR  -227  Interface f0/1 - Invalid IPv4 address
+	ip address 0.0.0.1 255.255.255.0
+
+interface f0/2
+
+	! >>>>> CONFIG ERROR  -210  Invalid IPv4 address
+	ip address 0.0.0.0 255.255.255.0
+
+exit
+
+interface test1
+
+	! >>>>> PARSE ERROR  -403  Interface test1 - Invalid VLAN number
+	encapsulation dot1q invalid
+
+	! >>>>> CONFIG ERROR  -201  Interface test1 - A VLAN number must be below 4096
+	encapsulation dot1q 4096
+
+	! >>>>> CONFIG ERROR  -202  Interface test1 - A VLAN must be set on sub-interface
+	encapsulation dot1q 10
+
+	ip address dhcp
+
+	! >>>>> CONFIG ERROR  -224  Interface test1 - Do not configure an IPv4 address on an interace with DHCP client enabled
+	ip address 1.2.3.4 255.255.255.0
+
+interface test2
+
+	ip address 1.2.3.4 255.255.255.0
+
+	! >>>>> CONFIG ERROR  -223  Interface test2 - Do not enable DHCP client on an interface with a valid IPv4 address
+	ip address dhcp
+
+! >>>>> CONFIG ERROR  -222  Interface test2 - Do not create sub-interface for an interface with an IPv4 address configured
+interface test2.1
+
+interface test3.1
+
+interface test3
+
+	! >>>>> CONFIG ERROR  -221  Interface test3 - Do not set a VLAN for an interface with sub-interfaces
+	encapsulation dot1q 10
+
+	! >>>>> CONFIG ERROR  -220  Interface test3 - Do not configure an IPv4 address on an interface with sub-interfaces
+	ip address 1.2.3.4 255.255.255.0
+
+	! >>>>> CONFIG ERROR  -219  Interface test3 - Do not enable DHCP client on an interface with sub-interfaces
+	ip address dhcp
+
+interface test4
+
+	ip address dhcp
+
+! >>>>> CONFIG ERROR  -218  Interface test4 - Do not create sub-interface for an interface with DHCP client enabled
+interface test4.1
+
+exit
+
+! ===== Expected error message after parsing the file =======================
+! ERROR    -1  File NHLib_Test/Tests/Test_interface.txt - 18 lines with error
+
+! ===== Expected error message at verification ==============================
+! CONFIG ERROR  -247  Interface f0/1 - No IPv4 address set and DHCP client not enabled
+! CONFIG ERROR  -246  Interfaces - Interface f0/1 and f0/2 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/1 and test1 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/1 and test3 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/1 and test3.1 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/1 and test4 are connected to the same subnet
+! CONFIG ERROR  -247  Interface f0/2 - No IPv4 address set and DHCP client not enabled
+! CONFIG ERROR  -246  Interfaces - Interface f0/2 and test1 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/2 and test3 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/2 and test3.1 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface f0/2 and test4 are connected to the same subnet
+! CONFIG ERROR   248  Interface test1 - Must be enabled because its address is configured using DHCP
+! CONFIG ERROR  -246  Interfaces - Interface test1 and test3 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface test1 and test3.1 are connected to the same subnet
+! CONFIG ERROR  -256  Interfaces - Interface test1 and test4 are connected to the same subnet
+! WARNING  -501  Interface test2 - Should be enabled because it is configured to use a static IPv4 address
+! WARNING  -505  Interface test3 - Disabled but has sub-interface
+! CONFIG ERROR  -246  Interfaces - Interface test3 and test3.1 are connected to the same subnet
+! CONFIG ERROR  -246  Interfaces - Interface test3 and test4 are connected to the same subnet
+! WARNING  -504  Interface test3.1 - Disabled sub-interface
+! WARNING  -503  Interface test3.1 - Disabled virtual interface
+! CONFIG ERROR  -247  Interface test3.1 - No IPv4 address set and DHCP client not enabled
+! CONFIG ERROR  -246  Interfaces - Interface test3.1 and test4 are connected to the same subnet
+! CONFIG ERROR  -245  Interface test4 - Must be enabled because its address is configured using DHCP
+! ERROR    -5  Network - 24 errors
