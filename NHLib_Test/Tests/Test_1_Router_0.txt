@@ -19,16 +19,19 @@ enable
     exit
     ip dhcp pool AB
       no default-router
+	  no dns-server
       network 192.168.20.0 255.255.255.0
       default-router 192.168.20.1
+	  dns-server 192.168.10.10
     ip dhcp pool CD
       no default-router
+	  no dns-server
       network 192.168.10.0 255.255.255.0
       default-router 192.168.10.1
+	  dns-server 192.168.10.10
     exit
     ip routing
   exit
   copy running-config startup-config
 
 exit
-

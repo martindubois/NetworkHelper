@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/SubNetList.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -53,7 +53,7 @@ namespace NH
             const SubNet * lResult = (*lSubNet);
             assert(NULL != lResult);
 
-            if (lResult->VerifyAddress(aAddr))
+            if (lResult->Match(aAddr))
             {
                 return lResult;
             }
@@ -129,7 +129,7 @@ namespace NH
                 SubNet * lSN1 = *lIt1;
                 assert(NULL != lSN1);
 
-                if (lSN1->VerifyAddress(lSN0->GetAddress()))
+                if (lSN1->Match(lSN0->GetAddress()))
                 {
                     char lMessage[128];
                     char lName[2][64];

@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/InterfaceList.cpp
 
-// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -52,7 +52,7 @@ namespace NH
             assert(NULL != lIt->second);
 
             const SubNet * lSubNet = lIt->second->GetSubNet();
-            if ((NULL != lSubNet) && lSubNet->VerifyAddress(aAddr))
+            if ((NULL != lSubNet) && lSubNet->Match(aAddr))
             {
                 return true;
             }

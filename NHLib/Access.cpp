@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-15 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-15 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -134,8 +134,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==             lDstH ) { lResult++; DisplayError(ERROR_217); } break;
-            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->VerifyAddress(lDstH)) { lResult++; DisplayError(ERROR_216); } break;
+            case AccessEnd::FILTER_HOST  : if (mSource.GetHost  () ==     lDstH ) { lResult++; DisplayError(ERROR_217); } break;
+            case AccessEnd::FILTER_SUBNET: if (mSource.GetSubNet()->Match(lDstH)) { lResult++; DisplayError(ERROR_216); } break;
 
             default: assert(false);
             }
@@ -151,8 +151,8 @@ namespace NH
             {
             case AccessEnd::FILTER_ANY: break;
 
-            case AccessEnd::FILTER_HOST  : if (lDstSN->VerifyAddress(mSource.GetHost  ())) { lResult++; DisplayError(ERROR_215); } break;
-            case AccessEnd::FILTER_SUBNET: if (lDstSN ==             mSource.GetSubNet() ) { lResult++; DisplayError(ERROR_238); } break;
+            case AccessEnd::FILTER_HOST  : if (lDstSN->Match(mSource.GetHost  ())) { lResult++; DisplayError(ERROR_215); } break;
+            case AccessEnd::FILTER_SUBNET: if (lDstSN ==     mSource.GetSubNet() ) { lResult++; DisplayError(ERROR_238); } break;
 
             default: assert(false);
             }

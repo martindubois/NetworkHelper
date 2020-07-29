@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.h
 
-// CODE REVIEW 2020-07-25 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -53,6 +53,7 @@ namespace Cisco
         bool Cmd_Ip_AccessList_Extended   (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Address               (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Address_Dhcp          (const char ** aElements, unsigned int aCount);
+        bool Cmd_Ip_Dhcp_Pool             (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Nat_Inside            (const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Nat_Inside_Source_List(const char ** aElements, unsigned int aCount);
         bool Cmd_Ip_Nat_Outside           (const char ** aElements, unsigned int aCount);
@@ -68,10 +69,12 @@ namespace Cisco
 
         // ===== Sections ===================================================
         void Section_AccessList(const char * aCommand, const char * aSection);
+        void Section_DHCP      (const char * aCommand);
         void Section_Error     (const char * aCommand, const char * aSection);
         void Section_Interface (const char * aCommand);
 
         NH::AccessList * mAccessList;
+        NH::DHCP       * mDHCP      ;
         NH::Interface  * mInterface ;
 
     };

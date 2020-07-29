@@ -169,4 +169,4 @@ interface test4.1
 exit
 
 ! ===== Expected error message after parsing the file =======================
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 38 lines with error
+! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 31 lines with error

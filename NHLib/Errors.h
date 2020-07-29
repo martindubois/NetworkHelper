@@ -71,6 +71,7 @@
 #define ERROR_237 ERROR_CONFIG, (-237), ("Must be enabled because it act as DHCP server")
 #define ERROR_238 ERROR_CONFIG, (-238), ("Describes traffic not going through the router")
 #define ERROR_239 ERROR_CONFIG, (-239), ("Invalid port range")
+#define ERROR_240 ERROR_CONFIG, (-240), ("No default router")
 
 // ===== FILE ERROR =========================================================
 
@@ -96,3 +97,4 @@
 #define ERROR_WARNING ("WARNING")
 
 #define ERROR_501 ERROR_WARNING, (-501), ("Should be enabled because it is configured to use a static IPv4 address")
+#define ERROR_502 ERROR_WARNING, (-502), ("No DNS server")

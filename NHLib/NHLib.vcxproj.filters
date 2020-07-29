@@ -140,5 +140,11 @@
     <ClCompile Include="Check_Private.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DHCP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DHCPList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

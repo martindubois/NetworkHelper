@@ -21,11 +21,15 @@ enable
     no ip dhcp pool DHCP20
     ip dhcp pool DHCP10
       no default-router
+	  no dns-server
       default-router 192.168.10.1
+	  dns-server 192.168.10.10
       network 192.168.10.0 255.255.255.0
     ip dhcp pool DHCP20
       no default-router
+	  no dns-server
       default-router 192.168.20.1
+	  dns-server 192.168.10.10
       network 192.168.20.0 255.255.255.0
     exit
     ip dhcp excluded-address 192.168.10.1

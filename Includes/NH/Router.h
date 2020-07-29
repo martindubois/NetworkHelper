@@ -21,6 +21,7 @@
 
 // ===== Includes ===========================================================
 #include <NH/AccessListMap.h>
+#include <NH/DHCPList.h>
 #include <NH/InterfaceList.h>
 #include <NH/NamedObject.h>
 #include <NH/NATList.h>
@@ -54,31 +55,28 @@ namespace NH
         }
         InfoType;
 
-        static const unsigned int FLAG_NO_ECHO;
-
         Router();
 
         virtual ~Router();
 
-        /// \param aRoute
-        void AddRoute(const Route & aRoute);
+        /// \param aSubNet     The destination subnet
+        /// \param aNextRouter The next router
+        /// \exception std::exception See Route::Route
+        void AddRoute(const SubNet * aDestination, uint32_t aNextRouter);
 
-        /// \param aSubNet
-        /// \param aAddr
-        void AddRoute(const SubNet * aSubNet, uint32_t aAddr);
+        /// \param aSubNet     The destination subnet
+        /// \param aNextRouter The next router
+        /// \exception std::exception See Route::Route
+        void AddRoute(const SubNet * aDestination, const char * aNextRouter);
 
-        /// \param aSubNet
-        /// \param aAddr
-        void AddRoute(const SubNet * aSubNet, const char * aAddr);
-
-        /// \param aAddr
-        /// \retval false Cannot reach
-        /// \retval true  Can reach
+        /// \param aAddr Can the router reach the address?
+        /// \retval false No, the router cannot reach the address.
+        /// \retval true  Yes, the router can reach the address.
         bool CanReach(uint32_t aAddr) const;
 
-        /// \param aSubNet
-        /// \retval false Cannot reach
-        /// \retval true  Can reach
+        /// \param aSubNet Can the router reach the subnet?
+        /// \retval false No, the router cannot reach the subnet.
+        /// \retval true  Yes, the router can reach the subnet.
         bool CanReach(const SubNet & aSubNet) const;
 
         /// \return This method returns the SubNetList associated to the network the router is in.
@@ -89,15 +87,17 @@ namespace NH
         /// \param aSubNets The list of subnet associated to the network
         void SetSubNetList(SubNetList * aSubNets);
 
-        /// \param aType  See INFO_...
+        /// \param aType  See InfoType
         /// \param aData  The data associated to the information type
-        /// \param aFlags See FLAG_...
+        /// \param aFlags Reserved
         /// \exception std::exception
         virtual void RetrieveInfo(InfoType aType, const char * aData, unsigned int aFlags = 0);
 
+        /// \exception std::exception
         virtual void Verify() const;
 
         AccessListMap mAccessLists;
+        DHCPList      mDHCPs      ;
         InterfaceList mInterfaces ;
         NATList       mNATs       ;
 

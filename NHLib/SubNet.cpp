@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/SubNet.cpp
 
-// CODE REVIEW 2020-07-26 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-26 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -96,6 +96,11 @@ namespace NH
     bool SubNet::IsPrivate() const { return IPv4_PRIVATE == IPv4_GetAddressType(mAddr); }
     bool SubNet::IsPublic () const { return IPv4_PUBLIC  == IPv4_GetAddressType(mAddr); }
 
+    bool SubNet::Match(uint32_t aAddr) const
+    {
+        return ((mAddr & mMask) == (aAddr & mMask));
+    }
+
     // TODO NH.SubNet.SetDHCP
     //      DHCP set twice
 
@@ -126,11 +131,6 @@ namespace NH
     void SubNet::ValidateAddress(uint32_t aAddr) const
     {
         IPv4_Validate(aAddr, mAddr, mMask);
-    }
-
-    bool SubNet::VerifyAddress(uint32_t aAddr) const
-    {
-        return ((mAddr & mMask) == (aAddr & mMask));
     }
 
     // Internal

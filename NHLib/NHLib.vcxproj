@@ -46,6 +46,8 @@
     <ClCompile Include="Cisco_Parser.cpp" />
     <ClCompile Include="Cisco_Router.cpp" />
     <ClCompile Include="Device.cpp" />
+    <ClCompile Include="DHCP.cpp" />
+    <ClCompile Include="DHCPList.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="InterfaceList.cpp" />
     <ClCompile Include="IP.cpp" />

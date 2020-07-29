@@ -267,7 +267,7 @@ namespace NH
         switch (mFilter)
         {
         case FILTER_ANY   : return true;
-        case FILTER_HOST  : return aSubNet.VerifyAddress(mHost);
+        case FILTER_HOST  : return aSubNet.Match(mHost);
         case FILTER_SUBNET: return mSubNet == &aSubNet;
 
         default: assert(false);
@@ -281,8 +281,8 @@ namespace NH
         switch (mFilter)
         {
         case FILTER_ANY   : return true;
-        case FILTER_HOST  : return mHost ==               aAddress ;
-        case FILTER_SUBNET: return mSubNet->VerifyAddress(aAddress);
+        case FILTER_HOST  : return mHost ==       aAddress ;
+        case FILTER_SUBNET: return mSubNet->Match(aAddress);
 
         default: assert(false);
         }

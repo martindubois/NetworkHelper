@@ -41,46 +41,48 @@ namespace NH
         /// \return This method returns the subnet address.
         uint32_t GetAddress() const;
 
-        /// \param aOut
-        /// \param aOutSize_byte
+        /// \param aOut          The output buffer
+        /// \param aOutSize_byte The outbut buffer size
         void GetAddress(char * aOut, unsigned int aOutSize_byte) const;
 
-        /// \param aInterface
-        /// \retval false
-        /// \retval true
+        /// \param aInterface Is the DHCP server of this subnet binded to this interface?
+        /// \retval false No, the DHCP server of this subnet is not binded to this interface.
+        /// \retval true  Yes, the DHCP server of this subnet is binded to this interface.
         bool GetDHCP(const Interface * aInterface) const;
 
-        /// \param aOut
-        /// \param aOutSize_byte
+        /// \param aOut          The output buffer
+        /// \param aOutSize_byte The output buffer size
         void GetFullName(char * aOut, unsigned int aOutSize_byte) const;
 
-        /// \param aOut
-        /// \param aOutSize_byte
+        /// \param aOut          The output buffer
+        /// \param aOutSize_byte The output buffer size
         void GetMask(char * aOut, unsigned int aOutSize_byte) const;
 
         /// \param aAddr IPv4 subnet address
         /// \param aMask IPV4 subnet mask
         bool Is(uint32_t aAddr, uint32_t aMask) const;
 
-        /// \retval false
-        /// \retval true
+        /// \retval false No, this subnet is not a private subnet.
+        /// \retval true  Yes, this subnetis a private subnet.
         bool IsPrivate() const;
 
-        /// \retval false
-        /// \retval true
+        /// \retval false No, this subnet is not a public subnet.
+        /// \retval true  Yes, this subnetis a public subnet.
         bool IsPublic() const;
 
-        /// \param aRouter
-        /// \param aInterface
+        /// \param aAddr Is this address on the subnet?
+        /// \retval false No, the address is not on the subnet.
+        /// \retval true  Yes, the address is on the subnet.
+        bool Match(uint32_t aAddr) const;
+
+        /// \param aRouter    This router act as the DHCP server for the subnet.
+        /// \param aInterface The DHCP server running on the router is binded to this interface.
         /// \exception std::exception
         void SetDHCP(const Router * aRouter, const Interface * aInterface);
 
         /// \param aAddr IPv4 address to validate
         /// \exception std::exception
         void ValidateAddress(uint32_t aAddr) const;
-
-        /// \param aAddr IPv4 address to validate
-        bool VerifyAddress(uint32_t aAddr) const;
 
     // Internal
 

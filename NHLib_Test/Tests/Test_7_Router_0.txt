@@ -58,6 +58,8 @@ exit
 ! CONFIG ERROR  -233  Access list 103 - Not used
 ! CONFIG ERROR  -208  Access list 103 - TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and TCP 192.168.20.0/255.255.255.0 ==> 192.168.10.10 == 80 describe opposed traffics
 ! CONFIG ERROR  -208  Access list 103 - TCP 192.168.10.0/255.255.255.0 ==> 192.168.20.0/255.255.255.0 and UDP 192.168.20.1 ==> 192.168.10.0/255.255.255.0 != 21 describe opposed traffics
+! CONFIG ERROR  -240  DHCP pool alice - No default router
+! WARNING  -502  DHCP pool alice - No DNS server
 ! WARNING  -501  Interface f0/0 - Should be enabled because it is configured to use a static IPv4 address
 ! CONFIG_ERROR  -236  Interface f0/0 - Must be enabled because an access list is associated to it
 ! CONFIG ERROR  -207  Access list 104 - TCP 192.168.10.10 == 80 ==> 192.168.0.0/255.255.255.0 describes traffic going out from the interface and the access list is used as "in"
@@ -71,4 +73,4 @@ exit
 ! CONFIG ERROR  -229  Router Test_7_Router_0 - IP routing is not enabled and the router use more than one interface
 
 ! ===== Expected error at the end of processing =============================
-! ERROR    -5  Network - 19 errors
+! ERROR    -5  Network - 21 errors

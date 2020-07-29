@@ -11,6 +11,7 @@
 #include "Component.h"
 
 // ===== Includes ===========================================================
+#include <NH/DHCP.h>
 #include <NH/NAT.h>
 #include <NH/Router.h>
 #include <NH/SubNet.h>
@@ -279,6 +280,7 @@ namespace Cisco
         case CMD_IP_ACCESS_LIST_EXTENDED  : return Cmd_Ip_AccessList_Extended   (aElements, aCount);
         case CMD_IP_ADDRESS               : return Cmd_Ip_Address               (aElements, aCount);
         case CMD_IP_ADDRESS_DHCP          : return Cmd_Ip_Address_Dhcp          (aElements, aCount);
+        case CMD_IP_DHCP_POOL             : return Cmd_Ip_Dhcp_Pool             (aElements, aCount);
         case CMD_IP_NAT_INSIDE            : return Cmd_Ip_Nat_Inside            (aElements, aCount);
         case CMD_IP_NAT_INSIDE_SOURCE_LIST: return Cmd_Ip_Nat_Inside_Source_List(aElements, aCount);
         case CMD_IP_NAT_OUTSIDE           : return Cmd_Ip_Nat_Outside           (aElements, aCount);
@@ -292,8 +294,6 @@ namespace Cisco
         case CMD_TUNNEL_DESTINATION       : return Cmd_Tunnel_Destination       (aElements, aCount);
         case CMD_TUNNEL_SOURCE            : return Cmd_Tunnel_Source            (aElements, aCount);
 
-        case CMD_IP_DHCP_POOL:
-            break;
 
         default: assert(false);
         }
@@ -307,11 +307,9 @@ namespace Cisco
     bool Parser::Access(const char ** aElements, unsigned int aCount, NH::Access::Type aType, const char * aCommand)
     {
         assert(NULL                 != aElements);
-        assert(                   1 <= aCount   );
         assert(NH::Access::TYPE_QTY >  aType    );
 
         ValidateCount(aCommand, aCount, 2);
-        assert(NULL != aElements[1]);
 
         Section_AccessList(aCommand, "access-list or ip access-list");
         assert(NULL != mAccessList);
@@ -333,7 +331,6 @@ namespace Cisco
     unsigned int Parser::Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd * aEnd, const char * aCommand)
     {
         assert(NULL   != aElements);
-        assert(     0 <  aCount   );
         assert(aCount >= aIndex   );
         assert(NH::Access::PROTOCOL_QTY > aProtocol);
         assert(NULL   != aEnd     );
@@ -471,11 +468,9 @@ namespace Cisco
     void Parser::Access_Nat_Source(const char ** aElements, unsigned int aCount, NH::AccessEnd * aSource, const char * aCommand)
     {
         assert(NULL != aElements);
-        assert(   1 <= aCount);
         assert(NULL != aSource);
 
         ValidateCount(aCommand, aCount, 2, 3);
-        assert(NULL != aElements[1]);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -524,7 +519,6 @@ namespace Cisco
         static const char * COMMAND = "access-list";
 
         assert(NULL != aElements);
-        assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 2);
 
@@ -548,20 +542,14 @@ namespace Cisco
     {
         static const char * COMMAND = "default-router";
 
-        assert(1 <= aCount);
-
         ValidateCount(COMMAND, aCount, 2, 2);
+
+        Section_DHCP(COMMAND);
+        assert(NULL != mDHCP);
 
         uint32_t lAddr = IPv4_TextToAddress(aElements[1]);
 
-        switch (IPv4_GetAddressType(lAddr))
-        {
-        case IPv4_PRIVATE:
-        case IPv4_PUBLIC :
-            break;
-
-        default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The default router address is not valid");
-        }
+        mDHCP->SetDefaultRouter(lAddr);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -591,20 +579,14 @@ namespace Cisco
     {
         static const char * COMMAND = "dns-server";
 
-        assert(1 <= aCount);
-
         ValidateCount(COMMAND, aCount, 2, 2);
+
+        Section_DHCP(COMMAND);
+        assert(NULL != mDHCP);
 
         uint32_t lAddr = IPv4_TextToAddress(aElements[1]);
 
-        switch (IPv4_GetAddressType(lAddr))
-        {
-        case IPv4_PRIVATE:
-        case IPv4_PUBLIC :
-            break;
-
-        default: Utl_ThrowError(ERROR_CONFIG, __LINE__, "The DNS server address is not valid");
-        }
+        mDHCP->SetDnsServer(lAddr);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -624,7 +606,6 @@ namespace Cisco
         static const char * COMMAND = "encapsulation dot1q";
 
         assert(NULL != aElements);
-        assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 3, 3);
 
@@ -652,7 +633,6 @@ namespace Cisco
         static const char * COMMAND = "hostname";
 
         assert(NULL != aElements);
-        assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 2, 2);
 
@@ -666,7 +646,6 @@ namespace Cisco
         static const char * COMMAND = "interface";
 
         assert(NULL != aElements);
-        assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 2, 2);
 
@@ -681,7 +660,6 @@ namespace Cisco
         static const char * COMMAND = "interface tunel";
 
         assert(NULL != aElements);
-        assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 3, 3);
         assert(NULL != aElements[2]);
@@ -705,7 +683,6 @@ namespace Cisco
         static const char * COMMAND = "ip access-group";
 
         assert(NULL != aElements);
-        assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 4, 4);
 
@@ -727,7 +704,6 @@ namespace Cisco
         static const char * COMMAND = "ip access-list extended";
 
         assert(NULL != aElements);
-        assert(   3 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 4);
 
@@ -753,7 +729,6 @@ namespace Cisco
         static const char * COMMAND = "ip address";
 
         assert(NULL != aElements);
-        assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 4, 4);
 
@@ -773,9 +748,6 @@ namespace Cisco
     {
         static const char * COMMAND = "ip address dhcp";
 
-        assert(NULL != aElements);
-        assert(   3 <= aCount   );
-
         ValidateCount(COMMAND, aCount, 3, 3);
 
         Section_Interface(COMMAND);
@@ -786,11 +758,23 @@ namespace Cisco
         return true;
     }
 
+    bool Parser::Cmd_Ip_Dhcp_Pool(const char ** aElements, unsigned int aCount)
+    {
+        static const char * COMMAND = "ip dhcp pool";
+
+        assert(NULL != aElements);
+
+        ValidateCount(COMMAND, aCount, 4, 4);
+
+        mDHCP = GetRouter()->mDHCPs.FindOrCreate(aElements[3]);
+        assert(NULL != mDHCP);
+
+        return true;
+    }
+
     bool Parser::Cmd_Ip_Nat_Inside(const char ** aElements, unsigned int aCount)
     {
         static const char * COMMAND = "ip nat inside";
-
-        assert(3 <= aCount);
 
         if (3 < aCount)
         {
@@ -809,7 +793,7 @@ namespace Cisco
     {
         static const char * COMMAND = "ip nat inside source list";
 
-        assert(5 <= aCount);
+        assert(NULL != aElements);
 
         ValidateCount(COMMAND, aCount, 8, 9);
         assert(NULL != aElements[6]);
@@ -847,9 +831,6 @@ namespace Cisco
     {
         static const char * COMMAND = "ip nat outside";
 
-        assert(NULL != aElements);
-        assert(   3 <= aCount   );
-
         ValidateCount(COMMAND, aCount, 3, 3);
 
         Section_Interface(COMMAND);
@@ -865,7 +846,6 @@ namespace Cisco
         static const char * COMMAND = "ip nat pool";
 
         assert(NULL != aElements);
-        assert(   3 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 8, 8);
 
@@ -887,7 +867,6 @@ namespace Cisco
         static const char * COMMAND = "ip route";
 
         assert(NULL != aElements);
-        assert(   2 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 5, 5);
 
@@ -906,8 +885,6 @@ namespace Cisco
     {
         static const char * COMMAND = "ip routing";
 
-        assert(2 <= aCount);
-
         ValidateCount(COMMAND, aCount, 2, 2);
 
         GetRouter()->SetIpRouting();
@@ -920,15 +897,19 @@ namespace Cisco
         static const char * COMMAND = "network";
 
         assert(NULL != aElements);
-        assert(   1 <= aCount   );
 
         ValidateCount(COMMAND, aCount, 3, 3);
+
+        Section_DHCP(COMMAND);
+        assert(NULL != mDHCP);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
 
         NH::SubNet * lSubNet = lRouter->GetSubNetList()->FindOrCreate(aElements[1], aElements[2]);
         assert(NULL != lSubNet);
+
+        mDHCP->SetSubNet(lSubNet);
 
         const NH::Interface * lInterface = lRouter->mInterfaces.Find(lSubNet);
 
@@ -952,8 +933,6 @@ namespace Cisco
     {
         static const char * COMMAND = "no shutdown";
 
-        assert(2 <= aCount);
-
         ValidateCount(COMMAND, 2, 2);
 
         Section_Interface(COMMAND);
@@ -975,9 +954,7 @@ namespace Cisco
     {
         static const char * COMMAND = "shutdown";
 
-        assert(1 <= aCount);
-
-        ValidateCount(COMMAND, 1, 1);
+        ValidateCount(COMMAND, aCount, 1, 1);
 
         Section_Interface(COMMAND);
         assert(NULL != mInterface);
@@ -991,9 +968,9 @@ namespace Cisco
     {
         static const char * COMMAND = "tunnel destination";
 
-        assert(2 <= aCount);
+        assert(NULL != aElements);
 
-        ValidateCount(COMMAND, 3, 3);
+        ValidateCount(COMMAND, aCount, 3, 3);
 
         Section_Interface(COMMAND);
 
@@ -1020,7 +997,7 @@ namespace Cisco
     {
         static const char * COMMAND = "tunnel source";
 
-        assert(2 <= aCount);
+        assert(NULL != aElements);
 
         ValidateCount(COMMAND, 3, 3);
 
@@ -1046,6 +1023,14 @@ namespace Cisco
         if (NULL == mAccessList)
         {
             Section_Error(aCommand, aSection);
+        }
+    }
+
+    void Parser::Section_DHCP(const char * aCommand)
+    {
+        if (NULL == mDHCP)
+        {
+            Section_Error(aCommand, "ip dhcp pool");
         }
     }
 

@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-27 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -39,8 +39,6 @@ namespace NH
 
     // Public
     ////////////////////////////////////////////////////////////////////////
-
-    const unsigned int Router::FLAG_NO_ECHO = 0x00000001;
 
     Router::Router() : NamedObject("Router"), mCheckList(new CheckList), mSubNets(NULL)
     {
@@ -81,7 +79,7 @@ namespace NH
 
         for (RouteList::const_iterator lIt = mRoutes.begin(); lIt != mRoutes.end(); lIt++)
         {
-            if (lIt->GetSubNet()->VerifyAddress(aAddr))
+            if (lIt->GetSubNet()->Match(aAddr))
             {
                 return true;
             }
@@ -237,6 +235,7 @@ namespace NH
         lResult += mCheckList->Verify(*this);
 
         lResult += mAccessLists.Verify_Internal(&mInterfaces, &mNATs);
+        lResult += mDHCPs      .Verify_Internal();
         lResult += mInterfaces .Verify_Internal(              &mNATs);
         lResult += mNATs       .Verify_Internal();
 
