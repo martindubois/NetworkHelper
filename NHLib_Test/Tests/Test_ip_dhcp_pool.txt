@@ -4,14 +4,18 @@
 ! Product   NetworkHelper
 ! File      NHLib_Test/Tests/Test_ip_dhcp_pool.txt
 
-! This file test error detection when parsing "default-router", "dns-server", "ip dhcp pool" and "network" command in configuration file.
+! This file test error detection for "default-router", "dns-server", "ip dhcp pool" and "network" commands in configuration file.
 
 interface Interface0
 	ip address 192.168.0.1 255.255.255.0
+	no shutdown
 exit
 
+! ===== Parsing and verification errors =====================================
+
 ! TEST INFO DHCP.Error
-!           -211, -212, -401
+!           Parsing errors -211, -212, -241 and -401. Verification error -240 and -502.
+!           Verification errors -240, -244 and -502
 
 ! >>>>> PARSE ERROR  -401  The command "network" must have at least 3 elements
 network
@@ -39,3 +43,16 @@ exit
 
 ! ===== Expected error message after parsing the file =======================
 ! ERROR    -1  File NHLib_Test/Tests/Test_ip_dhcp_pool_0.txt - 4 lines with error
+
+! ===== Expected error message at verification ==============================
+! CONFIG ERROR  -240  DHCP pool alice - No default router
+! WARNING  -502  DHCP pool alice - No DNS server
+! CONFIG ERROR  -244  DHCP pool Alice - No subnet
+! CONFIG ERROR  -240  DHCP pool Bob - No default router
+! WARNING  -502  DHCP pool Bob - No DNS server
+! CONFIG ERROR  -244  DHCP pool Bob - No subnet
+! CONFIG ERROR  -240  DHCP pool Charle - No default router
+! WARNING  -502  DHCP pool Charle - No DNS server
+! CONFIG ERROR  -240  DHCP pool Denis - No default router
+! WARNING  -502  DHCP pool Denis - No DNS server
+! ERROR    -5  Network - 10 errors

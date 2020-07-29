@@ -19,11 +19,13 @@ KMS_TEST_GROUP_LIST_END
 extern int Network_Base     ();
 extern int Network_MyNetwork();
 extern int Router_Base      ();
+extern int Router_Error     ();
 
 KMS_TEST_LIST_BEGIN
     KMS_TEST_LIST_ENTRY(Network_Base     , "Network - Base"      , 0, 0)
     KMS_TEST_LIST_ENTRY(Network_MyNetwork, "Network - My network", 0, 0)
     KMS_TEST_LIST_ENTRY(Router_Base      , "Router - Base"       , 0, 0)
+    KMS_TEST_LIST_ENTRY(Router_Error     , "Router - Error"      , 0, 0)
 KMS_TEST_LIST_END
 
 KMS_TEST_MAIN

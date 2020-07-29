@@ -14,6 +14,17 @@
 #include <Cisco/Router.h>
 #include <NH/Network.h>
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+static const char * ERRORS[]
+{
+    "Test_ip_route",
+    "Test_ip_dhcp_pool",
+
+    NULL
+};
+
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
@@ -21,10 +32,33 @@ static void Test (unsigned int aTestIndex, unsigned int aRouterIndex);
 static void Test (const char * aFileName);
 static void Tests(unsigned int aTestIndex, unsigned int aRouterQty);
 
+static bool Test_Error(const char * aFileName);
+
+// Macro
+/////////////////////////////////////////////////////////////////////////////
+
+#define CATCH                      \
+    catch (std::exception eE)      \
+    {                              \
+        KMS_TEST_ERROR_INFO;       \
+        printf("%s\n", eE.what()); \
+    }
+
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 
 KMS_TEST_BEGIN(Router_Base)
+{
+    Tests(0, 1);
+    Tests(1, 1);
+    Tests(2, 2);
+    Tests(3, 3);
+    Tests(4, 4);
+    Tests(5, 6);
+}
+KMS_TEST_END
+
+KMS_TEST_BEGIN(Router_Error)
 {
     Cisco::Router lCR;
 
@@ -35,73 +69,44 @@ KMS_TEST_BEGIN(Router_Base)
         lCR.RetrieveInfo(NH::Router::INFO_COM_PORT, "");
         KMS_TEST_ASSERT(false);
     }
-    catch (std::exception eE)
-    {
-        KMS_TEST_ERROR_INFO;
-        printf("%s\n", eE.what());
-    }
+    CATCH
 
     try
     {
         lCR.RetrieveInfo(NH::Router::INFO_CONFIG_FILE, "DoesNotExist.txt");
         KMS_TEST_ASSERT(false);
     }
-    catch (std::exception eE)
-    {
-        KMS_TEST_ERROR_INFO;
-        printf("%s\n", eE.what());
-    }
-
-    Tests(0, 1);
-    Tests(1, 1);
-    Tests(2, 2);
-    Tests(3, 3);
-    Tests(4, 4);
-    Tests(5, 6);
+    CATCH
 
     try
     {
         Tests(6, 1);
         KMS_TEST_ASSERT(false);
     }
-    catch (std::exception eE)
-    {
-        KMS_TEST_ERROR_INFO;
-        printf("%s\n", eE.what());
-    }
+    CATCH
 
     try
     {
         Tests(7, 1);
         KMS_TEST_ASSERT(false);
     }
-    catch (std::exception eE)
-    {
-        KMS_TEST_ERROR_INFO;
-        printf("%s\n", eE.what());
-    }
+    CATCH
 
     try
     {
         Test("Test_ip_access-list");
         KMS_TEST_ASSERT(false);
     }
-    catch (std::exception eE)
+    CATCH
+
+    unsigned int lIndex = 0;
+    while (NULL != ERRORS[lIndex])
     {
-        KMS_TEST_ERROR_INFO;
-        printf("%s\n", eE.what());
+        KMS_TEST_ASSERT(Test_Error(ERRORS[lIndex]));
+
+        lIndex++;
     }
 
-    try
-    {
-        Test("Test_ip_dhcp_pool");
-        KMS_TEST_ASSERT(false);
-    }
-    catch (std::exception eE)
-    {
-        KMS_TEST_ERROR_INFO;
-        printf("%s\n", eE.what());
-    }
 }
 KMS_TEST_END
 
@@ -150,4 +155,40 @@ void Tests(unsigned int aTestIndex, unsigned int aRouterQty)
     {
         Test(aTestIndex, i);
     }
+}
+
+bool Test_Error(const char * aFileName)
+{
+    Cisco::Router lCR;
+    char          lFileName[256];
+    NH::Network   lNN;
+    bool          lResult = true;
+
+    lCR.SetSubNetList(&lNN.mSubNets);
+
+    int lRet = sprintf_s(lFileName, "NHLib_Test/Tests/%s.txt", aFileName);
+    assert(lRet > 0);
+    assert(lRet < sizeof(lFileName));
+
+    try
+    {
+        lCR.RetrieveInfo(NH::Router::INFO_CONFIG_FILE, lFileName);
+        lResult = false;
+    }
+    CATCH
+
+    lNN.AddRouter(&lCR);
+
+    lNN.AddKnownRouters();
+
+    try
+    {
+        lNN.Verify();
+        lResult = false;
+    }
+    CATCH
+
+    lNN.Generate_HTML(HI::FOLDER_CURRENT, aFileName, aFileName);
+
+    return lResult;
 }

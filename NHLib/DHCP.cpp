@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/DHCP.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -96,7 +96,7 @@ namespace NH
 
         if (NULL == mSubNet)
         {
-            DisplayError(ERROR_CONFIG, __LINE__, "No subnet");
+            DisplayError(ERROR_244);
             lResult++;
         }
         else

@@ -84,17 +84,6 @@ interface f0/5
 
 exit
 
-! ===== Route ===============================================================
-
-! TEST INFO Route.Error
-!           -228, -401
-
-! >>>>> PARSE ERROR  -401  The command "ip route" must have at least 5 elements
-ip route
-
-! >>>>> CONFIG ERROR  -228  Route - Invalid next router IPv4 address
-ip route 192.168.10.0 255.255.255.0 0.0.0.1
-
 ! ===== Sub-Interface =======================================================
 
 ! TEST INFO Sub-Interface.Error
@@ -149,4 +138,4 @@ interface test4.1
 exit
 
 ! ===== Expected error message after parsing the file =======================
-! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 28 lines with error
+! ERROR    -1  File NHLib_Test/Tests/Test_6_Router_0.txt - 26 lines with error

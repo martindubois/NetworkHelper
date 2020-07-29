@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -62,7 +62,7 @@ namespace NH
 
         mRoutes.push_back(Route(aSubNet, aNextRouter));
 
-        mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a next router", aNextRouter));
+        mCheckList->Add(new Check_Reach(ERROR_243, aNextRouter));
     }
 
     void Router::AddRoute(const SubNet * aSubNet, const char * aNextRouter)
@@ -251,7 +251,7 @@ namespace NH
 
             if (!mRoutes.empty())
             {
-                DisplayError(ERROR_CONFIG, __LINE__, "IP routing is not enabled and at least one route is configured");
+                DisplayError(ERROR_242);
                 lResult++;
             }
         }
@@ -280,22 +280,6 @@ namespace NH
                 lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
 
                 lRet = sprintf_s(lMessage, "Useless route because the %s subnet is directly connected", lSubNet);
-                assert(               0 < lRet);
-                assert(sizeof(lMessage) > lRet);
-
-                DisplayError(ERROR_CONFIG, __LINE__, lMessage);
-                lResult++;
-            }
-
-            if (!CanReach(lIt->GetNextRouter()))
-            {
-                char lAddr[32];
-
-                lIt->GetNextRouter(lAddr, sizeof(lAddr));
-
-                lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
-
-                lRet = sprintf_s(lMessage, "Cannot reach %s, the next router for %s", lAddr, lSubNet);
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 

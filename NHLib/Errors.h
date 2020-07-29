@@ -73,6 +73,9 @@
 #define ERROR_239 ERROR_CONFIG, (-239), ("Invalid port range")
 #define ERROR_240 ERROR_CONFIG, (-240), ("No default router")
 #define ERROR_241 ERROR_CONFIG, (-241), ("Two DHCP server for the same subNet")
+#define ERROR_242 ERROR_CONFIG, (-242), ("IP routing is not enabled and at least one route is configured")
+#define ERROR_243 ERROR_CONFIG, (-243), ("Cannot reach a next router")
+#define ERROR_244 ERROR_CONFIG, (-244), ("No subnet")
 
 // ===== FILE ERROR =========================================================
 

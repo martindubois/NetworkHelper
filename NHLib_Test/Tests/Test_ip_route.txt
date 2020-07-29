@@ -1,0 +1,34 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_ip_dhcp_pool.txt
+
+! This file test error detection for "ip route" and "ip routing" commands in configuration file.
+
+! ===== Parsing errors =======================================================
+
+! TEST INFO Cisco.ip_route
+!           Parsing errors -228 and -401
+
+! >>>>> PARSE ERROR  -401  The command "ip route" must have at least 5 elements
+ip route
+
+! >>>>> CONFIG ERROR  -228  Route - Invalid next router IPv4 address
+ip route 192.168.10.0 255.255.255.0 0.0.0.1
+
+! ===== Verification errors =================================================
+
+! TEST INFO Cisco.ip_route
+!           Verifiction error -242
+
+ip route 192.168.40.0 255.255.255.0 192.168.30.2
+
+! ===== Expected error message after parsing the file =======================
+! ERROR    -1  File NHLib_Test/Tests/Test_ip_route.txt - 2 lines with error
+
+! ===== Expected error message at verification ==============================
+! CONFIG ERROR  -243  Router Test_ip_route - Cannot reach a next router - 192.168.30.2
+! CONFIG ERROR  -242  Router Test_ip_route - IP routing is not enabled and at least one route is configured
+! ERROR    -5  Network - 2 errors
+
