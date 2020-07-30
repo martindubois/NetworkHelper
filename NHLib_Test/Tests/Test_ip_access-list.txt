@@ -6,8 +6,17 @@
 
 ! This file test error detection when parsing "deny", "ip access-list" and "permit" command in configuration file.
 
+ip access-list extended 101 permit udp any 8.8.8.0 0.0.0.255
+ip access-list extended 101 deny udp any 8.8.8.0 0.0.0.255 eq 138
+
+! ===== Parsing and verification errors =====================================
+
 ! TEST INFO Access.Error
-!           ERROR -7, -213, -214, -215, -216, -217, -226, -238, -239, -405, -406
+!           Parsing error -7, -213, -214, -215, -216, -217, -225, -226, -238, -239, -405 and -406.
+!           Verification error -232, -233, -234 and -235.
+
+! >>>>> CONFIG ERROR  -225  "permit" command outside of an "access-list or ip access-list" section
+permit ip any any
 
 ! ERROR  -217  Access rule IP 192.168.0.10 ==> 192.168.0.10 - Describes traffic not going through the network
 ! >>>>> ERROR    -7  Access rule - 1 errors
@@ -41,6 +50,10 @@ ip access-list extended 106 permit IP any host 240.0.0.1
 ! >>>>> ERROR    -7  Access rule  - 1 errors
 ip access-list extended 107 permit tcp 192.168.30.0 0.0.0.255 192.168.30.0 0.0.0.255 eq 80
 
+! CONFIG ERROR  -238  Access rule TCP 192.168.30.0/255.255.255.0 ==> 192.168.30.0/255.255.255.0 80 - 80 - Describes traffic not going through the router
+! >>>>> ERROR    -7  Access rule  - 1 errors
+ip access-list extended 107 permit tcp 192.168.30.0 0.0.0.255 192.168.30.0 0.0.0.255 range 80 80
+
 ! >>>>> CONFIG ERROR  -239  Access end - Invalid port range
 ip access-list extended 108 permit tcp any any range 3 2
 
@@ -48,4 +61,35 @@ ip access-list extended 108 permit tcp any any range 3 2
 ip access-list extended 109 permit tcp any any invalid
 
 ! ===== Expected error message after parsing the file =======================
-! ERROR    -1  File NHLib_Test/Tests/Test_ip_access-list.txt - 10 lines with error
+! ERROR    -1  File NHLib_Test/Tests/Test_ip_access-list.txt - 12 lines with error
+
+! ===== Expected error message at verification ==============================
+! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
+! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.0.0/255.255.255.0
+! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
+! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.0.0/255.255.255.0
+! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.10.0/255.255.255.0
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.30.0/255.255.255.0
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.30.0/255.255.255.0
+! CONFIG ERROR  -233  Access list 101 - Not used
+! CONFIG ERROR  -232  Access list 101 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 102 - Not used
+! CONFIG ERROR  -232  Access list 102 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 103 - Not used
+! CONFIG ERROR  -232  Access list 103 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 104 - Not used
+! CONFIG ERROR  -232  Access list 104 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 105 - Not used
+! CONFIG ERROR  -232  Access list 105 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 106 - Not used
+! CONFIG ERROR  -232  Access list 106 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 107 - Not used
+! CONFIG ERROR  -232  Access list 107 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 108 - Not used
+! CONFIG ERROR  -232  Access list 108 - No access rule in the access list
+! CONFIG ERROR  -233  Access list 109 - Not used
+! CONFIG ERROR  -232  Access list 109 - No access rule in the access list
+! ERROR    -5  Network - 28 errors

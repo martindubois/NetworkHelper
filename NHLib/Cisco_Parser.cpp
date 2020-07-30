@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -524,18 +524,22 @@ namespace Cisco
 
         mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[1], ACCESS_LIST_NAT);
 
+        bool lResult = true;
+
         if (3 <= aCount)
         {
             switch (Walk(aElements + 2, 1, CMDS_ACCESS))
             {
-            case CMD_DENY  : return Cmd_Deny  (aElements + 2, aCount - 2);
-            case CMD_PERMIT: return Cmd_Permit(aElements + 2, aCount - 2);
+            case CMD_DENY  : lResult = Cmd_Deny  (aElements + 2, aCount - 2); break;
+            case CMD_PERMIT: lResult = Cmd_Permit(aElements + 2, aCount - 2); break;
 
             default: assert(false);
             }
+
+            mAccessList = NULL;
         }
 
-        return true;
+        return lResult;
     }
 
     bool Parser::Cmd_DefaultRouter(const char ** aElements, unsigned int aCount)
@@ -564,9 +568,6 @@ namespace Cisco
 
         return true;
     }
-
-    // NOT TESTED Cisco.Router
-    //            deny command
 
     bool Parser::Cmd_Deny(const char ** aElements, unsigned int aCount)
     {
@@ -710,18 +711,22 @@ namespace Cisco
         mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP_EXTENDED);
         assert(NULL != mAccessList);
 
+        bool lResult = true;
+
         if (5 <= aCount)
         {
             switch (Walk(aElements + 4, 1, CMDS_ACCESS))
             {
-            case CMD_DENY  : return Cmd_Deny  (aElements + 4, aCount - 4);
-            case CMD_PERMIT: return Cmd_Permit(aElements + 4, aCount - 4);
+            case CMD_DENY  : lResult = Cmd_Deny  (aElements + 4, aCount - 4); break;
+            case CMD_PERMIT: lResult = Cmd_Permit(aElements + 4, aCount - 4); break;
 
             default: assert(false);
             }
+
+            mAccessList = NULL;
         }
 
-        return true;
+        return lResult;
     }
 
     bool Parser::Cmd_Ip_Address(const char ** aElements, unsigned int aCount)
@@ -1015,9 +1020,6 @@ namespace Cisco
 
     // ===== Sections =======================================================
 
-    // NOT TESTED Cisco.Router.Error
-    //            Access list entry outside of an access list section
-
     void Parser::Section_AccessList(const char * aCommand, const char * aSection)
     {
         if (NULL == mAccessList)
@@ -1060,10 +1062,6 @@ namespace Cisco
 
 // Static functions
 /////////////////////////////////////////////////////////////////////////////
-
-// NOT TESTED Cisco.Router
-//            Access list entry with port range;
-//            Access list entry without destination port;
 
 unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::AccessEnd * aEnd, const char * aCommand)
 {

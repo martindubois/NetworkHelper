@@ -30,6 +30,7 @@ namespace NH
 
     public:
 
+        /// \brief NH::Access::Type
         typedef enum
         {
             TYPE_DENY  ,
@@ -39,6 +40,7 @@ namespace NH
         }
         Type;
 
+        /// \brief NH::Acces::Protocol
         typedef enum
         {
             PROTOCOL_ICMP,
@@ -52,32 +54,33 @@ namespace NH
         }
         Protocol;
 
+        /// \param aType See NH::Access::Type
         Access(Type aType);
 
-        /// \param aOut
-        /// \param aOutSize_byte
+        /// \param aOut          Output buffer
+        /// \param aOutSize_byte Output buffer size
         void GetDescription(char * aOut, unsigned int aOutSize_byte) const;
 
-        /// \return See Type
+        /// \return See NH::Access::Type
         Type GetType() const;
 
         void SetEstablished();
 
-        /// \param aProtocol See Protocol
+        /// \param aProtocol See NH::Access::Protocol
         void SetProtocol(Protocol aProtocol);
 
-        /// \param aProtocol  See Protocol
-        /// \param aSrcSubNet
-        /// \param aSrcPort
-        /// \param aDstAddr
-        /// \param aDstPort
-        /// \retval false
-        /// \retval true
+        /// \param aProtocol  See NH::Access::Protocol
+        /// \param aSrcSubNet The source subnet
+        /// \param aSrcPort   The source port
+        /// \param aDstAddr   The destination IPv4 address
+        /// \param aDstPort   The destination port
+        /// \retval false No, this access rule does not match the arguments.
+        /// \retval true  Yes, this access rule matches the arguments.
         bool Match(Protocol aProtocol, const SubNet & aSrcSubNet, uint16_t aSrcPort, uint32_t aDstAddr, uint16_t aDstPort) const;
 
-        /// \param aProtocol  See Protocol
-        /// \retval false
-        /// \retval true
+        /// \param aProtocol See NH::Access::Protocol
+        /// \retval false No, the access rule is not for the specified protocol.
+        /// \retval true  Yes, the access rule is for the specified protocol.
         bool Match(Protocol aProtocol) const;
 
         void Verify() const;
@@ -89,7 +92,7 @@ namespace NH
 
         unsigned int Verify_Internal() const;
 
-    // Protected
+    protected:
 
         // ===== Object =====================================================
         virtual void DisplayError(const char * aErrorType, int aCode, const char * aMessage) const;

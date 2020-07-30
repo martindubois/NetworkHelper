@@ -20,6 +20,7 @@
 static const char * ERRORS[]
 {
     "Test_interface",
+    "Test_ip_access-list",
     "Test_ip_route",
     "Test_ip_dhcp_pool",
 
@@ -89,13 +90,6 @@ KMS_TEST_BEGIN(Router_Error)
     try
     {
         Tests(7, 1);
-        KMS_TEST_ASSERT(false);
-    }
-    CATCH
-
-    try
-    {
-        Test("Test_ip_access-list");
         KMS_TEST_ASSERT(false);
     }
     CATCH

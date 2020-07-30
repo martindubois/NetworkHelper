@@ -73,9 +73,6 @@ namespace NH
         /// \param aOutSize_byte
         void GetHost(char * aOut, unsigned int aOutSize_byte) const;
 
-        /// \return See Operator
-        Operator GetPortOperator() const;
-
         /// \return This method returns the subnet
         const SubNet * GetSubNet() const;
 

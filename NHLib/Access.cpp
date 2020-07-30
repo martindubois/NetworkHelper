@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Access.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -110,9 +110,6 @@ namespace NH
 
     // Internal
     /////////////////////////////////////////////////////////////////////////
-
-    // NOT TESTED NH.Access
-    //            FILTER_ANY on source
 
     unsigned int Access::Verify_Internal() const
     {

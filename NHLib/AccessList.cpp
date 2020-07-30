@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessList.cpp
 
-// CODE REVIEW 2020-07-24 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-24 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -106,6 +106,9 @@ namespace NH
     // Internal
     /////////////////////////////////////////////////////////////////////////
 
+    // TODO NH.AccessList
+    //      Verify if 2 rules describe overlapping traffic
+
     // aInterfaces [--O;R--]
     // aNATs       [--O;R--]
     unsigned int AccessList::Verify_Internal(const InterfaceList * aInterfaces, const NATList * aNATs) const
@@ -172,9 +175,6 @@ namespace NH
         return lResult;
     }
 
-    // NOT TESTED NH.AccessList.Verify
-    //            Some case of inverted data stream
-
     unsigned int AccessList::Verify_Internal(uint32_t aAddr, Direction aDirection) const
     {
         unsigned int lResult = 0;
@@ -223,9 +223,6 @@ namespace NH
 
         return lResult;
     }
-
-    // NOT TESTED NH.AccessList.Verify
-    //            Access associated to an interface using DHCP.
 
     unsigned int AccessList::Verify_Internal(const SubNet & aSubNet, Direction aDirection) const
     {

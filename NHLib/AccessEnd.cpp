@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/AccessEnd.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -38,9 +38,6 @@ namespace NH
     AccessEnd::AccessEnd() : Object("Access end"), mFilter(FILTER_INVALID), mHost(0), mPort_A(0), mPort_B(0), mPort_Op(OPERATOR_INVALID), mSubNet(NULL)
     {
     }
-
-    // NOT TESTED NH.Access.End.SetPort
-    //            OPERATOR_RANGE
 
     void AccessEnd::GetDescription(char * aOut, unsigned int aOutSize_byte) const
     {
@@ -94,13 +91,6 @@ namespace NH
     void AccessEnd::GetHost(char * aOut, unsigned int aOutSize_byte) const
     {
         IPv4_AddressToText(aOut, aOutSize_byte, mHost);
-    }
-
-    // NOT TESTED NH.AccessEnd.GetPortOperator
-
-    AccessEnd::Operator AccessEnd::GetPortOperator() const
-    {
-        return mPort_Op;
     }
 
     const SubNet * AccessEnd::GetSubNet() const
@@ -315,7 +305,7 @@ namespace NH
     }
 
     // NOT TESTED NH.AccessEnd.VerifyPrivate
-    //            FILTER_ANY and FILTER_HOST
+    //            FILTER_ANY
 
     void AccessEnd::VerifyPrivate() const
     {

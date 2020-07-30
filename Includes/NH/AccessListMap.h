@@ -37,8 +37,6 @@ namespace NH
         /// \return This method return a pointer to a AccessList instance.
         AccessList * FindOrCreate(const char * aName, unsigned int aListType);
 
-        void Verify() const;
-
     // Internal
 
         unsigned int Verify_Internal(const InterfaceList * aInterfaces, const NATList * aNATs) const;
