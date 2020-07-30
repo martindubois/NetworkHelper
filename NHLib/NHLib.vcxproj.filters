@@ -146,5 +146,8 @@
     <ClCompile Include="DHCPList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Check_Address.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

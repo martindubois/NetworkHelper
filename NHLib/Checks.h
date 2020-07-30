@@ -14,6 +14,25 @@
 // Classes
 /////////////////////////////////////////////////////////////////////////////
 
+class Check_Address : public Check
+{
+
+public:
+
+    Check_Address(const char * aType, int aCode, const char * aMessage, uint32_t aAddress);
+
+    // ===== Check ==========================================================
+
+    virtual ~Check_Address();
+
+    virtual unsigned int Verify(const NH::Router & aElement) const;
+
+private:
+
+    uint32_t mAddress;
+
+};
+
 class Check_Enabled : public Check
 {
 

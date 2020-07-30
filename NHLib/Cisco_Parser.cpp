@@ -559,12 +559,8 @@ namespace Cisco
         assert(NULL != lRouter);
         assert(NULL != lRouter->mCheckList);
 
-        // TODO Cisco.default-router
-        //      lRouter->mCheckList->Add(new Check_Address(ERROR_WARNING, __LINE__, "The router is not the default router it advertises", lAddr));
+        lRouter->mCheckList->Add(new Check_Address(ERROR_WARNING, __LINE__, "The router is not the default router it advertises", lAddr));
         lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a default router", lAddr));
-
-        // TODO Cisco.default-router
-        //      Verify if the default router match the network
 
         return true;
     }

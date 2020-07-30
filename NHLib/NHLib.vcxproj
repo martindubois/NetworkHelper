@@ -39,6 +39,7 @@
     <ClCompile Include="AccessListMap.cpp" />
     <ClCompile Include="Check.cpp" />
     <ClCompile Include="CheckList.cpp" />
+    <ClCompile Include="Check_Address.cpp" />
     <ClCompile Include="Check_Enabled.cpp" />
     <ClCompile Include="Check_Private.cpp" />
     <ClCompile Include="Check_Public.cpp" />
