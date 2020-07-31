@@ -82,6 +82,7 @@
 #define ERROR_246_FMT "Interface %s and %s are connected to the same subnet"
 
 #define ERROR_247 ERROR_CONFIG, (-247), ("No IPv4 address set and DHCP client not enabled")
+#define ERROR_248 ERROR_CONFIG, (-248), ("IP routing already enabled")
 
 // ===== FILE ERROR =========================================================
 

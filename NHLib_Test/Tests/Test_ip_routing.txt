@@ -1,0 +1,20 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_ip_routint.txt
+
+! This file test error detection for "ip routing" commands in configuration file.
+
+ip routing
+
+! ===== Error detected at parsing ===========================================
+
+! TEST INFO Cisco.ip_routing
+!           CONFIG ERROR -248.
+
+!>>>>> CONFIG ERROR  -248  Router Test_ip_routing - IP routing already enabled
+ip routing
+
+! ===== Expected error message after parsing the file =======================
+! ERROR    -1  File NHLib_Test/Tests/Test_ip_route.txt - 1 lines with error

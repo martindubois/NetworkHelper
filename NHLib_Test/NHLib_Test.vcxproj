@@ -202,6 +202,7 @@
     <Text Include="Tests\Test_ip_access-list.txt" />
     <Text Include="Tests\Test_ip_dhcp_pool.txt" />
     <Text Include="Tests\Test_ip_route.txt" />
+    <Text Include="Tests\Test_ip_routing.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

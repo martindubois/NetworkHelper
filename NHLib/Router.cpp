@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-31 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-31 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -118,7 +118,7 @@ namespace NH
     {
         if (mFlags.mIpRouting)
         {
-            ThrowError(ERROR_CALLER, __LINE__, "IP routing already enabled");
+            ThrowError(ERROR_248);
         }
 
         mFlags.mIpRouting = true;
@@ -222,9 +222,7 @@ namespace NH
     }
 
     // TODO NH.Router.Verify
-    //      Is tunel desintation reachable through the tunnel source interface?
     //      Does NAT pool access list match the nat inside interface?
-    //      Does NAT pool address really public?
 
     unsigned int Router::Verify_Internal() const
     {
