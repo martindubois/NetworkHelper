@@ -93,6 +93,11 @@ namespace NH
         return false;
     }
 
+    bool Interface::GetDHCP() const
+    {
+        return mFlags.mDHCP;
+    }
+
     const SubNet * Interface::GetSubNet() const { return mSubNet; }
 
     bool Interface::IsDHCPServer() const
@@ -106,7 +111,7 @@ namespace NH
     }
 
     // NOT TESTED NH.Interface.IsPrivate
-    //            Test without static address
+    //            Without static address
 
     bool Interface::IsPrivate() const
     {
@@ -173,7 +178,6 @@ namespace NH
     }
 
     // TODO NH.Interface.SetAddress
-    //      Report error if the address is a multicast or broadcast address.
     //      Report error if the address is already set
 
     // NOT TESTED NH.Interface.SetAddress
@@ -221,12 +225,14 @@ namespace NH
         SetAddress(IPv4_TextToAddress(aAddr));
     }
 
-    // TODO NH.Interface.SetDHCP.Error
-    //      DHCP already set
-
     void Interface::SetDHCP()
     {
         assert(NULL != mCheckList);
+
+        if (mFlags.mDHCP)
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "The DHCP client is already enabled");
+        }
 
         if (mFlags.mHasSubInterface)
         {
@@ -271,12 +277,14 @@ namespace NH
         }
     }
 
-    // TODO NH.Interface.SetNAT_Inside.Error
-    //      NAT inside already set
-
     void Interface::SetNAT_Inside()
     {
         assert(NULL != mCheckList);
+
+        if (mFlags.mNAT_Inside)
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "Already configured as NAT inside");
+        }
 
         if (mFlags.mNAT_Outside)
         {
@@ -289,9 +297,6 @@ namespace NH
         mCheckList->Add(new Check_Private(ERROR_CONFIG, __LINE__, "Must be configured using private address because it is configured as NAT inside"));
     }
 
-    // TODO NH.Interface.SetNAT_Inside.Error
-    //      NAT outside already set
-
     void Interface::SetNAT_Outside()
     {
         assert(NULL != mCheckList);
@@ -301,42 +306,43 @@ namespace NH
             ThrowError(ERROR_204);
         }
 
+        if (mFlags.mNAT_Outside)
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "Already set as NAT outside");
+        }
+
         mFlags.mNAT_Outside = true;
 
         mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT outside"));
         mCheckList->Add(new Check_Public(ERROR_WARNING, __LINE__, "Should be configured with a public address because it is configured as NAT outside"));
     }
 
-    // TODO NH.Interface.SetSubNet.Error
-    //      SubNet already set
-
     void Interface::SetSubNet(const SubNet * aSubNet)
     {
         assert(NULL != aSubNet);
 
-        if (mSubNet != aSubNet)
+        if (mFlags.mHasSubInterface)
         {
-            if (mFlags.mHasSubInterface)
-            {
-                ThrowError(ERROR_CONFIG, __LINE__, "Do not connect a subnet to and interface with sub-interfaces");
-            }
-
-            if (0 != mAddr)
-            {
-                aSubNet->ValidateAddress(mAddr);
-            }
-
-            if (mFlags.mDHCP && aSubNet->GetDHCP(this))
-            {
-                ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
-            }
-
-            mSubNet = aSubNet;
+            ThrowError(ERROR_CONFIG, __LINE__, "Do not connect a subnet to and interface with sub-interfaces");
         }
-    }
 
-    // TODO NH.Interface.SetVLAN.Error
-    //      VLAN already set
+        if (0 != mAddr)
+        {
+            aSubNet->ValidateAddress(mAddr);
+        }
+
+        if (mFlags.mDHCP && aSubNet->GetDHCP(this))
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "Do not enable DHCP client on an interface acting as DHCP server");
+        }
+
+        if (NULL != mSubNet)
+        {
+            ThrowError(ERROR_CALLER, __LINE__, "The subnet is already set");
+        }
+
+        mSubNet = aSubNet;
+    }
 
     void Interface::SetVLAN(const char * aVLAN)
     {
@@ -365,6 +371,11 @@ namespace NH
         if (!mFlags.mSub)
         {
             ThrowError(ERROR_202);
+        }
+
+        if (0 != mVLAN)
+        {
+            ThrowError(ERROR_CONFIG, __LINE__, "VLAN is already set");
         }
 
         mVLAN = lVLAN;

@@ -55,6 +55,10 @@ namespace NH
         /// \retval true  This interface is a sub-interface
         bool GetBaseName(char * aOut, unsigned int aOutSize_byte);
 
+        /// \retval No, the DHCP client is not enabled.
+        /// \retval Yes, the DHCP client is enabled.
+        bool GetDHCP() const;
+
         /// \return This methode returns the pointer to an internal stored into the SubNetList instance associated to the Network.
         const SubNet * GetSubNet() const;
 

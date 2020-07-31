@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.h
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -33,12 +33,13 @@ namespace Cisco
 
     private:
 
-        bool         Access    (const char ** aElements, unsigned int aCount,                      NH::Access::Type     aType    ,                         const char * aCommand);
-        unsigned int Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd  * aEnd , const char * aCommand);
+        bool         Access          (const char ** aElements, unsigned int aCount,                      NH::Access::Type     aType                          );
+        unsigned int Access_End      (const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd * aEnd);
+        unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex,                                 NH::AccessEnd * aEnd);
 
-        bool Access_Ip        (const char ** aElements, unsigned int aCount, NH::Access    * aAccess, const char * aCommand);
-        bool Access_Nat       (const char ** aElements, unsigned int aCount, NH::Access    * aAccess, const char * aCommand);
-        void Access_Nat_Source(const char ** aElements, unsigned int aCount, NH::AccessEnd * aSource, const char * aCommand);
+        bool Access_Ip        (const char ** aElements, unsigned int aCount, NH::Access    * aAccessd);
+        bool Access_Nat       (const char ** aElements, unsigned int aCount, NH::Access    * aAccessd);
+        void Access_Nat_Source(const char ** aElements, unsigned int aCount, NH::AccessEnd * aSourced);
 
         // ===== Commands ===================================================
         bool Cmd_AccessList               (const char ** aElements, unsigned int aCount);
@@ -46,6 +47,7 @@ namespace Cisco
         bool Cmd_Deny                     (const char ** aElements, unsigned int aCount);
         bool Cmd_DnsServer                (const char ** aElements, unsigned int aCount);
         bool Cmd_Encapsulation_Dot1Q      (const char ** aElements, unsigned int aCount);
+        bool Cmd_Exit                     (const char ** aElements, unsigned int aCount);
         bool Cmd_Hostname                 (const char ** aElements, unsigned int aCount);
         bool Cmd_Interface                (const char ** aElements, unsigned int aCount);
         bool Cmd_Interface_Tunnel         (const char ** aElements, unsigned int aCount);
@@ -66,16 +68,6 @@ namespace Cisco
         bool Cmd_Shutdown                 (const char ** aElements, unsigned int aCount);
         bool Cmd_Tunnel_Destination       (const char ** aElements, unsigned int aCount);
         bool Cmd_Tunnel_Source            (const char ** aElements, unsigned int aCount);
-
-        // ===== Sections ===================================================
-        void Section_AccessList(const char * aCommand, const char * aSection);
-        void Section_DHCP      (const char * aCommand);
-        void Section_Error     (const char * aCommand, const char * aSection);
-        void Section_Interface (const char * aCommand);
-
-        NH::AccessList * mAccessList;
-        NH::DHCP       * mDHCP      ;
-        NH::Interface  * mInterface ;
 
     };
 

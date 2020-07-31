@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Parser.h
 
-// CODE REVIEW 2020-07-14 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-14 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -24,6 +24,11 @@
 
 #include "Parser.h"
 
+// Constants
+/////////////////////////////////////////////////////////////////////////////
+
+#define TYPE_NONE (0xffffffff)
+
 // Static function declarations
 /////////////////////////////////////////////////////////////////////////////
 
@@ -35,35 +40,6 @@ static unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_b
 
 // Public
 /////////////////////////////////////////////////////////////////////////////
-
-void Parser::ValidateCount(const char * aCommand, unsigned int aCount, unsigned int aMin, unsigned int aMax)
-{
-    assert(NULL != aCommand);
-    assert(   0 < aCount   );
-    assert(   0 < aMin     );
-    assert(aMin <= aMax    );
-
-    char lMessage[128];
-    int  lRet;
-
-    if (aMin > aCount)
-    {
-        lRet = sprintf_s(lMessage, ERROR_401_FMT, aCommand, aMin);
-        assert(               0 < lRet);
-        assert(sizeof(lMessage) > lRet);
-
-        Utl_ThrowError(ERROR_401, lMessage);
-    }
-
-    if (aMax < aCount)
-    {
-        lRet = sprintf_s(lMessage, ERROR_402_FMT, aCommand, aMax);
-        assert(               0 < lRet);
-        assert(sizeof(lMessage) > lRet);
-
-        Utl_ThrowError(ERROR_402, lMessage);
-    }
-}
 
 unsigned int Parser::Walk(const char **aElements, unsigned int aCount, const Node * aNodes)
 {
@@ -172,9 +148,10 @@ void Parser::Display_Comment(const char * aLine)
 }
 
 // aCommands [-K-;R--]
-Parser::Parser(const Node * aCommands) : mCommands(aCommands), mRouter(NULL)
+Parser::Parser(const Node * aCommands, const char ** aSectionNames) : mCommands(aCommands), mRouter(NULL), mSection_Names(aSectionNames), mSection_Type(TYPE_NONE)
 {
     assert(NULL != aCommands);
+    assert(NULL != aSectionNames);
 }
 
 NH::Router * Parser::GetRouter()
@@ -182,6 +159,14 @@ NH::Router * Parser::GetRouter()
     assert(NULL != mRouter);
 
     return mRouter;
+}
+
+// aCommand [-K-;R--]
+void Parser::SetCommand(const char * aCommand)
+{
+    assert(NULL != aCommand);
+
+    mCommand = aCommand;
 }
 
 unsigned int Parser::ParseLine(const char * aLine)
@@ -224,6 +209,41 @@ unsigned int Parser::ParseLine(const char * aLine)
     }
 
     return 0;
+}
+
+NH::Object * Parser::Section_GetContext(unsigned int aType)
+{
+    assert(TYPE_NONE != aType);
+
+    assert(NULL != mCommand);
+    assert(NULL != mSection_Names);
+
+    if ((TYPE_NONE == mSection_Type) || (mSection_Type != aType))
+    {
+        char lMessage[128];
+
+        int lRet = sprintf_s(lMessage, ERROR_225_FMT, mCommand, mSection_Names[aType]);
+        assert(lRet > 0);
+        assert(lRet < sizeof(lMessage));
+
+        Utl_ThrowError(ERROR_225, lMessage);
+    }
+
+    return mSection_Context;
+}
+
+// aContext [-K-;---]
+void Parser::Section_Enter(unsigned int aType, NH::Object * aContext)
+{
+    assert(TYPE_NONE != aType);
+
+    mSection_Context = aContext;
+    mSection_Type    = aType;
+}
+
+void Parser::Section_Exit()
+{
+    mSection_Type = TYPE_NONE;
 }
 
 // Static functions
@@ -315,5 +335,42 @@ unsigned int Split(const char * aIn, char * aOut, unsigned int aOutSize_byte, co
             Utl_ThrowError(ERROR_PARSE, __LINE__, "The command is too long");
         }
         lIn++;
+    }
+}
+
+void Parser::ValidateCount(const char * aCommand, unsigned int aCount, unsigned int aMin, unsigned int aMax)
+{
+    SetCommand(aCommand);
+
+    ValidateCount(aCount, aMin, aMax);
+}
+
+void Parser::ValidateCount(unsigned int aCount, unsigned int aMin, unsigned int aMax)
+{
+    assert(0    <  aCount);
+    assert(0    <  aMin);
+    assert(aMin <= aMax);
+
+    assert(NULL != mCommand);
+
+    char lMessage[128];
+    int  lRet;
+
+    if (aMin > aCount)
+    {
+        lRet = sprintf_s(lMessage, ERROR_401_FMT, mCommand, aMin);
+        assert(0 < lRet);
+        assert(sizeof(lMessage) > lRet);
+
+        Utl_ThrowError(ERROR_401, lMessage);
+    }
+
+    if (aMax < aCount)
+    {
+        lRet = sprintf_s(lMessage, ERROR_402_FMT, mCommand, aMax);
+        assert(0 < lRet);
+        assert(sizeof(lMessage) > lRet);
+
+        Utl_ThrowError(ERROR_402, lMessage);
     }
 }

@@ -34,6 +34,19 @@
 #define ACCESS_LIST_IP          (ACCESS_LIST_IP_EXTENDED|ACCESS_LIST_IP_STANDARD)
 #define ACCESS_LIST_NAT         (0x00000004)
 
+#define SECTION_ACCESS_LIST (0)
+#define SECTION_DHCP        (1)
+#define SECTION_INTERFACE   (2)
+
+#define SECTION_QTY (3)
+
+static const char * SECTION_NAMES[SECTION_QTY] =
+{
+    "access-list or ip access-list",
+    "ip dhcp pool",
+    "interface",
+};
+
 // Enumerations
 /////////////////////////////////////////////////////////////////////////////
 
@@ -77,31 +90,32 @@ static const Parser::Node ENUM_DIRECTION[] =
 // Commands
 /////////////////////////////////////////////////////////////////////////////
 
-#define CMD_ACCESS_LIST             ( 1)
-#define CMD_DEFAULT_ROUTER          ( 2)
-#define CMD_DENY                    ( 3)
-#define CMD_DNS_SERVER              ( 4)
-#define CMD_ENCAPSULATION_DOT1Q     ( 5)
-#define CMD_HOSTNAME                ( 6)
-#define CMD_INTERFACE               ( 7)
-#define CMD_INTERFACE_TUNNEL        ( 8)
-#define CMD_IP_ACCESS_GROUP         ( 9)
-#define CMD_IP_ACCESS_LIST_EXTENDED (10)
-#define CMD_IP_ADDRESS              (11)
-#define CMD_IP_ADDRESS_DHCP         (12)
-#define CMD_IP_DHCP_POOL            (13)
-#define CMD_IP_NAT_INSIDE           (14)
-#define CMD_IP_NAT_INSIDE_SOURCE_LIST (15)
-#define CMD_IP_NAT_OUTSIDE          (16)
-#define CMD_IP_NAT_POOL             (17)
-#define CMD_IP_ROUTE                (18)
-#define CMD_IP_ROUTING              (19)
-#define CMD_NETWORK                 (20)
-#define CMD_NO_SHUTDOWN             (21)
-#define CMD_PERMIT                  (22)
-#define CMD_SHUTDOWN                (23)
-#define CMD_TUNNEL_DESTINATION      (24)
-#define CMD_TUNNEL_SOURCE           (25)
+#define CMD_ACCESS_LIST               ( 1)
+#define CMD_DEFAULT_ROUTER            ( 2)
+#define CMD_DENY                      ( 3)
+#define CMD_DNS_SERVER                ( 4)
+#define CMD_ENCAPSULATION_DOT1Q       ( 5)
+#define CMD_EXIT                      ( 6)
+#define CMD_HOSTNAME                  ( 7)
+#define CMD_INTERFACE                 ( 8)
+#define CMD_INTERFACE_TUNNEL          ( 9)
+#define CMD_IP_ACCESS_GROUP           (10)
+#define CMD_IP_ACCESS_LIST_EXTENDED   (11)
+#define CMD_IP_ADDRESS                (12)
+#define CMD_IP_ADDRESS_DHCP           (13)
+#define CMD_IP_DHCP_POOL              (14)
+#define CMD_IP_NAT_INSIDE             (15)
+#define CMD_IP_NAT_INSIDE_SOURCE_LIST (16)
+#define CMD_IP_NAT_OUTSIDE            (17)
+#define CMD_IP_NAT_POOL               (18)
+#define CMD_IP_ROUTE                  (19)
+#define CMD_IP_ROUTING                (20)
+#define CMD_NETWORK                   (21)
+#define CMD_NO_SHUTDOWN               (22)
+#define CMD_PERMIT                    (23)
+#define CMD_SHUTDOWN                  (24)
+#define CMD_TUNNEL_DESTINATION        (25)
+#define CMD_TUNNEL_SOURCE             (26)
 
 static const Parser::Node CMDS_ACCESS[] =
 {
@@ -199,19 +213,20 @@ static const Parser::Node CMDS_TUNNEL[] =
 
 static const Parser::Node COMMANDS[] =
 {
-    { CMD_ACCESS_LIST    , "access-list"  , NULL               },
-    { CMD_DEFAULT_ROUTER , "default-router", NULL              },
-    { CMD_DENY           , "deny"         , NULL               },
-    { CMD_DNS_SERVER     , "dns-server"   , NULL               },
-    { Parser::CODE_IGNORE, "encapsulation", CMDS_ENCAPSULATION },
-    { CMD_HOSTNAME       , "hostname"     , NULL               },
-    { CMD_INTERFACE      , "interface"    , CMDS_INTERFACE     },
-    { Parser::CODE_IGNORE, "ip"           , CMDS_IP            },
-    { CMD_NETWORK        , "network"      , NULL               },
-    { Parser::CODE_IGNORE, "no"           , CMDS_NO            },
-    { CMD_PERMIT         , "permit"       , NULL               },
-    { CMD_SHUTDOWN       , "shutdown"     , NULL               },
-    { Parser::CODE_IGNORE, "tunnel"       , CMDS_TUNNEL        },
+    { CMD_ACCESS_LIST    , "access-list"   , NULL               },
+    { CMD_DEFAULT_ROUTER , "default-router", NULL               },
+    { CMD_DENY           , "deny"          , NULL               },
+    { CMD_DNS_SERVER     , "dns-server"    , NULL               },
+    { Parser::CODE_IGNORE, "encapsulation" , CMDS_ENCAPSULATION },
+    { CMD_EXIT           , "exit"          , NULL               },
+    { CMD_HOSTNAME       , "hostname"      , NULL               },
+    { CMD_INTERFACE      , "interface"     , CMDS_INTERFACE     },
+    { Parser::CODE_IGNORE, "ip"            , CMDS_IP            },
+    { CMD_NETWORK        , "network"       , NULL               },
+    { Parser::CODE_IGNORE, "no"            , CMDS_NO            },
+    { CMD_PERMIT         , "permit"        , NULL               },
+    { CMD_SHUTDOWN       , "shutdown"      , NULL               },
+    { Parser::CODE_IGNORE, "tunnel"        , CMDS_TUNNEL        },
 
     { Parser::CODE_IGNORE, NULL, NULL }
 };
@@ -227,7 +242,7 @@ namespace Cisco
     // Public
     /////////////////////////////////////////////////////////////////////////
 
-    Parser::Parser() : ::Parser(COMMANDS), mAccessList(NULL), mInterface(NULL)
+    Parser::Parser() : ::Parser(COMMANDS, SECTION_NAMES)
     {
     }
 
@@ -273,6 +288,7 @@ namespace Cisco
         case CMD_DENY                     : return Cmd_Deny                     (aElements, aCount);
         case CMD_DNS_SERVER               : return Cmd_DnsServer                (aElements, aCount);
         case CMD_ENCAPSULATION_DOT1Q      : return Cmd_Encapsulation_Dot1Q      (aElements, aCount);
+        case CMD_EXIT                     : return Cmd_Exit                     (aElements, aCount);
         case CMD_HOSTNAME                 : return Cmd_Hostname                 (aElements, aCount);
         case CMD_INTERFACE                : return Cmd_Interface                (aElements, aCount);
         case CMD_INTERFACE_TUNNEL         : return Cmd_Interface_Tunnel         (aElements, aCount);
@@ -294,7 +310,6 @@ namespace Cisco
         case CMD_TUNNEL_DESTINATION       : return Cmd_Tunnel_Destination       (aElements, aCount);
         case CMD_TUNNEL_SOURCE            : return Cmd_Tunnel_Source            (aElements, aCount);
 
-
         default: assert(false);
         }
 
@@ -304,31 +319,36 @@ namespace Cisco
     // Private
     /////////////////////////////////////////////////////////////////////////
 
-    bool Parser::Access(const char ** aElements, unsigned int aCount, NH::Access::Type aType, const char * aCommand)
+    bool Parser::Access(const char ** aElements, unsigned int aCount, NH::Access::Type aType)
     {
-        assert(NULL                 != aElements);
-        assert(NH::Access::TYPE_QTY >  aType    );
+        ValidateCount(aCount, 2);
 
-        ValidateCount(aCommand, aCount, 2);
+        NH::AccessList * lContext = dynamic_cast<NH::AccessList *>(Section_GetContext(SECTION_ACCESS_LIST));
+        assert(NULL != lContext);
 
-        Section_AccessList(aCommand, "access-list or ip access-list");
-        assert(NULL != mAccessList);
-
-        NH::Access * lAccess = mAccessList->Add(aType);
+        NH::Access * lAccess = lContext->Add(aType);
         assert(NULL != lAccess);
 
-        switch (mAccessList->GetListType())
+        try
         {
-        case ACCESS_LIST_IP_EXTENDED: return Access_Ip (aElements, aCount, lAccess, aCommand);
-        case ACCESS_LIST_NAT        : return Access_Nat(aElements, aCount, lAccess, aCommand);
+            switch (lContext->GetListType())
+            {
+            case ACCESS_LIST_IP_EXTENDED: return Access_Ip (aElements, aCount, lAccess);
+            case ACCESS_LIST_NAT        : return Access_Nat(aElements, aCount, lAccess);
 
-        default: assert(false);
+            default: assert(false);
+            }
+        }
+        catch (...)
+        {
+            lContext->Undo();
+            throw;
         }
 
         return false;
     }
 
-    unsigned int Parser::Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd * aEnd, const char * aCommand)
+    unsigned int Parser::Access_End(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::Access::Protocol aProtocol, NH::AccessEnd * aEnd)
     {
         assert(NULL   != aElements);
         assert(aCount >= aIndex   );
@@ -337,7 +357,7 @@ namespace Cisco
 
         unsigned int lIndex = aIndex;
 
-        ValidateCount(aCommand, aCount, lIndex + 1);
+        ValidateCount(aCount, lIndex + 1);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -352,7 +372,7 @@ namespace Cisco
         case NH::AccessEnd::FILTER_HOST:
             lIndex++;
 
-            ValidateCount(aCommand, aCount, lIndex + 1);
+            ValidateCount(aCount, lIndex + 1);
 
             uint32_t lHost;
 
@@ -364,7 +384,7 @@ namespace Cisco
             break;
 
         case Parser::CODE_NO_MATCH:
-            ValidateCount(aCommand, aCount, lIndex + 2);
+            ValidateCount(aCount, lIndex + 2);
 
             uint32_t lAddr;
             uint32_t lMask;
@@ -392,85 +412,126 @@ namespace Cisco
         {
         case NH::Access::PROTOCOL_TCP:
         case NH::Access::PROTOCOL_UDP:
-            lIndex = Access_End_Ports(aElements, aCount, lIndex, aEnd, aCommand);
+            lIndex = Access_End_Ports(aElements, aCount, lIndex, aEnd);
             break;
         }
 
         return lIndex;
     }
 
-    bool Parser::Access_Ip(const char ** aElements, unsigned int aCount, NH::Access * aAccess, const char * aCommand)
+    unsigned int Parser::Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::AccessEnd * aEnd)
     {
-        assert(NULL != aElements);
-        assert(NULL != aAccess);
+        assert(NULL   != aElements);
+        assert(     0 <  aCount   );
+        assert(aCount >= aIndex   );
+        assert(NULL   != aEnd     );
 
-        try
+        unsigned int lIndex = aIndex;
+
+        if (aCount > lIndex)
         {
-            NH::Access::Protocol lProtocol = static_cast<NH::Access::Protocol>(Walk(aElements + 1, 1, ENUM_ACCESS_PROTOCOL));
+            assert(NULL != aElements[lIndex]);
 
-            aAccess->SetProtocol(lProtocol);
-
-            unsigned int lIndex = 2;
-
-            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &aAccess->mSource     , aCommand);
-            lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &aAccess->mDestination, aCommand);
-
-            if (aCount > lIndex)
+            NH::AccessEnd::Operator lOperator = static_cast<NH::AccessEnd::Operator>(Parser::Walk(aElements + lIndex, 1, ENUM_ACCESS_END_OPERATOR));
+            switch (lOperator)
             {
+            case NH::AccessEnd::OPERATOR_ANY:
+                aEnd->SetPort(lOperator);
+                break;
+
+            case NH::AccessEnd::OPERATOR_EQ :
+            case NH::AccessEnd::OPERATOR_GT :
+            case NH::AccessEnd::OPERATOR_LT :
+            case NH::AccessEnd::OPERATOR_NEQ:
+                lIndex++;
+
+                ValidateCount(aCount, lIndex + 1);
                 assert(NULL != aElements[lIndex]);
 
-                if (0 == _stricmp("established", aElements[lIndex]))
-                {
-                    aAccess->SetEstablished();
-                }
-                else
-                {
-                    Utl_ThrowError(ERROR_406);
-                }
+                aEnd->SetPort(lOperator, aElements[lIndex]);
+
+                lIndex++;
+                break;
+
+            case NH::AccessEnd::OPERATOR_RANGE:
+                lIndex++;
+
+                ValidateCount(aCount, lIndex + 2);
+                assert(NULL != aElements[lIndex]);
+                assert(NULL != aElements[lIndex + 1]);
+
+                aEnd->SetPort(lOperator, aElements[lIndex], aElements[lIndex + 1]);
+
+                lIndex += 2;
+                break;
+
+            default: assert(false);
             }
-
-            aAccess->Verify();
-
-            // TODO Cisco.ip.access-list
-            //      Add a Check_Allowed to verify if the answer is allowed it other direction
         }
-        catch (...)
+        else
         {
-            mAccessList->Undo();
-            throw;
+            aEnd->SetPort(NH::AccessEnd::OPERATOR_ANY);
         }
 
-        return true;
+        return lIndex;
     }
 
-    bool Parser::Access_Nat(const char ** aElements, unsigned int aCount, NH::Access * aAccess, const char * aCommand)
+    bool Parser::Access_Ip(const char ** aElements, unsigned int aCount, NH::Access * aAccess)
     {
         assert(NULL != aElements);
         assert(NULL != aAccess);
 
-        try
-        {
-            aAccess->mDestination.SetAny();
+        NH::Access::Protocol lProtocol = static_cast<NH::Access::Protocol>(Walk(aElements + 1, 1, ENUM_ACCESS_PROTOCOL));
 
-            Access_Nat_Source(aElements, aCount, &aAccess->mSource, aCommand);
+        aAccess->SetProtocol(lProtocol);
 
-            aAccess->Verify();
-        }
-        catch (...)
+        unsigned int lIndex = 2;
+
+        lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &aAccess->mSource     );
+        lIndex = Access_End(aElements, aCount, lIndex, lProtocol, &aAccess->mDestination);
+
+        if (aCount > lIndex)
         {
-            mAccessList->Undo();
-            throw;
+            assert(NULL != aElements[lIndex]);
+
+            if (0 == _stricmp("established", aElements[lIndex]))
+            {
+                aAccess->SetEstablished();
+            }
+            else
+            {
+                Utl_ThrowError(ERROR_406);
+            }
         }
+
+        aAccess->Verify();
+
+        // TODO Cisco.ip.access-list
+        //      Add a Check_Allowed to verify if the answer is allowed it other direction
 
         return true;
     }
 
-    void Parser::Access_Nat_Source(const char ** aElements, unsigned int aCount, NH::AccessEnd * aSource, const char * aCommand)
+    bool Parser::Access_Nat(const char ** aElements, unsigned int aCount, NH::Access * aAccess)
+    {
+        assert(NULL != aElements);
+        assert(NULL != aAccess);
+
+        aAccess->mDestination.SetAny();
+
+        Access_Nat_Source(aElements, aCount, &aAccess->mSource);
+
+        aAccess->Verify();
+
+        return true;
+    }
+
+    void Parser::Access_Nat_Source(const char ** aElements, unsigned int aCount, NH::AccessEnd * aSource)
     {
         assert(NULL != aElements);
         assert(NULL != aSource);
 
-        ValidateCount(aCommand, aCount, 2, 3);
+        ValidateCount(aCount, 2, 3);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -489,7 +550,7 @@ namespace Cisco
             break;
 
         case 3:
-            ValidateCount(aCommand, aCount, 3, 3);
+            ValidateCount(aCount, 3, 3);
 
             uint32_t lAddr;
             uint32_t lMask;
@@ -516,13 +577,14 @@ namespace Cisco
 
     bool Parser::Cmd_AccessList(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "access-list";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 2);
+        ValidateCount("access-list", aCount, 2);
 
-        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[1], ACCESS_LIST_NAT);
+        NH::AccessList * lContext = GetRouter()->mAccessLists.FindOrCreate(aElements[1], ACCESS_LIST_NAT);
+        assert(NULL != lContext);
+
+        Section_Enter(SECTION_ACCESS_LIST, lContext);
 
         bool lResult = true;
 
@@ -536,7 +598,7 @@ namespace Cisco
             default: assert(false);
             }
 
-            mAccessList = NULL;
+            Section_Exit();
         }
 
         return lResult;
@@ -544,16 +606,14 @@ namespace Cisco
 
     bool Parser::Cmd_DefaultRouter(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "default-router";
+        ValidateCount("default-router", aCount, 2, 2);
 
-        ValidateCount(COMMAND, aCount, 2, 2);
-
-        Section_DHCP(COMMAND);
-        assert(NULL != mDHCP);
+        NH::DHCP * lContext = dynamic_cast<NH::DHCP *>(Section_GetContext(SECTION_DHCP));
+        assert(NULL != lContext);
 
         uint32_t lAddr = IPv4_TextToAddress(aElements[1]);
 
-        mDHCP->SetDefaultRouter(lAddr);
+        lContext->SetDefaultRouter(lAddr);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -567,53 +627,50 @@ namespace Cisco
 
     bool Parser::Cmd_Deny(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "deny";
+        SetCommand("deny");
 
-        return Access(aElements, aCount, NH::Access::TYPE_DENY, COMMAND);
+        return Access(aElements, aCount, NH::Access::TYPE_DENY);
     }
 
     bool Parser::Cmd_DnsServer(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "dns-server";
+        assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 2, 2);
+        ValidateCount("dns-server", aCount, 2, 2);
 
-        Section_DHCP(COMMAND);
-        assert(NULL != mDHCP);
+        NH::DHCP * lContext = dynamic_cast<NH::DHCP *>(Section_GetContext(SECTION_DHCP));
+        assert(NULL != lContext);
 
         uint32_t lAddr = IPv4_TextToAddress(aElements[1]);
 
-        mDHCP->SetDnsServer(lAddr);
+        lContext->SetDnsServer(lAddr);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
         assert(NULL != lRouter->mCheckList);
 
-        GetRouter()->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a configured DNS server", lAddr));
+        lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a configured DNS server", lAddr));
 
         // TODO Cisco.dns-server
         //      Verify the DNS request are allowed (in) on the interface - Check_Allowed
-        //      Verify the DNS answer are allowed (out) on the interface - Check_Allowed
 
         return true;
     }
 
     bool Parser::Cmd_Encapsulation_Dot1Q(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "encapsulation dot1q";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 3, 3);
+        ValidateCount("encapsulation dot1q", aCount, 3, 3);
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
-        mInterface->SetVLAN(aElements[2]);
+        lContext->SetVLAN(aElements[2]);
 
         char lBaseName[64];
 
-        bool lRetB = mInterface->GetBaseName(lBaseName, sizeof(lBaseName));
+        bool lRetB = lContext->GetBaseName(lBaseName, sizeof(lBaseName));
         assert(lRetB);
 
         NH::Interface * lBase = GetRouter()->mInterfaces.FindOrCreate(lBaseName);
@@ -625,13 +682,20 @@ namespace Cisco
         return true;
     }
 
+    bool Parser::Cmd_Exit(const char ** aElements, unsigned int aCount)
+    {
+        ValidateCount("exit", aCount, 1, 1);
+
+        Section_Exit();
+
+        return true;
+    }
+
     bool Parser::Cmd_Hostname(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "hostname";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 2, 2);
+        ValidateCount("hostname", aCount, 2, 2);
 
         GetRouter()->SetName(aElements[1]);
 
@@ -640,25 +704,23 @@ namespace Cisco
 
     bool Parser::Cmd_Interface(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "interface";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 2, 2);
+        ValidateCount("interface", aCount, 2, 2);
 
-        mInterface = GetRouter()->mInterfaces.FindOrCreate(aElements[1]);
-        assert(NULL != mInterface);
+        NH::Interface * lContext = GetRouter()->mInterfaces.FindOrCreate(aElements[1]);
+        assert(NULL != lContext);
+
+        Section_Enter(SECTION_INTERFACE, lContext);
 
         return true;
     }
 
     bool Parser::Cmd_Interface_Tunnel(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "interface tunel";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 3, 3);
+        ValidateCount("interface tunel", aCount, 3, 3);
         assert(NULL != aElements[2]);
 
         char lName[64];
@@ -667,45 +729,45 @@ namespace Cisco
         assert(            0 < lRet);
         assert(sizeof(lName) > lRet);
 
-        mInterface = GetRouter()->mInterfaces.FindOrCreate(lName);
-        assert(NULL != mInterface);
+        NH::Interface * lContext = GetRouter()->mInterfaces.FindOrCreate(lName);
+        assert(NULL != lContext);
 
-        mInterface->SetVirtual();
+        lContext->SetVirtual();
+
+        Section_Enter(SECTION_INTERFACE, lContext);
 
         return true;
     }
 
     bool Parser::Cmd_Ip_AccessGroup(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip access-group";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 4, 4);
+        ValidateCount("ip access-group", aCount, 4, 4);
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
         NH::Direction lDirection = static_cast<NH::Direction>(Walk(aElements + 3, 1, ENUM_DIRECTION));
 
         NH::AccessList * lAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[2], ACCESS_LIST_IP);
         assert(NULL != lAccessList);
 
-        mInterface->SetAccessList(lDirection, lAccessList);
+        lContext->SetAccessList(lDirection, lAccessList);
 
         return true;
     }
 
     bool Parser::Cmd_Ip_AccessList_Extended(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip access-list extended";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 4);
+        ValidateCount("ip access-list extended", aCount, 4);
 
-        mAccessList = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP_EXTENDED);
-        assert(NULL != mAccessList);
+        NH::AccessList * lContext = GetRouter()->mAccessLists.FindOrCreate(aElements[3], ACCESS_LIST_IP_EXTENDED);
+        assert(NULL != lContext);
+
+        Section_Enter(SECTION_ACCESS_LIST, lContext);
 
         bool lResult = true;
 
@@ -719,7 +781,7 @@ namespace Cisco
             default: assert(false);
             }
 
-            mAccessList = NULL;
+            Section_Exit();
         }
 
         return lResult;
@@ -727,76 +789,70 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Address(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip address";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 4, 4);
+        ValidateCount("ip address", aCount, 4, 4);
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
         uint32_t lAddr = IPv4_TextToAddress(aElements[2]);
         uint32_t lMask = IPv4_TextToAddress(aElements[3]);
 
-        mInterface->SetAddress(lAddr);
-        mInterface->SetSubNet (GetRouter()->GetSubNetList()->FindOrCreate(lAddr & lMask, lMask));
+        lContext->SetAddress(lAddr);
+        lContext->SetSubNet (GetRouter()->GetSubNetList()->FindOrCreate(lAddr & lMask, lMask));
 
         return true;
     }
 
     bool Parser::Cmd_Ip_Address_Dhcp(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip address dhcp";
+        ValidateCount("ip address dhcp", aCount, 3, 3);
 
-        ValidateCount(COMMAND, aCount, 3, 3);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext) ;
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
-
-        mInterface->SetDHCP();
+        lContext->SetDHCP();
 
         return true;
     }
 
     bool Parser::Cmd_Ip_Dhcp_Pool(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip dhcp pool";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 4, 4);
+        ValidateCount("ip dhcp pool", aCount, 4, 4);
 
-        mDHCP = GetRouter()->mDHCPs.FindOrCreate(aElements[3]);
-        assert(NULL != mDHCP);
+        NH::DHCP * lContext = GetRouter()->mDHCPs.FindOrCreate(aElements[3]);
+        assert(NULL != lContext);
+
+        Section_Enter(SECTION_DHCP, lContext);
 
         return true;
     }
 
     bool Parser::Cmd_Ip_Nat_Inside(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip nat inside";
+        SetCommand("ip nat inside");
 
         if (3 < aCount)
         {
             return false;
         }
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
-        mInterface->SetNAT_Inside();
+        lContext->SetNAT_Inside();
 
         return true;
     }
 
     bool Parser::Cmd_Ip_Nat_Inside_Source_List(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip nat inside source list";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 8, 9);
+        ValidateCount("ip nat inside source list", aCount, 8, 9);
         assert(NULL != aElements[6]);
 
         if (0 != _stricmp("pool", aElements[6]))
@@ -830,25 +886,21 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Nat_Outside(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip nat outside";
+        ValidateCount("ip nat outside", aCount, 3, 3);
 
-        ValidateCount(COMMAND, aCount, 3, 3);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
-
-        mInterface->SetNAT_Outside();
+        lContext->SetNAT_Outside();
 
         return true;
     }
 
     bool Parser::Cmd_Ip_Nat_Pool(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip nat pool";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 8, 8);
+        ValidateCount("ip nat pool", aCount, 8, 8);
 
         if (0 != _stricmp("netmask", aElements[6]))
         {
@@ -865,11 +917,9 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Route(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip route";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 5, 5);
+        ValidateCount("ip route", aCount, 5, 5);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -884,9 +934,7 @@ namespace Cisco
 
     bool Parser::Cmd_Ip_Routing(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "ip routing";
-
-        ValidateCount(COMMAND, aCount, 2, 2);
+        ValidateCount("ip routing", aCount, 2, 2);
 
         GetRouter()->SetIpRouting();
 
@@ -895,14 +943,12 @@ namespace Cisco
 
     bool Parser::Cmd_Network(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "network";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 3, 3);
+        ValidateCount("network", aCount, 3, 3);
 
-        Section_DHCP(COMMAND);
-        assert(NULL != mDHCP);
+        NH::DHCP * lContext = dynamic_cast<NH::DHCP *>(Section_GetContext(SECTION_DHCP));
+        assert(NULL != lContext);
 
         NH::Router * lRouter = GetRouter();
         assert(NULL != lRouter);
@@ -910,7 +956,7 @@ namespace Cisco
         NH::SubNet * lSubNet = lRouter->GetSubNetList()->FindOrCreate(aElements[1], aElements[2]);
         assert(NULL != lSubNet);
 
-        mDHCP->SetSubNet(lSubNet);
+        lContext->SetSubNet(lSubNet);
 
         const NH::Interface * lInterface = lRouter->mInterfaces.Find(lSubNet);
 
@@ -921,9 +967,9 @@ namespace Cisco
             assert(NULL != lInterface->mCheckList);
 
             lInterface->mCheckList->Add(new Check_Enabled(ERROR_237));
+            lInterface->mCheckList->Add(new Check_NoDHCP(ERROR_CONFIG, __LINE__, "A same interface cannot be DHCP client and server"));
 
             // TODO Cisco.network
-            //      lInterface->mCheckList->Add(new Check_NoDHCP(ERROR_CONFIG, __LINE__, "A same interface cannot be DHCP client and server"));
             //      Add a Check_StaticAddress
         }
 
@@ -932,48 +978,43 @@ namespace Cisco
 
     bool Parser::Cmd_No_Shutdown(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "no shutdown";
+        ValidateCount("no shutdown", 2, 2);
 
-        ValidateCount(COMMAND, 2, 2);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
-
-        mInterface->SetEnable();
+        lContext->SetEnable();
 
         return true;
     }
 
     bool Parser::Cmd_Permit(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "permit";
+        SetCommand("permit");
 
-        return Access(aElements, aCount, NH::Access::TYPE_PERMIT, COMMAND);
+        return Access(aElements, aCount, NH::Access::TYPE_PERMIT);
     }
 
     bool Parser::Cmd_Shutdown(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "shutdown";
+        ValidateCount("shutdown", aCount, 1, 1);
 
-        ValidateCount(COMMAND, aCount, 1, 1);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
-        Section_Interface(COMMAND);
-        assert(NULL != mInterface);
-
-        mInterface->SetEnable(false);
+        lContext->SetEnable(false);
 
         return true;
     }
 
     bool Parser::Cmd_Tunnel_Destination(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "tunnel destination";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, aCount, 3, 3);
+        ValidateCount("tunnel destination", aCount, 3, 3);
 
-        Section_Interface(COMMAND);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
         uint32_t lAddr = IPv4_TextToAddress(aElements[2]);
 
@@ -996,13 +1037,12 @@ namespace Cisco
 
     bool Parser::Cmd_Tunnel_Source(const char ** aElements, unsigned int aCount)
     {
-        static const char * COMMAND = "tunnel source";
-
         assert(NULL != aElements);
 
-        ValidateCount(COMMAND, 3, 3);
+        ValidateCount("tunnel source", 3, 3);
 
-        Section_Interface(COMMAND);
+        NH::Interface * lContext = dynamic_cast<NH::Interface *>(Section_GetContext(SECTION_INTERFACE));
+        assert(NULL != lContext);
 
         NH::Interface * lInterface = GetRouter()->mInterfaces.FindOrCreate(aElements[2]);
         assert(NULL != lInterface);
@@ -1014,105 +1054,4 @@ namespace Cisco
         return true;
     }
 
-    // ===== Sections =======================================================
-
-    void Parser::Section_AccessList(const char * aCommand, const char * aSection)
-    {
-        if (NULL == mAccessList)
-        {
-            Section_Error(aCommand, aSection);
-        }
-    }
-
-    void Parser::Section_DHCP(const char * aCommand)
-    {
-        if (NULL == mDHCP)
-        {
-            Section_Error(aCommand, "ip dhcp pool");
-        }
-    }
-
-    void Parser::Section_Error(const char * aCommand, const char * aSection)
-    {
-        assert(NULL != aCommand);
-        assert(NULL != aSection);
-
-        char lMessage[128];
-
-        int lRet = sprintf_s(lMessage, ERROR_225_FMT, aCommand, aSection);
-        assert(0 < lRet);
-        assert(sizeof(lMessage) > lRet);
-
-        Utl_ThrowError(ERROR_225, lMessage);
-    }
-
-    void Parser::Section_Interface(const char * aCommand)
-    {
-        if (NULL == mInterface)
-        {
-            Section_Error(aCommand, "interface");
-        }
-    }
-
-}
-
-// Static functions
-/////////////////////////////////////////////////////////////////////////////
-
-unsigned int Access_End_Ports(const char ** aElements, unsigned int aCount, unsigned int aIndex, NH::AccessEnd * aEnd, const char * aCommand)
-{
-    assert(NULL   != aElements);
-    assert(     0 <  aCount   );
-    assert(aCount >= aIndex   );
-    assert(NULL   != aEnd     );
-    assert(NULL   != aCommand );
-
-    unsigned int lIndex = aIndex;
-
-    if (aCount > lIndex)
-    {
-        assert(NULL != aElements[lIndex]);
-
-        NH::AccessEnd::Operator lOperator = static_cast<NH::AccessEnd::Operator>(Parser::Walk(aElements + lIndex, 1, ENUM_ACCESS_END_OPERATOR));
-        switch (lOperator)
-        {
-        case NH::AccessEnd::OPERATOR_ANY:
-            aEnd->SetPort(lOperator);
-            break;
-
-        case NH::AccessEnd::OPERATOR_EQ :
-        case NH::AccessEnd::OPERATOR_GT :
-        case NH::AccessEnd::OPERATOR_LT :
-        case NH::AccessEnd::OPERATOR_NEQ:
-            lIndex++;
-
-            Parser::ValidateCount(aCommand, aCount, lIndex + 1);
-            assert(NULL != aElements[lIndex]);
-
-            aEnd->SetPort(lOperator, aElements[lIndex]);
-
-            lIndex++;
-            break;
-
-        case NH::AccessEnd::OPERATOR_RANGE:
-            lIndex++;
-
-            Parser::ValidateCount(aCommand, aCount, lIndex + 2);
-            assert(NULL != aElements[lIndex]);
-            assert(NULL != aElements[lIndex + 1]);
-
-            aEnd->SetPort(lOperator, aElements[lIndex], aElements[lIndex + 1]);
-
-            lIndex += 2;
-            break;
-
-        default: assert(false);
-        }
-    }
-    else
-    {
-        aEnd->SetPort(NH::AccessEnd::OPERATOR_ANY);
-    }
-
-    return lIndex;
 }

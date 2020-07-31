@@ -4,7 +4,7 @@
 // Product    NetworkHelper
 // File       NHLib/Checks.h
 
-// CODE REVIEW 2020-07-27 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
 
 #pragma once
 
@@ -43,6 +43,21 @@ public:
     // ===== Check ==========================================================
 
     virtual ~Check_Enabled();
+
+    virtual unsigned int Verify(const NH::Interface & aElement) const;
+
+};
+
+class Check_NoDHCP : public Check
+{
+
+public:
+
+    Check_NoDHCP(const char * aType, int aCode, const char * aMessage);
+
+    // ===== Check ==========================================================
+
+    virtual ~Check_NoDHCP();
 
     virtual unsigned int Verify(const NH::Interface & aElement) const;
 
