@@ -1,0 +1,60 @@
+
+! Authot    KMS - Martin Dubois, P.Eng.
+! Copyright (C) 2020 KMS. All rights reserved.
+! Product   NetworkHelper
+! File      NHLib_Test/Tests/Test_ip_nat_pool.txt
+
+! This file test error detection for "access-list", "ip nat inside", "ip nat outside", "ip nat pool" and "ip nat inside source list" commands in configuration file.
+
+! ===== Errors detected at parrsing and at verification =====================
+
+// TEST INFO Cisco.ip_nat_pool
+//           CONFIG ERROR -203, -204, -230 and -231.
+//           CONFIG ERROR (Verification) -229, -232, -233, -246, -247, -249, -250, -251, -252 and -253.
+//           PARSE ERROR -402.
+//           WARNING (Verfication) -506, -507 and -508.
+
+! >>>>> CONFIG ERROR  -230  Access end - The access rule source subnet is not private
+access-list 1 permit 204.105.94.0 0.0.0.255
+
+! >>>>> CONFIG ERROR  -231  Access end - The access rule source is not a private address
+access-list 1 permit 204.105.94.1
+
+! >>>>> PARSE ERROR  -402  The command "ip nat outside" must have 3 elements or less
+ip nat outside invalid
+
+interface f0/4
+
+	ip nat outside
+
+	! >>>>> CONFIG ERROR  -203  Interface f0/4 - A same interface cannot be NAT outside and NAT inside
+	ip nat inside
+
+interface f0/5
+
+	ip nat inside
+
+	! >>>>> CONFIG ERROR  -204  Interface f0/5 - A same interface cannot be NAT inside and NAT outside
+	ip nat outside
+
+exit
+
+! ===== Expected error message after parsing the file =======================
+! ERROR    -1  File NHLib_Test/Tests/Test_ip_nat_pool.txt - 5 lines with error
+
+! ===== Expected error message at verification ==============================
+! CONFIG ERROR  -249  Router Test_ip_nat_pool - Cannot reach a host configured in a NAT access list - 204.105.94.0/255.255.255.0
+! CONFIG ERROR  -250  Router Test_ip_nat_pool - Cannot reach a host configured in a NAT access list - 204.105.94.1
+! CONFIG ERROR  -233  Access list 1 - Not used
+! CONFIG ERROR  -232  Access list 1 - No access rule in the access list
+! CONFIG ERROR  -251  Interface f0/4 - Must be enabled because it is configured as NAT outside
+! WARNING  -506  Interface f0/4 - Should be configured with a public address because it is configured as NAT outside
+! WARNING  -507  Interface f0/4 - Disabled but configured as NAT outside
+! CONFIG ERROR  -247  Interface f0/4 - No IPv4 address set and DHCP client not enabled
+! CONFIG ERROR  -246  Interfaces - Interface f0/4 and f0/5 are connected to the same subnet
+! CONFIG ERROR  -252  Interface f0/5 - Must be enabled because it is configured as NAT inside
+! CONFIG ERROR  -253  Interface f0/5 - Must be configured using private address because it is configured as NAT inside
+! WARNING  -508  Interface f0/5 - Disabled but configured as NAT inside
+! CONFIG ERROR  -247  Interface f0/5 - No IPv4 address set and DHCP client not enabled
+! CONFIG ERROR  -229  Router Test_ip_nat_pool - IP routing is not enabled, and the router use more than one interface
+! ERROR    -5  Network - 14 errors

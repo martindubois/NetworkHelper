@@ -22,6 +22,7 @@ static const char * ERRORS[]
     "Test_interface",
     "Test_ip_access-list",
     "Test_ip_dhcp_pool",
+    "Test_ip_nat_pool",
     "Test_ip_route",
 
     NULL

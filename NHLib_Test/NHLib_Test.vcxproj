@@ -201,6 +201,7 @@
     <Text Include="Tests\Test_interface.txt" />
     <Text Include="Tests\Test_ip_access-list.txt" />
     <Text Include="Tests\Test_ip_dhcp_pool.txt" />
+    <Text Include="Tests\Test_ip_nat_pool.txt" />
     <Text Include="Tests\Test_ip_route.txt" />
     <Text Include="Tests\Test_ip_routing.txt" />
   </ItemGroup>

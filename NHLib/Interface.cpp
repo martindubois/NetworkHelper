@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Interface.cpp
 
-// CODE REVIEW 2020-07-29 KMS - Martin Dubois, P.Eng
+// CODE REVIEW 2020-08-03 KMS - Martin Dubois, P.Eng
 
-// TEST COVERAGE 2020-07-29 KMS - Martin Dubois, P.Eng
+// TEST COVERAGE 2020-08-03 KMS - Martin Dubois, P.Eng
 
 #include "Component.h"
 
@@ -111,7 +111,7 @@ namespace NH
     }
 
     // NOT TESTED NH.Interface.IsPrivate
-    //            Without static address
+    //            Without static address but connected to a subnet
 
     bool Interface::IsPrivate() const
     {
@@ -129,7 +129,7 @@ namespace NH
     }
 
     // NOT TESTED NH.Interface.IsPublic
-    //            Test without static address
+    //            Test without static address but connected to a subnet
 
     bool Interface::IsPublic() const
     {
@@ -160,6 +160,7 @@ namespace NH
         return false;
     }
 
+    // aAccessList [-K-;R--]
     void Interface::SetAccessList(Direction aDirection, const AccessList * aAccessList)
     {
         assert(DIRECTION_QTY >  aDirection );
@@ -293,8 +294,8 @@ namespace NH
 
         mFlags.mNAT_Inside = true;
 
-        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT inside"));
-        mCheckList->Add(new Check_Private(ERROR_CONFIG, __LINE__, "Must be configured using private address because it is configured as NAT inside"));
+        mCheckList->Add(new Check_Enabled(ERROR_252));
+        mCheckList->Add(new Check_Private(ERROR_253));
     }
 
     void Interface::SetNAT_Outside()
@@ -313,8 +314,8 @@ namespace NH
 
         mFlags.mNAT_Outside = true;
 
-        mCheckList->Add(new Check_Enabled(ERROR_CONFIG, __LINE__, "Must be enabled because it is configured as NAT outside"));
-        mCheckList->Add(new Check_Public(ERROR_WARNING, __LINE__, "Should be configured with a public address because it is configured as NAT outside"));
+        mCheckList->Add(new Check_Enabled(ERROR_251));
+        mCheckList->Add(new Check_Public(ERROR_506));
     }
 
     void Interface::SetSubNet(const SubNet * aSubNet)
@@ -552,8 +553,6 @@ namespace NH
         }
     }
 
-    // NOT TESTED NH.Inteface.Title.Warning
-
     void Interface::Prepare_Title(HI::Shape * aShape)
     {
         assert(NULL != aShape);
@@ -624,13 +623,13 @@ namespace NH
 
             if (mFlags.mNAT_Inside)
             {
-                DisplayError(ERROR_WARNING, __LINE__, "Disabled but configured as NAT inside");
+                DisplayError(ERROR_508);
                 lResult++;
             }
 
             if (mFlags.mNAT_Outside)
             {
-                DisplayError(ERROR_WARNING, __LINE__, "Disabled but configured as NAT outside");
+                DisplayError(ERROR_507);
                 lResult++;
             }
 

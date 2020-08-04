@@ -83,6 +83,11 @@
 
 #define ERROR_247 ERROR_CONFIG, (-247), ("No IPv4 address set and DHCP client not enabled")
 #define ERROR_248 ERROR_CONFIG, (-248), ("IP routing already enabled")
+#define ERROR_249 ERROR_CONFIG, (-249), ("Cannot reach a subnet configured in a NAT access list")
+#define ERROR_250 ERROR_CONFIG, (-250), ("Cannot reach a host configured in a NAT access list")
+#define ERROR_251 ERROR_CONFIG, (-251), ("Must be enabled because it is configured as NAT outside")
+#define ERROR_252 ERROR_CONFIG, (-252), ("Must be enabled because it is configured as NAT inside")
+#define ERROR_253 ERROR_CONFIG, (-253), ("Must be configured using private address because it is configured as NAT inside")
 
 // ===== FILE ERROR =========================================================
 
@@ -112,3 +117,6 @@
 #define ERROR_503 ERROR_WARNING, (-503), ("Disabled virtual interface")
 #define ERROR_504 ERROR_WARNING, (-504), ("Disabled sub-interface")
 #define ERROR_505 ERROR_WARNING, (-505), ("Disabled but has sub-interface")
+#define ERROR_506 ERROR_WARNING, (-506), ("Should be configured with a public address because it is configured as NAT outside")
+#define ERROR_507 ERROR_WARNING, (-507), ("Disabled but configured as NAT outside")
+#define ERROR_508 ERROR_WARNING, (-508), ("Disabled but configured as NAT inside")

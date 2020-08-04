@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-07-30 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-08-03 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-30 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-08-03 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -546,7 +546,7 @@ namespace Cisco
 
             aSource->SetHost(lHost);
 
-            lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a host configured in a NAT access list", lHost));
+            lRouter->mCheckList->Add(new Check_Reach(ERROR_250, lHost));
             break;
 
         case 3:
@@ -564,7 +564,7 @@ namespace Cisco
 
             aSource->SetSubNet(lSubNet);
 
-            lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a host configured in a NAT access list", lSubNet));
+            lRouter->mCheckList->Add(new Check_Reach(ERROR_249, lSubNet));
             break;
 
         default: assert(false);
