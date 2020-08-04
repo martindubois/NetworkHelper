@@ -22,6 +22,8 @@ network
 
 ip dhcp pool Alice
 
+	default-router 192.168.10.1
+
 	! >>>>> CONFIG ERROR  -212  The subnet address is not a valid subnet address
 	network 192.168.0.1 255.255.255.0
 
@@ -45,7 +47,8 @@ exit
 ! ERROR    -1  File NHLib_Test/Tests/Test_ip_dhcp_pool_0.txt - 4 lines with error
 
 ! ===== Expected error message at verification ==============================
-! CONFIG ERROR  -240  DHCP pool alice - No default router
+! WARNING  -509  Router Test_ip_dhcp_pool - The router is not the default router it advertises - 192.168.10.1
+! CONFIG ERROR  -254  Router Test_ip_dhcp_pool - Cannot reach a default router - 192.168.10.1
 ! WARNING  -502  DHCP pool alice - No DNS server
 ! CONFIG ERROR  -244  DHCP pool Alice - No subnet
 ! CONFIG ERROR  -240  DHCP pool Bob - No default router
@@ -55,4 +58,4 @@ exit
 ! WARNING  -502  DHCP pool Charle - No DNS server
 ! CONFIG ERROR  -240  DHCP pool Denis - No default router
 ! WARNING  -502  DHCP pool Denis - No DNS server
-! ERROR    -5  Network - 10 errors
+! ERROR    -5  Network - 11 errors

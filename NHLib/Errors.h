@@ -88,6 +88,7 @@
 #define ERROR_251 ERROR_CONFIG, (-251), ("Must be enabled because it is configured as NAT outside")
 #define ERROR_252 ERROR_CONFIG, (-252), ("Must be enabled because it is configured as NAT inside")
 #define ERROR_253 ERROR_CONFIG, (-253), ("Must be configured using private address because it is configured as NAT inside")
+#define ERROR_254 ERROR_CONFIG, (-254), ("Cannot reach a default router")
 
 // ===== FILE ERROR =========================================================
 
@@ -120,3 +121,4 @@
 #define ERROR_506 ERROR_WARNING, (-506), ("Should be configured with a public address because it is configured as NAT outside")
 #define ERROR_507 ERROR_WARNING, (-507), ("Disabled but configured as NAT outside")
 #define ERROR_508 ERROR_WARNING, (-508), ("Disabled but configured as NAT inside")
+#define ERROR_509 ERROR_WARNING, (-509), ("The router is not the default router it advertises")

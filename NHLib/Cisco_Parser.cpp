@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Cisco_Parser.cpp
 
-// CODE REVIEW 2020-08-03 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-08-04 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-08-03 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-08-04 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -619,8 +619,8 @@ namespace Cisco
         assert(NULL != lRouter);
         assert(NULL != lRouter->mCheckList);
 
-        lRouter->mCheckList->Add(new Check_Address(ERROR_WARNING, __LINE__, "The router is not the default router it advertises", lAddr));
-        lRouter->mCheckList->Add(new Check_Reach(ERROR_CONFIG, __LINE__, "Cannot reach a default router", lAddr));
+        lRouter->mCheckList->Add(new Check_Address(ERROR_509, lAddr));
+        lRouter->mCheckList->Add(new Check_Reach(ERROR_254, lAddr));
 
         return true;
     }
