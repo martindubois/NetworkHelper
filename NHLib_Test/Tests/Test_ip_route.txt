@@ -14,7 +14,7 @@ exit
 ! ===== Errors detected at parrsing =========================================
 
 ! TEST INFO Cisco.ip_route
-!           CONFIG ERROR -228.
+!           CONFIG ERROR -228 and -256.
 !           PARSE ERROR -401.
 
 ! >>>>> PARSE ERROR  -401  The command "ip route" must have at least 5 elements
@@ -22,6 +22,9 @@ ip route
 
 ! >>>>> CONFIG ERROR  -228  Route - Invalid next router IPv4 address
 ip route 192.168.10.0 255.255.255.0 0.0.0.1
+
+! >>>>> CONFIG ERROR  -256  Route - The next router cannot be on the destination subnet
+ip route 192.168.30.0 255.255.255.0 192.168.30.2
 
 ! ===== Errors detected at verification =====================================
 

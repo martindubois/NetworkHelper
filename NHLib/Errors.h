@@ -93,6 +93,8 @@
 #define ERROR_255     ERROR_CONFIG, (-255)
 #define ERROR_255_FMT "Useless route because the %s subnet is directly connected"
 
+#define ERROR_256 ERROR_CONFIG, (-256), ("The next router cannot be on the destination subnet")
+
 // ===== FILE ERROR =========================================================
 
 #define ERROR_FILE ("FILE ERROR")

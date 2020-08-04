@@ -4,9 +4,9 @@
 // Product   NetworkHelper
 // File      NHLib/Route.cpp
 
-// CODE REVIEW 2020-07-28 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-08-04 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-28 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-08-04 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -104,7 +104,7 @@ namespace NH
 
         if (aSubNet->Match(aNextRouter))
         {
-            ThrowError(ERROR_CONFIG, __LINE__, "The next router cannot be on the destination subnet");
+            ThrowError(ERROR_256);
         }
 
         mNextRouter = aNextRouter;
