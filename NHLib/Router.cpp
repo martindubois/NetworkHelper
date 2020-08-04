@@ -4,9 +4,9 @@
 // Product    NetworkHelper
 // File       NHLib/Router.cpp
 
-// CODE REVIEW 2020-07-31 KMS - Martin Dubois, P.Eng.
+// CODE REVIEW 2020-08-05 KMS - Martin Dubois, P.Eng.
 
-// TEST COVERAGE 2020-07-31 KMS - Martin Dubois, P.Eng.
+// TEST COVERAGE 2020-08-04 KMS - Martin Dubois, P.Eng.
 
 #include "Component.h"
 
@@ -277,11 +277,11 @@ namespace NH
             {
                 lDestSubNet->GetFullName(lSubNet, sizeof(lSubNet));
 
-                lRet = sprintf_s(lMessage, "Useless route because the %s subnet is directly connected", lSubNet);
+                lRet = sprintf_s(lMessage, ERROR_255_FMT, lSubNet);
                 assert(               0 < lRet);
                 assert(sizeof(lMessage) > lRet);
 
-                DisplayError(ERROR_CONFIG, __LINE__, lMessage);
+                DisplayError(ERROR_255, lMessage);
                 lResult++;
             }
         }

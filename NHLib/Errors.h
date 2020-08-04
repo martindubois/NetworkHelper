@@ -90,6 +90,9 @@
 #define ERROR_253 ERROR_CONFIG, (-253), ("Must be configured using private address because it is configured as NAT inside")
 #define ERROR_254 ERROR_CONFIG, (-254), ("Cannot reach a default router")
 
+#define ERROR_255     ERROR_CONFIG, (-255)
+#define ERROR_255_FMT "Useless route because the %s subnet is directly connected"
+
 // ===== FILE ERROR =========================================================
 
 #define ERROR_FILE ("FILE ERROR")
