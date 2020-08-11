@@ -9,11 +9,15 @@
 ip access-list extended 101 permit udp any 8.8.8.0 0.0.0.255
 ip access-list extended 101 deny udp any 8.8.8.0 0.0.0.255 eq 138
 
-! ===== Parsing and verification errors =====================================
+! ===== Errors detected at parsing and verification =========================
 
-! TEST INFO Access.Error
-!           Parsing error -7, -213, -214, -215, -216, -217, -225, -226, -238, -239, -405 and -406.
-!           Verification error -232, -233, -234 and -235.
+! TEST INFO Cisco.ip_access-list
+!           CONFIG ERROR -213, -214, -215, -216, -217, -226, -238 and -239.
+!           PARSE ERROR -405 and -406.
+!           CONFIG ERROR (Verification) -232, -233, -234 and -235.
+
+! TEST INFO Cisco.permit
+!           CONFIG ERROR -225.
 
 ! >>>>> CONFIG ERROR  -225  "permit" command outside of an "access-list or ip access-list" section
 permit ip any any
@@ -64,6 +68,8 @@ ip access-list extended 109 permit tcp any any invalid
 ! ERROR    -1  File NHLib_Test/Tests/Test_ip_access-list.txt - 12 lines with error
 
 ! ===== Expected error message at verification ==============================
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 8.8.8.0/255.255.255.0
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 8.8.8.0/255.255.255.0
 ! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
 ! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
 ! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.0.0/255.255.255.0
@@ -72,6 +78,8 @@ ip access-list extended 109 permit tcp any any invalid
 ! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.0.0/255.255.255.0
 ! CONFIG ERROR  -235  Router Test_ip_access-list - Cannot reach a host indicated in an access list - 192.168.0.10
 ! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.10.0/255.255.255.0
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.30.0/255.255.255.0
+! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.30.0/255.255.255.0
 ! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.30.0/255.255.255.0
 ! CONFIG ERROR  -234  Router Test_ip_access-list - Cannot reach a subnet indicated in an access list - 192.168.30.0/255.255.255.0
 ! CONFIG ERROR  -233  Access list 101 - Not used
@@ -92,4 +100,4 @@ ip access-list extended 109 permit tcp any any invalid
 ! CONFIG ERROR  -232  Access list 108 - No access rule in the access list
 ! CONFIG ERROR  -233  Access list 109 - Not used
 ! CONFIG ERROR  -232  Access list 109 - No access rule in the access list
-! ERROR    -5  Network - 28 errors
+! ERROR    -5  Network - 31 errors

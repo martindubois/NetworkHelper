@@ -5,4 +5,23 @@ License   https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
 Product   NetworkHelper
 File      _DocUser/NetworkHelper.ReadMe.txt
 
+1.0.1 Beta Windows
+
+- Parse Cisco commands
+	- hostname
+	- interface
+		- no shutdown
+		- sutdown
+	- inteface tunnel
+		- tunnel destination
+		- tunnel source
+	- ip dhcp pool
+		- default-router
+		- dns-server
+	- ip nat pool
+	- ip nat pool inside list
+	- ip routing
+- Verify use of IPv4 reserved address ranges
+- Verify access lists are not empty and used
+
 1.0.0 Beta Windows

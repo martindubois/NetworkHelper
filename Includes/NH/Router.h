@@ -59,13 +59,13 @@ namespace NH
 
         virtual ~Router();
 
-        /// \param aSubNet     The destination subnet
-        /// \param aNextRouter The next router
+        /// \param aDestination The destination subnet
+        /// \param aNextRouter  The next router
         /// \exception std::exception See Route::Route
         void AddRoute(const SubNet * aDestination, uint32_t aNextRouter);
 
-        /// \param aSubNet     The destination subnet
-        /// \param aNextRouter The next router
+        /// \param aDestination The destination subnet
+        /// \param aNextRouter  The next router
         /// \exception std::exception See Route::Route
         void AddRoute(const SubNet * aDestination, const char * aNextRouter);
 

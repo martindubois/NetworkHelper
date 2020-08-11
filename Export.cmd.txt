@@ -6,4 +6,4 @@
 
 Installer .
 # KmsVersion "NetworkHelper_" ".exe" 3
-	NetworkHelper_1.0.0.exe
+	NetworkHelper_1.0.1.exe

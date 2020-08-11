@@ -12,13 +12,13 @@ AppName=NetworkHelper
 AppPublisher=KMS
 AppPublisherURL=http://www.kms-quebec.com
 AppSupportURL=http://www.kms-quebec.com
-AppVersion=1.0.0
+AppVersion=1.0.1
 ArchitecturesAllowed=x64 x86
 ArchitecturesInstallIn64BitMode=x64
 DefaultDirName={pf}\NetworkHelper
 LicenseFile=License.txt
 MinVersion=10.0
-OutputBaseFilename=NetworkHelper_1.0.0
+OutputBaseFilename=NetworkHelper_1.0.1
 OutputDir=Installer
 
 [Files]

@@ -4,7 +4,7 @@
 
 /// \author    KMS - Martin Dubois, P.Eng.
 /// \copyright Copyright &copy; 2020 KMS. All rights reserved.
-/// \file      Includes/NH/NameObject.h
+/// \file      Includes/NH/NamedObject.h
 /// \brief     NH::NamedObject
 
 #pragma once

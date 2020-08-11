@@ -170,7 +170,7 @@ namespace NH
 
         sprintf_s(lMessage, "%s %s - %s", GetObjectType(), lFullName, aMessage);
 
-        Utl_DisplayError(aErrorType, aCode, lMessage);
+        Utl_ThrowError(aErrorType, aCode, lMessage);
     }
 
 }
